@@ -12,9 +12,9 @@ let pos1 = 0,
   pos3 = 0,
   pos4 = 0;
 
-function dragMouseDown(e, _el) {
+function dragMouseDown(e) {
   console.log("dragMouseDown");
-  const el = e.target.parentElement;
+  const el = e.currentTarget.parentElement;
   if (!el) {
     console.log("el eempty");
     return;
@@ -106,7 +106,7 @@ export default class Window extends React.Component {
           className={styles["window-container-header"]}
           id={this.navId}
           onMouseDown={(e) => {
-            dragMouseDown(e, this.winElem);
+            dragMouseDown(e);
           }}
         >
           <ul className={styles["button-container"]}>

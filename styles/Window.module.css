@@ -19,6 +19,15 @@
   top: 0;
   left: 0;
   background-color: #3c3a38;
+  cursor: move; /* fallback if grab cursor is unsupported */
+    cursor: grab;
+    cursor: -moz-grab;
+    cursor: -webkit-grab;
+}
+.window-container-header:active {
+  cursor: grabbing;
+    cursor: -moz-grabbing;
+    cursor: -webkit-grabbing;
 }
 .window-title {
   font-weight: 500;
