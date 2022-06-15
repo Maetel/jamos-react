@@ -6,14 +6,26 @@ const winCmdMap: { [key: string]: (props) => JSX.Element } = {
   testwindow: TestWindow,
 };
 
-const windows = ["testwindow"];
-
 export default function Windows(props) {
+  let [windows, setWindows] = useState(["testwindow"]);
   return (
     <div className={styles.container}>
-      {windows.map((winname, i) =>
-        React.createElement(winCmdMap[winname], { key: i })
-      )}
+      <button
+        className="add"
+        onClick={() => {
+          setWindows([...windows, "testwindosw"]);
+        }}
+      >
+        add test
+      </button>
+      {windows
+        .filter((winname) => {
+          console.error("No such element : ", winname);
+          return !!winCmdMap[winname];
+        })
+        .map((winname, i) =>
+          React.createElement(winCmdMap[winname], { key: i })
+        )}
     </div>
   );
 }
