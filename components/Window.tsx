@@ -5,14 +5,14 @@ import { clamp, randomId } from "../scripts/utils";
 import styles from "../styles/Window.module.css";
 
 const onCloseBtn = (e) => {};
-const onMaximizeBtn = (e) => {};
+const onMaximizeBtn = (e: any) => {};
 
 let pos1 = 0,
   pos2 = 0,
   pos3 = 0,
   pos4 = 0;
 
-function dragMouseDown(e) {
+function dragMouseDown(e: any) {
   console.log("dragMouseDown");
   const el = e.currentTarget.parentElement;
   if (!el) {
@@ -35,7 +35,7 @@ function dragMouseDown(e) {
   };
 }
 
-function elementDrag(e, el) {
+function elementDrag(e: any, el: HTMLElement) {
   if (!el) {
     return;
   }
@@ -66,7 +66,7 @@ function elementDrag(e, el) {
   // Updater.rect("left", `${offsetLeft}px`);
 }
 
-function closeDragElement(el) {
+function closeDragElement(el: HTMLElement) {
   /* stop moving when mouse button is released:*/
   document.onmouseup = null;
   document.onmousemove = null;
@@ -116,7 +116,9 @@ export default class Window extends React.Component {
           </ul>
           <span className={styles["window-title"]}>Window</span>
         </div>
-        <div className={styles["content-container"]}>{this.props.children}</div>
+        <div className={styles["content-container"]}>
+          {(this.props as any).children}
+        </div>
       </section>
     );
   }
