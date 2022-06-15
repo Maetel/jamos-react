@@ -1,6 +1,4 @@
 import React, { ReactElement, useEffect, useState } from "react";
-import { Window } from "../components/Window";
-import { randomId } from "../scripts/utils";
 import styles from "../styles/Windows.module.css";
 import TestWindow from "../windows/TestWindow";
 
