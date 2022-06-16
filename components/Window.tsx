@@ -6,14 +6,12 @@ import { useAppDispatch } from "../app/hooks";
 import ProcMgr from "../features/procmgr/ProcMgr";
 import { setActiveWindow } from "../features/procmgr/procSlice";
 import Process from "../features/procmgr/ProcTypes";
+import { addError } from "../scripts/Path";
 import { clamp, randomId } from "../scripts/utils";
 import styles from "../styles/Window.module.css";
 
 const procmgr = ProcMgr.getInstance();
-const setActive = (e, procId) => {
-  // dispatch(setActiveWindow(this.procId));
-  dispatch(setActiveWindow(procId));
-};
+
 const onCloseBtn = (e) => {};
 const onMaximizeBtn = (e: any) => {};
 
@@ -23,10 +21,9 @@ let pos1 = 0,
   pos4 = 0;
 
 function dragMouseDown(e: any) {
-  console.log("dragMouseDown");
   const el = e.currentTarget.parentElement;
   if (!el) {
-    console.log("el eempty");
+    addError("el eempty");
     return;
   }
   e = e || window.event;
@@ -94,55 +91,46 @@ function closeDragElement(el: HTMLElement) {
   // win.style.transition = transition;
   // contentElem.classList.remove("dragging");
 }
-export default class Window extends React.Component {
-  private winElem: HTMLElement | undefined;
-  private navElem: HTMLElement | undefined;
-  private winId: string = randomId();
-  private navId: string = randomId();
-  constructor(props: Process) {
-    super(props);
-    this.state = {};
-  }
-  componentDidMount() {
-    this.winElem = document.querySelector(`#${this.winId}`) as HTMLElement;
-    this.navElem = document.querySelector(`#${this.navId}`) as HTMLElement;
-    // console.log("Winelem : ", this.winElem);
-  }
 
-  get procId() {
-    return this.proc.id;
-  }
-  get proc() {
-    return this.props["proc"] as Process;
-  }
+let winElem: HTMLElement | undefined;
+let navElem: HTMLElement | undefined;
+const winId: string = randomId();
+const navId: string = randomId();
 
-  render() {
-    return (
-      <section
-        className={styles["window-container"]}
-        id={this.winId}
+export default function Window(props) {
+  const dispatch = useAppDispatch();
+  const proc: Process = props.proc;
+
+  useEffect(() => {
+    winElem = document.querySelector(`#${winId}`) as HTMLElement;
+    navElem = document.querySelector(`#${navId}`) as HTMLElement;
+  }, []);
+
+  return (
+    <section
+      className={styles["window-container"]}
+      id={winId}
+      onMouseDown={(e) => {
+        dispatch(setActiveWindow(proc.id));
+      }}
+    >
+      <div
+        className={styles["window-container-header"]}
+        id={navId}
         onMouseDown={(e) => {
-          procmgr.setActiveWindow(this.procId);
+          dragMouseDown(e);
         }}
       >
-        <div
-          className={styles["window-container-header"]}
-          id={this.navId}
-          onMouseDown={(e) => {
-            dragMouseDown(e);
-          }}
-        >
-          <ul className={styles["button-container"]}>
-            <li className={styles["btn-close"]} onClick={onCloseBtn} />
-            <li className={styles["btn-minimize"]} />
-            <li className={styles["btn-maximize"]} onClick={onMaximizeBtn} />
-          </ul>
-          <span className={styles["window-title"]}>Window - {this.procId}</span>
-        </div>
-        <div className={styles["content-container"]}>
-          {(this.props as any).children}
-        </div>
-      </section>
-    );
-  }
+        <ul className={styles["button-container"]}>
+          <li className={styles["btn-close"]} onClick={onCloseBtn} />
+          <li className={styles["btn-minimize"]} />
+          <li className={styles["btn-maximize"]} onClick={onMaximizeBtn} />
+        </ul>
+        <span className={styles["window-title"]}>Window - {proc.procId}</span>
+      </div>
+      <div className={styles["content-container"]}>
+        {(props as any).children}
+      </div>
+    </section>
+  );
 }

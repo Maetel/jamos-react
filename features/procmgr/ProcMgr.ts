@@ -66,10 +66,4 @@ export default class ProcMgr{
   }
 
   //엄밀히 따지면 프로세스의 z-index는 별도의 어레이에 매핑되어 관리되는 것이 맞아보인다.
-  public setActiveWindow(procId:string) {
-    if(this.find(procId)?.zIndex==='0'){
-      addLog('Already at the top. id : '+procId);
-    }
-    store.dispatch(setActiveWindow(procId));
-  }
 }

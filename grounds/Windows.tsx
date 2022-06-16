@@ -1,4 +1,6 @@
 import React, { ReactElement, useEffect, useState } from "react";
+import { Provider } from "react-redux";
+import store from "../app/store";
 
 import ProcMgr from "../features/procmgr/ProcMgr";
 import styles from "../styles/Windows.module.css";
@@ -23,24 +25,13 @@ export default function Windows(props) {
       >
         add test
       </button>
-      {/* {windows
-        .filter((winname) => {
-          if (winCmdMap[winname] === undefined) {
-            console.error("No such element : ", winname);
-            return false;
-          }
-
-          return true;
-        })
-        .map((winname, i) =>
-          React.createElement(winCmdMap[winname], { key: i })
-        )} */}
-      {processes.map((proc) =>
-        React.createElement(winCmdMap[proc.comp], {
-          key: proc.id,
-          proc: proc,
-        })
-      )}
+      {processes.map((proc) => (
+        <Provider store={store} key={proc.id}>
+          {React.createElement(winCmdMap[proc.comp], {
+            proc: proc,
+          })}
+        </Provider>
+      ))}
     </div>
   );
 }
