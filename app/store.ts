@@ -1,10 +1,14 @@
 import { configureStore, ThunkAction, Action } from '@reduxjs/toolkit'
 
 import procReducer from '../features/procmgr/procSlice';
+import logReducer from '../features/log/logSlice';
 
 export function makeStore() {
   return configureStore({
-    reducer: { proc: procReducer },
+    reducer: { 
+      proc: procReducer,
+      log: logReducer,
+    },
   })
 }
 
