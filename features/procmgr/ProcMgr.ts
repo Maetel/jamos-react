@@ -1,13 +1,11 @@
-import { useAppDispatch } from "../../app/hooks";
+import { useSelector } from "react-redux";
 import store from "../../app/store";
 
 import {
   addProc,
-  ProcCore,
-  ProcData,
-  Process,
   selectProcesses,
 } from "./procSlice";
+import { ProcCore, ProcData, Process } from "./ProcTypes";
 
 
 export default class ProcMgr{
@@ -26,12 +24,16 @@ export default class ProcMgr{
   public add(procType:string, args:{}={}){
     const _id = this.getId;
     const core = new ProcCore(_id, procType);
-    const datum = new ProcData(_id,args);
+    const datum = new ProcData(_id,{...args, dataId:_id});
     const proc = new Process(core, datum);
-    console.log("Add, proc:",proc);
     store.dispatch(
     addProc(proc));
 
     return this;
+  }
+
+  public get procs(){
+
+    return useSelector(selectProcesses);
   }
 }
