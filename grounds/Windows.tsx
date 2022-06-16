@@ -1,5 +1,6 @@
 import React, { ReactElement, useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
+import ProcMgr from "../features/procmgr/ProcMgr";
 import {
   addProc,
   ProcCore,
@@ -14,7 +15,6 @@ const winCmdMap: { [key: string]: (props) => JSX.Element } = {
 };
 
 export default function Windows(props) {
-  const dispatch = useAppDispatch();
   const processes = useAppSelector(selectProcesses);
 
   let [windows, setWindows] = useState(["testwindow"]);
@@ -24,7 +24,7 @@ export default function Windows(props) {
         className="add"
         onClick={() => {
           // setWindows([...windows, "testwindosw"])
-          dispatch(addProc(new Process(new ProcCore("1", "testwindow"))));
+          ProcMgr.getInstance().add("testwindow");
         }}
       >
         add test

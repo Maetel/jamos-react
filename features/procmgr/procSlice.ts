@@ -14,9 +14,7 @@ export class Process {
   //public core:ProcCore;
   public data:ProcData;
  constructor(public core:ProcCore, data?:ProcData){
-   if(!data){
-     this.data = new ProcData(core.id);
-   }
+   this.data = data || new ProcData(core.id);
  }
 }
 export class ProcCore {
@@ -36,8 +34,8 @@ export class ProcCore {
 }
 export class ProcData {
   static empty(){return new ProcData('')}
-  constructor(public id:string){}
-  [key:string]:any
+  constructor(public id:string, public data:{}={}){}
+  
   isEmpty(){return this.id===''}
 }
 
@@ -59,20 +57,23 @@ export const procSlice = createSlice({
     addProc:(state, action:PayloadAction<Process>)=>{
       const actionId = action.payload.core.id;
 
-      //handle core
       const sameFound = state.procCore.find(core=>core.id===actionId);
       if(sameFound){
         throw new Error("Samd id process found");
       }
-      state.procCore.push(action.payload.core);
 
       //handle data
       const dataFoundIndex = state.procData.findIndex(data=>data.id===actionId);
       if(dataFoundIndex===-1){
-        state.procData.push(action.payload.data);
+      state.procData.push(action.payload.data);
       } else {
-        state.procData[dataFoundIndex] = action.payload.data
+      state.procData[dataFoundIndex] = action.payload.data
       }
+
+      //handle core
+      state.procCore.push(action.payload.core);
+
+      
     },
 
     removeProc:(state, action:PayloadAction<string>)=>{
