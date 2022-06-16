@@ -1,6 +1,7 @@
 import React from "react";
 import { useEffect, useRef, useState } from "react";
 import { render } from "react-dom";
+import Process from "../features/procmgr/ProcTypes";
 import { clamp, randomId } from "../scripts/utils";
 import styles from "../styles/Window.module.css";
 
@@ -89,18 +90,25 @@ export default class Window extends React.Component {
   private navElem: HTMLElement | undefined;
   private winId: string = randomId();
   private navId: string = randomId();
-  constructor(props) {
+  constructor(props: Process) {
     super(props);
     this.state = {};
   }
   componentDidMount() {
     this.winElem = document.querySelector(`#${this.winId}`) as HTMLElement;
     this.navElem = document.querySelector(`#${this.navId}`) as HTMLElement;
-    console.log("Winelem : ", this.winElem);
+    // console.log("Winelem : ", this.winElem);
+  }
+
+  get procId() {
+    return this.proc.id;
+  }
+  get proc() {
+    return this.props["proc"] as Process;
   }
 
   render() {
-    console.log("Window props : ", this.props);
+    // console.log("Window props : ", this.props);
     return (
       <section className={styles["window-container"]} id={this.winId}>
         <div
@@ -115,7 +123,7 @@ export default class Window extends React.Component {
             <li className={styles["btn-minimize"]} />
             <li className={styles["btn-maximize"]} onClick={onMaximizeBtn} />
           </ul>
-          <span className={styles["window-title"]}>Window</span>
+          <span className={styles["window-title"]}>Window - {this.procId}</span>
         </div>
         <div className={styles["content-container"]}>
           {(this.props as any).children}
