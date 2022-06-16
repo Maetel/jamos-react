@@ -37,11 +37,9 @@ export default function Windows(props) {
           React.createElement(winCmdMap[winname], { key: i })
         )} */}
       {processes.map((proc) =>
-        React.createElement(winCmdMap[proc.core.comp], {
-          key: proc.core.id,
-          id: proc.core.id,
-          core: proc.core,
-          data: proc.data,
+        React.createElement(winCmdMap[proc.comp], {
+          key: proc.id,
+          proc: proc,
         })
       )}
     </div>

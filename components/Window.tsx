@@ -100,6 +100,7 @@ export default class Window extends React.Component {
   }
 
   render() {
+    console.log("Window props : ", this.props);
     return (
       <section className={styles["window-container"]} id={this.winId}>
         <div
