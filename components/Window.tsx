@@ -1,10 +1,19 @@
 import React from "react";
 import { useEffect, useRef, useState } from "react";
 import { render } from "react-dom";
+import { useDispatch } from "react-redux";
+import { useAppDispatch } from "../app/hooks";
+import ProcMgr from "../features/procmgr/ProcMgr";
+import { setActiveWindow } from "../features/procmgr/procSlice";
 import Process from "../features/procmgr/ProcTypes";
 import { clamp, randomId } from "../scripts/utils";
 import styles from "../styles/Window.module.css";
 
+const procmgr = ProcMgr.getInstance();
+const setActive = (e, procId) => {
+  // dispatch(setActiveWindow(this.procId));
+  dispatch(setActiveWindow(procId));
+};
 const onCloseBtn = (e) => {};
 const onMaximizeBtn = (e: any) => {};
 
@@ -108,9 +117,14 @@ export default class Window extends React.Component {
   }
 
   render() {
-    // console.log("Window props : ", this.props);
     return (
-      <section className={styles["window-container"]} id={this.winId}>
+      <section
+        className={styles["window-container"]}
+        id={this.winId}
+        onMouseDown={(e) => {
+          procmgr.setActiveWindow(this.procId);
+        }}
+      >
         <div
           className={styles["window-container-header"]}
           id={this.navId}

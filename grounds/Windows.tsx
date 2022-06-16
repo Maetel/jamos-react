@@ -10,9 +10,8 @@ const winCmdMap: { [key: string]: (props) => JSX.Element } = {
 
 export default function Windows(props) {
   const procmgr = ProcMgr.getInstance();
-  const processes = procmgr.procs;
+  const processes = procmgr.procsInOrder;
 
-  let [windows, setWindows] = useState(["testwindow"]);
   return (
     <div className={styles.container}>
       <button

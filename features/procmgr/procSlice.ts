@@ -28,7 +28,29 @@ export const procSlice = createSlice({
 
     removeProc:(state, action:PayloadAction<string>)=>{
       state.procs.filter(proc=>proc.id!==action.payload)
-    }
+    },
+
+    increaseIndices:(state, action:PayloadAction<null>)=>{
+      state.procs.forEach(proc=>{
+        proc.zIndex = ''+(parseInt(proc.zIndex)+1);
+        return proc
+      })
+    },
+
+    setActiveWindow:(state, action:PayloadAction<string>)=>{
+      const proc = state.procs.find(proc=>proc.id===action.payload)
+      if(!proc){
+        throw new Error(`setActiveWindow. could not find procId : ${action.payload}`);
+      }
+      const axis = parseInt(proc.zIndex);
+      state.procs.forEach(proc=>{
+        const idx = parseInt(proc.zIndex);
+        if(idx < axis){
+          proc.zIndex = ''+(idx+1);
+        }
+      })
+      proc.zIndex = '0';
+    },
   }
 })
 
@@ -37,6 +59,9 @@ export const selectProcessById = createSelector([state=>state.procs, (state, pro
 })
 
 export const selectProcesses = (state:AppState)=>state.proc.procs;
+export const selectProcInIndexOrder = (state:AppState)=>[...state.proc.procs].sort((l,r)=>{
+  return parseInt(r.zIndex)-parseInt(l.zIndex);
+});
 
 export default procSlice.reducer;
-export const { addProc, removeProc} = procSlice.actions
+export const { addProc, removeProc, increaseIndices, setActiveWindow} = procSlice.actions
