@@ -2,7 +2,7 @@ import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import store, { AppState } from "../../app/store";
 import Path from "../../scripts/Path";
 import Log from "../log/Log";
-import { Dir, File, Node } from "./FileTypes";
+import { Dir, File, Node, NodeControl } from "./FileTypes";
 
 export interface FileState {
   root:Dir,
@@ -13,7 +13,7 @@ const initialHomePathRefined = new Path(initialHomePath);
 const initialHome:Dir = {
   dirs:[],
   files:[],
-  node: new Node(new Path(initialHomePath), 'dir')
+  node: NodeControl.build(initialHomePath,'dir')
 };
 const initialState :FileState = {
   root:{...initialHome},
@@ -32,15 +32,15 @@ const bfs = (dir:Dir, query:Path)=>{
   if(!dir){
     return undefined;
   }
-  if(dir.node.path.isSame(query)){
+  if(Path.areSame(dir.node.path, query.path)){
     return dir;
   }
-  return bfs(dir.dirs.reduce((prev,dir)=>{
+  return bfs(dir.dirs.reduce((prev,_dir)=>{
     if(prev!==undefined){
       return prev;
     }
-    if(dir.node.path.isSame(query)){
-      return dir;
+    if(Path.areSame(_dir.node.path, query.path)){
+      return _dir;
     }
     return undefined;
   },undefined), query);
@@ -81,7 +81,7 @@ const fileSlice = createSlice({
         }
 
         const newDir: Dir = {
-          node: new Node(new Path(path), "dir"),
+          node: NodeControl.build(path, 'dir'),
           dirs: [],
           files: [],
         };
@@ -122,10 +122,10 @@ export const selectFiles = (state:AppState)=>{
       return retval;
 };
 export const selectDir = createSelector([state=>state.file.dirs, (state, path:string)=>path], (dirs:Dir[], path:string)=>{
-  return dirs.find(dir=>dir.node.path.isSame(new Path(path)))
+  return dirs.find(dir=>Path.areSame(dir.node.path,path))
 })
 export const selectFile = createSelector([state=>state.file.files, (state, path:string)=>path], (files:File[], path:string)=>{
-  return files.find(file=>file.node.path.isSame(new Path(path)))
+  return files.find(file=>Path.areSame(file.node.path, path))
 })
 
 

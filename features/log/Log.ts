@@ -2,8 +2,8 @@ import store from "../../app/store";
 import {log, warn, error, system, addLog} from "./logSlice";
 
 export default class Log {
-  static obj(obj:any) {
-    console.log('[log]',obj);
+  static obj(obj:any,msg?:string) {
+    console.log(`[log]${msg?msg+':':''}`,obj);
     store.dispatch(log(JSON.stringify(obj)));
   }
 

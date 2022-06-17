@@ -1,43 +1,40 @@
 import Path from "../../scripts/Path";
+import Log from "../log/Log";
 
-export class Node {
-  public id: string;
-  public exeCmd: string;
-  public iconPath: string;
-  public args : {} = {};
+export interface Node {
+  id: string,
+  path:string,
+  type:string,
+  exeCmd: string,
+  iconPath: string,
+  data : {},
+}
+
+export class NodeControl {
+  public static build(path:string, type:string, exeCmd?:string, iconPath?:string, data?:{}) {
+    return {
+      id :type + path,
+      path:path,
+      type:type,
+      exeCmd:exeCmd|| this._setDefaultCmd(new Path(path), type),
+      iconPath : iconPath || this._setDefaultIcon(type),
+      data: data || {},
+    }
+  }
+
   public static fromString(str: string) {
-    const parsed = JSON.parse(str);
-    return new Node(new Path(parsed.path), parsed.type)
-      .setCmd(parsed.exeCmd)
-      .setIconPath(parsed.iconPath);
-  }
-  public toString = (): string => {
-    return JSON.stringify({
-      path: this.path.path,
-      type: this.type,
-      exeCmd: this.exeCmd,
-      iconPath: this.iconPath,
-    });
+    try {
+      return <Node>JSON.parse(str)
+    } catch (error) {
+      Log.error(error);
+      return undefined;
+    }
+  } 
+  public static toString = (node:Node): string => {
+    return JSON.stringify(node);
   };
-  constructor(public path: Path, public type: string) {
-    this.id = type + path.path;
-    this.exeCmd = this._setDefaultCmd(path, type);
-    this.iconPath = this._setDefaultIcon(type);
-  }
-  public setCmd(cmd: string, args?:{}) {
-    this.exeCmd = cmd;
-    if(args){this.setArgs(args)};
-    return this;
-  }
-  public setArgs(args:{}){
-    this.args = {...args};
-    return this;
-  }
-  public setIconPath(path: string) {
-    this.iconPath = path;
-    return this;
-  }
-  private _setDefaultIcon(type: string) {
+  
+  private static _setDefaultIcon(type: string) {
     let retval = "/imgs/icon-default.svg";
     switch (type) {
       case "text":
@@ -70,7 +67,7 @@ export class Node {
     }
     return retval;
   }
-  private _setDefaultCmd(path: Path, type: string): string {
+  private static _setDefaultCmd(path: Path, type: string): string {
     let retval = type;
     switch (type) {
       case "dir":
@@ -85,13 +82,10 @@ export class Node {
     }
     return retval;
   }
-  isSame(rhs: Node) {
-    return this.id === rhs.id;
+  public static isSame(lhs:Node, rhs: Node) {
+    return lhs.id === rhs.id;
   }
 
-  get parent() {
-    return this.path.parent;
-  }
 } //!Node
 
 export interface FileData {
@@ -143,7 +137,7 @@ export function FileToString(file: File): string {
 export function StringToFile(str: string): File {
   const parsed = JSON.parse(str);
   const file = <File>{
-    node: Node.fromString(parsed.node),
+    node: NodeControl.fromString(parsed.node),
     data: parsed.data ? JSON.parse(parsed.data) : {},
   };
   return file;

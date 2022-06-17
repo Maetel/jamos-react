@@ -100,6 +100,9 @@ export default class Path {
   public isSame(rhs: Path) {
     return this.path === rhs.path;
   }
+  public static areSame(lhs:string, rhs:string){
+    return new Path(lhs).isSame(new Path(rhs));
+  }
   public copied() {
     return new Path(this.path);
   }

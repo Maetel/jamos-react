@@ -1,6 +1,7 @@
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 import Window from "../components/Window";
 import { mkdir, selectDirs, selectHome } from "../features/file/fileSlice";
+import { Dir } from "../features/file/FileTypes";
 import Log from "../features/log/Log";
 import { selectLogAll, selectLogSystem } from "../features/log/logSlice";
 import Process from "../features/procmgr/ProcTypes";
@@ -13,11 +14,23 @@ export default function TestWindow(props) {
   const home = useAppSelector(selectHome);
   const dirs = useAppSelector(selectDirs);
   const addFile = (e) => {
-    Log.obj(home);
-    Log.obj(dirs);
     dispatch(mkdir("~/hi/ho"));
-    // Log.obj(home);
-    // Log.obj(dirs);
+  };
+
+  const DirView = (dir: Dir) => {
+    return (
+      <div style={{ marginLeft: 10 }} className="dir-container">
+        * {dir.node.path} <br></br>
+        Dirs :{dir.dirs.map((dir) => DirView(dir))}
+        <br></br>
+        Files :
+        <ul>
+          {dir.files.map((file) => (
+            <li>{file.node.path}</li>
+          ))}
+        </ul>
+      </div>
+    );
   };
 
   return (
@@ -28,6 +41,8 @@ export default function TestWindow(props) {
         <button className="addfile" onClick={addFile}>
           add file
         </button>
+        Dirs: <br></br>
+        {DirView(home)}
       </div>
     </Window>
   );
