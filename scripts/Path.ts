@@ -24,8 +24,9 @@ export default class Path {
   // assumes that all paths begin with '~/', which is home
   // removes '.' and '..'
   static calcNetPath(path: string): string {
-    const paths = path.split(Path.splitter);
-    if (!paths.at(0) || paths.at(0) === ".." || paths.at(0).length === 0) {
+    const paths:Array<string> = path.split(Path.splitter);
+    const first = paths[0];
+    if (!first || first === ".." || first.length === 0) {
       addError(
         "First argument of path cannot be (..) nor empty @Commands.calcNetPath"
       );
@@ -35,7 +36,7 @@ export default class Path {
       return path;
     }
     for (let i = 1; i < paths.length; ++i) {
-      const val = paths.at(i);
+      const val = paths[i];
       if (val !== "..") {
         continue;
       }
@@ -74,7 +75,7 @@ export default class Path {
       .join(Path.splitter);
     this.path = Path.calcNetPath(refinedPrimary);
     this.paths = this.path.split(Path.splitter);
-    this.last = this.paths.at(this.paths.length - 1);
+    this.last = this.paths[this.paths.length - 1];
     this.parentArray = this.paths.slice(0, this.paths.length - 1);
     this.parent = this.paths
       .slice(0, this.paths.length - 1)
@@ -106,3 +107,4 @@ export default class Path {
     return this.path.startsWith(rhs.path);
   }
 }
+Path.prototype.toString = function pathToString(){return this.path};

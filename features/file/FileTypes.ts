@@ -1,4 +1,4 @@
-import Path from "./Path";
+import Path from "../../scripts/Path";
 
 export class Node {
   public id: string;
@@ -92,7 +92,7 @@ export class Node {
   get parent() {
     return this.path.parent;
   }
-}
+} //!Node
 
 export interface FileData {
   params?: {};
