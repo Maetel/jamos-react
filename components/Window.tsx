@@ -1,11 +1,15 @@
 import React from "react";
 import { useEffect, useRef, useState } from "react";
-import { render } from "react-dom";
+import ReactDOM, { render } from "react-dom";
 import { useDispatch } from "react-redux";
-import { useAppDispatch } from "../app/hooks";
+import { useAppDispatch, useAppSelector } from "../app/hooks";
 import ProcMgr from "../features/procmgr/ProcMgr";
-import { setActiveWindow } from "../features/procmgr/procSlice";
-import Process from "../features/procmgr/ProcTypes";
+import {
+  selectProcProp,
+  setActiveWindow,
+  setProcProps,
+} from "../features/procmgr/procSlice";
+import Process, { Rect } from "../features/procmgr/ProcTypes";
 import { addError } from "../scripts/Path";
 import { clamp, randomId } from "../scripts/utils";
 import styles from "../styles/Window.module.css";
@@ -100,11 +104,49 @@ const navId: string = randomId();
 export default function Window(props) {
   const dispatch = useAppDispatch();
   const proc: Process = props.proc;
+  const rect: Rect = useAppSelector(selectProcProp(proc.id, "rect"));
 
+  const buildStyle = (rect: Rect, id: string) => {
+    const retval = {};
+    // console.log(`Buildstyle from id:${id}, rect : ${JSON.stringify(rect)}`);
+    for (let key in rect) {
+      retval[key] = rect[key];
+    }
+    return retval;
+  };
+  const dispatchRect = () => {
+    const s = getComputedStyle(winElem);
+    const retval: Rect = {
+      top: s.top,
+      left: s.left,
+      width: s.width,
+      height: s.height,
+    };
+    dispatch(
+      setProcProps({
+        id: proc.id,
+        props: {
+          rect: retval,
+        },
+      })
+    );
+
+    console.log("dispatchRect :", retval);
+    return retval;
+  };
+  const style = buildStyle(rect, proc.id);
+
+  let effectCalled = 1;
   useEffect(() => {
+    console.log("Use effect called :", effectCalled++);
     winElem = document.querySelector(`#${winId}`) as HTMLElement;
     navElem = document.querySelector(`#${navId}`) as HTMLElement;
+    if (winElem) {
+      // dispatchRect();
+    }
   }, []);
+
+  // console.log(ReactDOM.findDOMNode(this.refs.container));
 
   return (
     <section
@@ -113,12 +155,16 @@ export default function Window(props) {
       onMouseDown={(e) => {
         dispatch(setActiveWindow(proc.id));
       }}
+      style={style}
     >
       <div
         className={styles["window-container-header"]}
         id={navId}
         onMouseDown={(e) => {
           dragMouseDown(e);
+        }}
+        onMouseUp={(e) => {
+          dispatchRect();
         }}
       >
         <ul className={styles["button-container"]}>

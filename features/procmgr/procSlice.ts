@@ -2,7 +2,7 @@ import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import type { AppState, AppThunk } from '../../app/store'
 
 
-import Process from "./ProcTypes";
+import Process, { Rect } from "./ProcTypes";
 
 
 export interface ProcState {
@@ -37,6 +37,17 @@ export const procSlice = createSlice({
       })
     },
 
+    setProcProps:(state, action:PayloadAction<{id:string,props:{}}>)=>{
+      const proc = state.procs.find(proc=>proc.id===action.payload.id)
+      
+      if(proc){
+        // console.log("set prop : ", action.payload.props)
+        for(let key in action.payload.props){
+          proc[key] = action.payload.props[key];
+        }
+      }
+    },
+
     setActiveWindow:(state, action:PayloadAction<string>)=>{
       const proc = state.procs.find(proc=>proc.id===action.payload)
       if(!proc){
@@ -51,6 +62,7 @@ export const procSlice = createSlice({
       })
       proc.zIndex = '0';
     },
+
   }
 })
 
@@ -62,6 +74,11 @@ export const selectProcesses = (state:AppState)=>state.proc.procs;
 export const selectProcInIndexOrder = (state:AppState)=>[...state.proc.procs].sort((l,r)=>{
   return parseInt(r.zIndex)-parseInt(l.zIndex);
 });
+export const selectProcProp = (id:string,prop:string)=>(state:AppState)=>{
+  const proc = state.proc.procs.find(proc=>proc.id===id)
+  // console.log(`selctProcProc id:${id}, proc:`,proc);
+  return proc?.[prop]
+}
 
 export default procSlice.reducer;
-export const { addProc, removeProc, increaseIndices, setActiveWindow} = procSlice.actions
+export const { addProc, removeProc, increaseIndices, setActiveWindow,setProcProps} = procSlice.actions
