@@ -82,7 +82,7 @@ export default class Path {
       .join(Path.splitter);
   }
   // does not include '~/'
-  get subPaths() {
+  get subPaths():Path[] {
     const subPaths = [];
     //calc subpaths
     for (let i = 0; i < this.paths.length; ++i) {

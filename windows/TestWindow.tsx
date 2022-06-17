@@ -1,6 +1,12 @@
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 import Window from "../components/Window";
-import { mkdir, selectDirs, selectHome } from "../features/file/fileSlice";
+import {
+  mkdir,
+  selectDir,
+  selectDirs,
+  selectFile,
+  selectHome,
+} from "../features/file/fileSlice";
 import { Dir } from "../features/file/FileTypes";
 import Log from "../features/log/Log";
 import { selectLogAll, selectLogSystem } from "../features/log/logSlice";
@@ -13,20 +19,23 @@ export default function TestWindow(props) {
   const system = useAppSelector(selectLogSystem);
   const home = useAppSelector(selectHome);
   const dirs = useAppSelector(selectDirs);
+  const dir = useAppSelector(selectDir("~/hi/ho"));
+  // const f = useAppSelector(selectFile("f"));
   const addFile = (e) => {
     dispatch(mkdir("~/hi/ho"));
+    Log.obj(dirs, "Dirs");
   };
 
-  const DirView = (dir: Dir) => {
+  const DirView = (dir: Dir, key = 0) => {
     return (
-      <div style={{ marginLeft: 10 }} className="dir-container">
+      <div style={{ marginLeft: 10 }} className="dir-container" key={key}>
         * {dir.node.path} <br></br>
-        Dirs :{dir.dirs.map((dir) => DirView(dir))}
+        Dirs :{dir.dirs.map((dir, i) => DirView(dir, i))}
         <br></br>
         Files :
         <ul>
-          {dir.files.map((file) => (
-            <li>{file.node.path}</li>
+          {dir.files.map((file, i) => (
+            <li key={i}>{file.node.path}</li>
           ))}
         </ul>
       </div>
@@ -43,6 +52,9 @@ export default function TestWindow(props) {
         </button>
         Dirs: <br></br>
         {DirView(home)}
+        <br></br>
+        select dir : <br></br>
+        {JSON.stringify(dir)}
       </div>
     </Window>
   );

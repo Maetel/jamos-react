@@ -1,4 +1,6 @@
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { dir } from "console";
+import { WritableDraft } from "immer/dist/internal";
 import store, { AppState } from "../../app/store";
 import Path from "../../scripts/Path";
 import Log from "../log/Log";
@@ -28,26 +30,23 @@ const _verifyPath = (path:string)=>{
   return true;
 }
 
-const bfs = (dir:Dir, query:Path)=>{
-  if(!dir){
-    return undefined;
+const bfsDir = (from:WritableDraft<Dir>|Dir, to:string):WritableDraft<Dir>|Dir=>{
+  if(Path.areSame(from.node.path, to)){
+    return from;
   }
-  if(Path.areSame(dir.node.path, query.path)){
-    return dir;
-  }
-  return bfs(dir.dirs.reduce((prev,_dir)=>{
-    if(prev!==undefined){
-      return prev;
-    }
-    if(Path.areSame(_dir.node.path, query.path)){
-      return _dir;
-    }
-    return undefined;
-  },undefined), query);
+  return from.dirs.map(dir=>bfsDir(dir, to)).filter(dir=>dir!==undefined).at(0);
 }
 
-const findDir = (state, path:string):Dir|undefined=>{
-  return bfs(state.root, new Path(path));
+//slice internal use only
+const findDir = (state:WritableDraft<FileState>, path:string):Dir|undefined=>{
+  // return bfsDir(state.root, new Path(path));
+  const query = new Path(path);
+  const dir = state.root;
+  if(!dir || query.isEmpty){
+    return undefined;
+  }
+
+  return bfsDir(dir, path);
 }
 
 const log = console.log;
@@ -58,16 +57,10 @@ const fileSlice = createSlice({
     mkdir:(state,action:PayloadAction<string>)=>{
       const _path = action.payload;
       
-      if(0)
-      {
-        debugger;
-        findDir(state, '~/');
-      }
-
       const _mkdir = (path:string)=>{
         const refined = new Path(path);
         if(!_verifyPath(path)){
-          log(`Path must not begin with '${initialHomePath}'`);
+          log(`Path must begin with '${initialHomePath}'`);
           return false;
         }
         if(findDir(state, path)){
@@ -76,7 +69,7 @@ const fileSlice = createSlice({
         }
         const parentPath = new Path(path).parent;
         if(!findDir(state, parentPath)){
-          log("Parent not found. making parent path:"+ parentPath)
+          //make parent recursively
           _mkdir(parentPath);
         }
 
@@ -121,13 +114,15 @@ export const selectFiles = (state:AppState)=>{
   selectRecursively(root);
       return retval;
 };
-export const selectDir = createSelector([state=>state.file.dirs, (state, path:string)=>path], (dirs:Dir[], path:string)=>{
-  return dirs.find(dir=>Path.areSame(dir.node.path,path))
-})
-export const selectFile = createSelector([state=>state.file.files, (state, path:string)=>path], (files:File[], path:string)=>{
-  return files.find(file=>Path.areSame(file.node.path, path))
+
+export const selectDir = (path:string)=>((state:AppState)=>{
+  return bfsDir(state.file.root, path);
 })
 
+export const selectFile = (path:string)=>((state:AppState)=>{
+
+  return bfsDir(state.file.root, path)?.files.filter(file=>Path.areSame(file.node.path, path))
+})
 
 ////////////////////////
 
