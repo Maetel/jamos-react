@@ -5,14 +5,17 @@ import { randomId } from "../scripts/utils";
 import PromptTextView from "../components/PromptTextView";
 import Path from "../scripts/Path";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
-import { selectDir, selectFile } from "../features/file/fileSlice";
+import { mkdir, selectDir, selectFile } from "../features/file/fileSlice";
 import ProcMgr from "../features/procmgr/ProcMgr";
 import { Provider } from "react-redux";
 import store from "../app/store";
 import React from "react";
+import PromptTableView, { TableData } from "../components/PromptTableView";
 
 const viewMap = {
   PromptTextView: PromptTextView,
+  PromptTableView: PromptTableView,
+  // PromptGridView: PromptGridView,
 };
 
 interface PromptItem {
@@ -39,8 +42,8 @@ export default function (props) {
   const [cmdValue, setCmdValue] = useState("");
 
   const dispatch = useAppDispatch();
-  const findFile = (path) => useAppSelector(selectFile(path));
-  const findDir = (path) => useAppSelector(selectDir(path));
+  const findFile = (path: string) => useAppSelector(selectFile(path));
+  const findDir = (path: string) => useAppSelector(selectDir(path));
 
   const pwd = new Path("~/");
 
@@ -64,15 +67,25 @@ export default function (props) {
       },
     };
   };
-  const _add = (item: PromptItem, addLine = true) => {
-    item.id = "" + itemId++; //randomId();
-    if (addLine) {
-      setPromptItems([item, lineElem(), ...promptItems]);
-      return;
-    }
-    setPromptItems([item, ...promptItems]);
+  const addLine = () => {
+    _add(lineElem());
   };
-  const addText = (prom: string, line: boolean = true, type?: string) => {
+  const _add = (item: PromptItem) => {
+    item.id = "" + itemId++; //randomId();
+    setPromptItems((promptItems) => [item, ...promptItems]);
+    console.log("_add, item :", item);
+  };
+  const addWarn = (prom: string) => {
+    addText(prom, "warn");
+  };
+  const addError = (prom: string) => {
+    addText(prom, "error");
+  };
+
+  const addSuccess = (prom: string) => {
+    addText(prom, "okay");
+  };
+  const addText = (prom: string, type?: string) => {
     const data = {
       text: prom,
     };
@@ -83,7 +96,95 @@ export default function (props) {
       comp: "PromptTextView",
       data: data,
     };
-    _add(textItem, line);
+
+    _add(textItem);
+  };
+  const addHelp = () => {
+    const titleAndApps: TableData = {
+      title: "JamOS Terminal Commands",
+      desc: `- Applications, [optional] <required>`,
+      heads: ["App Name", "Description"],
+      rows: [
+        ["about", "About JamOS🍞"],
+        ["bakery", "Let's begin from here"],
+        ["terminal", "CLI interface that can control JamOS"],
+        ["finder [$path]", "displays and interacts with directories and files"],
+        ["notepad [$path]", "easy and simple text editor"],
+        ["markdown [$path]", "markdown editor and viewer"],
+        ["browser [$url]", "JamBrowser"],
+        ["broom", "close all process"],
+        ["settings", "open user settings"],
+        ["styler", "JamOS Styler"],
+        ["atelier", "Interactive canvas with generative art"],
+      ],
+    };
+    const terminalCmds: TableData = {
+      desc: "- Terminal Commands",
+      heads: ["Command Name", "Description"],
+      rows: [
+        ["ls [$path]", "list all directories and files"],
+        ["cd <$path>", "goes to the path"],
+        ["mkdir <$path>", "makes directories recursively to the path"],
+        [
+          "touch <$path>",
+          "makes a file in text mode and creates directories to the file",
+        ],
+        ["cat <$path>", "reads a text file"],
+        ["rm <$path>", "removes a file"],
+        ["rmdir <$path>", "removes a directory recursively"],
+        ["clear", "clears prompt"],
+        ["get <$url>", "sends get request to url"],
+        ["whoami", "shows your username"],
+        ["maximize", "toggle window maximize"],
+        ["quit, exit", "quits this terminal"],
+        ["ps", "process list"],
+      ],
+    };
+
+    const systemCmds: TableData = {
+      desc: `- System commands, or dev/beta apps`,
+      heads: ["App Name", "Description"],
+      rows: [
+        ["savebread", "save current status"],
+        ["loadbread", "load saved"],
+        ["resetbread", "reset all data and settings and reboot"],
+        ["get <$url>", "<DEV> send get request and display response"],
+        ["postman", "<DEV> send request and receive response"],
+        [
+          "logger",
+          "<DEV>A logger watches over the whole OS and displays changes",
+        ],
+        [
+          "hub",
+          "<To be updated> where you can create and share your bread with your friends.",
+        ],
+        ["mv <$path:from> <$path:to>", "<To be updated>moves a file"],
+        ["cp <$path:from> <$path:to>", "<To be updated>copies a file"],
+      ],
+    };
+
+    titleAndApps.rows.sort();
+    terminalCmds.rows.sort();
+
+    const appItem: PromptItem = {
+      comp: "PromptTableView",
+      data: { tableData: titleAndApps },
+    };
+    const terminalItem: PromptItem = {
+      comp: "PromptTableView",
+      data: { tableData: terminalCmds },
+    };
+    const systemCmdItem: PromptItem = {
+      comp: "PromptTableView",
+      data: { tableData: systemCmds },
+    };
+    addLine();
+    addText(" End of help");
+    _add(systemCmdItem);
+    addText(" ");
+    _add(terminalItem);
+    addText(" ");
+    _add(appItem);
   };
 
   /////////// main handlers
@@ -110,11 +211,287 @@ export default function (props) {
 
     if (cmd.startsWith("./")) {
       const app = Path.join(pwd.path, cmd.slice(2));
-      if (findFile(app)) {
+      if (findFile(app.path)) {
         procmgr.exeFile(app);
         addText("Execute " + app.last);
         return;
       }
+    }
+    switch (cmd) {
+      case "atelier":
+      case "postman":
+      case "terminal":
+      case "logger":
+      case "markdown":
+      case "bakery":
+      case "broom":
+      case "about":
+      case "styler":
+      case "settings":
+        procmgr.add(cmd);
+        break;
+      case "notepad":
+        if (merged.length === 0) {
+          procmgr.add("notepad");
+        } else {
+          console.log(merged);
+          procmgr.add("notepad", { path: mergedFilePath.path });
+        }
+        break;
+      case "viewer":
+        if (merged.length === 0) {
+          addWarn("Path required for image viewer.");
+          break;
+        }
+
+        procmgr.add("viewer", { path: mergedFilePath.path });
+        break;
+      case "cp":
+      case "mv":
+        addWarn("To be updated soon");
+        break;
+
+      case "mkdir":
+        if (!merged) {
+          addWarn("Path required");
+          return;
+        }
+        dispatch(mkdir(mergedFilePath.path));
+        if (!findDir(mergedFilePath.path)) {
+          addError(`Failed to make directory at ${merged}`);
+          return;
+        }
+        addSuccess(`Successfully made directory at ${merged}`);
+        break;
+
+      // case "get":
+      //   dest = merged;
+      //   if (!dest || dest.length === 0) {
+      //     addWarn("Path required for get request");
+      //     return;
+      //   }
+      //   addText("Get request to " + dest);
+      //   const res = await axios
+      //     .get(dest)
+      //     .then((response) => response.data)
+      //     .catch((err) => {
+      //       console.log(err);
+      //       addError(err);
+      //       return;
+      //     });
+
+      //   addText("Fetched data : " + JSON.stringify(res));
+      //   break;
+
+      // case "touch":
+      //   if (!merged) {
+      //     addWarn("Path required");
+      //     return;
+      //   }
+      //   if (!filemgr.touch(mergedFilePath.path, "text")) {
+      //     addError(`Failed to make file at ${merged}`);
+      //     return;
+      //   }
+      //   addSuccess(`Successfully made file at ${merged}`);
+      //   break;
+
+      // case "rm":
+      //   if (!merged) {
+      //     addWarn("Path required");
+      //     return;
+      //   }
+      //   const rmf = findFile(mergedFilePath);
+      //   if (!rmf) {
+      //     addError("No file! " + mergedFilePath.path);
+      //     if (findDir(mergedFilePath)) {
+      //       addWarn("If you want to remove a directory, use 'rmdir'.");
+      //     }
+      //     return;
+      //   }
+      //   if (filemgr.rm(mergedFilePath)) {
+      //     addText("File removed");
+      //   } else {
+      //     addWarn("Failed to remove file");
+      //   }
+      //   return;
+      // case "savebread":
+      // case "loadbread":
+      // case "resetbread":
+      //   let forceAction = false;
+      //   if (merged === "-f") {
+      //     forceAction = true;
+      //   }
+      //   procmgr.exeCmd(cmd, { force: forceAction });
+      //   return;
+      // case "rmdir":
+      //   if (!merged) {
+      //     addWarn("Path required");
+      //     return;
+      //   }
+      //   if (!filemgr.findDirValue(mergedFilePath)) {
+      //     addError("No directory! " + mergedFilePath.path);
+      //     return;
+      //   }
+      //   const info = filesInDirectory(filemgr.findDirValue(mergedFilePath));
+      //   focusout();
+      //   procmgr.openModal({
+      //     title: "Remove directory",
+      //     descs: [
+      //       `Directory ${mergedFilePath.path} and its files will be removed,`,
+      //       `which contains ${info.totalDirs} directories and ${info.totalFiles} files.`,
+      //     ],
+      //     buttons: ["Remove", "Cancel"],
+      //     callbacks: [
+      //       () => {
+      //         // procmgr.modalResult = { result: "remove" };
+      //         if (filemgr.rmdir(mergedFilePath)) {
+      //           addText("Directory removed");
+      //         } else {
+      //           addWarn(
+      //             `Failed to remove directory. ${
+      //               mergedFilePath.isHome ? 'Directory was "home".' : ""
+      //             }`
+      //           );
+      //         }
+      //         procmgr.closeModal();
+      //         {
+      //           console.log("InputELem focus");
+      //           inputElem.focus();
+      //         }
+      //       },
+      //       () => {
+      //         // procmgr.modalResult = { result: "cancel" };
+      //         addWarn("Canceled.");
+      //         procmgr.closeModal();
+      //         console.log("InputELem focus");
+      //         inputElem.focus();
+      //       },
+      //     ],
+      //   });
+
+      //   return;
+      // case "ls":
+      //   //join path if exists
+      //   const dir = filemgr.lsValue(mergedFilePath);
+      //   if (!dir) {
+      //     addError(`No directory : ${mergedFilePath.path}`);
+      //     break;
+      //   }
+      //   const buildPromptGridGroups = (dir: Dir): PromptItem => {
+      //     const item: PromptItem = {
+      //       comp: "PromptGridView",
+      //       data: { pwd: dir.node.path, groups: <PromptFileViewGroup[]>[] },
+      //     };
+
+      //     const groups: PromptFileViewGroup[] = [];
+      //     const _dirs: PromptFileViewGroup = {
+      //       type: "Directory",
+      //       // color: "#27e8a7",
+      //       color: _colors["1"],
+      //       items: [],
+      //     };
+      //     const _apps: PromptFileViewGroup = {
+      //       type: "Application",
+      //       // color: "#add7ff",
+      //       color: _colors["1"],
+      //       items: [],
+      //     };
+      //     const _texts: PromptFileViewGroup = {
+      //       type: "Text file",
+      //       // color: "#dbdbdb",
+      //       color: _colors["1"],
+      //       items: [],
+      //     };
+      //     dir.dirs.forEach((_) => {
+      //       _dirs.items.push(_.node.path.last + "/");
+      //     });
+      //     dir.files.forEach((_) => {
+      //       if (_.node.type === "text") {
+      //         _texts.items.push(_.node.path.last);
+      //         return;
+      //       }
+      //       _apps.items.push("./" + _.node.path.last);
+      //     });
+      //     const pushIfExists = (arr) => {
+      //       if (arr.items.length) {
+      //         item.data["groups"].push(arr);
+      //       }
+      //     };
+      //     pushIfExists(_dirs);
+      //     pushIfExists(_apps);
+      //     pushIfExists(_texts);
+
+      //     return item;
+      //   };
+
+      //   _add(buildPromptGridGroups(dir));
+      //   break;
+      // case "ps":
+      //   addPs();
+
+      //   break;
+      // case "cd":
+      //   if (!merged) {
+      //     addWarn("Path required");
+      //     return;
+      //   }
+      //   if (!filemgr.findDirValue(mergedFilePath)) {
+      //     addError(`Directory '${mergedFilePath.path}' does not exist `);
+      //     return;
+      //   }
+      //   pwd.set(mergedFilePath);
+      //   break;
+      // case "cat":
+      //   dest = cmds.slice(1).join(" ");
+      //   if (!dest) {
+      //     addWarn("cat : path required");
+      //     return;
+      //   }
+      //   const textpath = Path.join(pwd.path, dest);
+      //   const f = filemgr.findFile(textpath);
+      //   if (!f) {
+      //     addError(`File : '${f.node.path.path}' does not exist `);
+      //     return;
+      //   }
+      //   if (f.node.type !== "text") {
+      //     addError(`${textpath.path} is not a text file!`);
+      //     return;
+      //   }
+      //   addText((f.data as any)?.text);
+      //   break;
+      // case "finder":
+      //   dest = Path.join(pwd.path, cmds.at(1)).path;
+      //   procmgr.add("finder", { path: dest });
+      //   break;
+      // case "browser":
+      //   dest = cmds.at(1) || "";
+      //   procmgr.add("browser", { path: dest });
+      //   break;
+      // case "whoami":
+      //   addText(username);
+      //   break;
+
+      // //Terminal commands
+      // case "pwd":
+      //   addText(`${pwd.path}`);
+      //   break;
+      // case "clear":
+      //   clearPrompt();
+      //   break;
+      case "help":
+        console.log("terminal help");
+        addHelp();
+        break;
+      // case "exit":
+      // case "quit":
+      //   closeWindow();
+      //   break;
+      // case "maximize":
+      //   maximizeWindow();
+      //   break;
+      default:
+        addError("No command : " + cmds.join(" "));
+        break;
     }
   };
 
@@ -176,7 +553,6 @@ export default function (props) {
               value={cmdValue}
               onChange={(e) => {
                 setCmdValue(e.target.value);
-                console.log("setcmdvalue, cmdavlue:", cmdValue);
               }}
               onKeyDown={handleKeydown}
             />
@@ -187,7 +563,7 @@ export default function (props) {
           return (
             <Provider store={store} key={i}>
               {React.createElement(viewMap[item.comp], {
-                ...item,
+                ...item.data,
               })}
             </Provider>
           );

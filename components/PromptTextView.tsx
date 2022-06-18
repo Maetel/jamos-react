@@ -24,8 +24,7 @@ const styles = {
 
 export default function PromptTextView(props) {
   const TextElem = (props) => {
-    console.log("Text elem. props : ", props);
-    if (!props?.data?.text) {
+    if (!props.text) {
       return;
     }
     return (
@@ -44,7 +43,7 @@ export default function PromptTextView(props) {
     );
   };
   const LineElem = (props) => {
-    if (!props?.data?.line) {
+    if (!props.isLine) {
       return;
     }
     return (
