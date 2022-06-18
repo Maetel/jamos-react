@@ -1,4 +1,5 @@
 import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { WritableDraft } from 'immer/dist/internal';
 import type { AppState, AppThunk } from '../../app/store'
 
 
@@ -26,8 +27,24 @@ export const procSlice = createSlice({
       state.procs.push(action.payload);
     },
 
-    removeProc:(state, action:PayloadAction<string>)=>{
-      state.procs.filter(proc=>proc.id!==action.payload)
+    killProc:(state, action:PayloadAction<string>)=>{
+      const inputId = action.payload;
+      const found = state.procs.find(proc=>proc.id===inputId);
+      if(!found){
+        return;
+      }
+      const axis = parseInt(found.zIndex);
+      state.procs = state.procs.map(
+        proc=>{
+          if(parseInt(proc.zIndex) > axis){
+            proc.zIndex = ''+(parseInt(proc.zIndex)-1);
+          }
+          return proc;
+        }
+      ).filter(proc=>proc.id !== inputId);
+    },
+    killAllProcs:(state, action:PayloadAction<void>)=>{
+      state.procs = [];
     },
 
     increaseIndices:(state, action:PayloadAction<null>)=>{
@@ -62,8 +79,10 @@ export const procSlice = createSlice({
       })
       proc.zIndex = '0';
     },
+    
+  },
 
-  }
+  
 })
 
 export const selectProcessById = createSelector([state=>state.procs, (state, procId:string)=>procId], (procs,procId)=>{
@@ -81,4 +100,4 @@ export const selectProcProp = (id:string,prop:string)=>(state:AppState)=>{
 }
 
 export default procSlice.reducer;
-export const { addProc, removeProc, increaseIndices, setActiveWindow,setProcProps} = procSlice.actions
+export const { addProc, killProc, killAllProcs, increaseIndices, setActiveWindow,setProcProps} = procSlice.actions

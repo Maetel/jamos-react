@@ -9,7 +9,7 @@ import styles from "../styles/Logger.module.css";
 
 export default function TestWindow(props) {
   const proc: Process = props.proc;
-  const logs = useAppSelector(selectLogAll).reverse();
+  const logs = [...useAppSelector(selectLogAll)].reverse();
 
   const procs = useAppSelector(selectProcesses);
   return (

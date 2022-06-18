@@ -8,12 +8,14 @@ import styles from "../styles/Windows.module.css";
 import TestWindow from "../windows/TestWindow";
 import Logger from "../windows/Logger";
 import { useAppDispatch } from "../app/hooks";
-import { setProcProps } from "../features/procmgr/procSlice";
+import { killAllProcs, setProcProps } from "../features/procmgr/procSlice";
 import { Rect } from "../features/procmgr/ProcTypes";
+import Terminal from "../windows/Terminal";
 
 const winCmdMap: { [key: string]: (props) => JSX.Element } = {
   testwindow: TestWindow,
   logger: Logger,
+  terminal: Terminal,
 };
 
 export default function Windows(props) {
@@ -25,6 +27,10 @@ export default function Windows(props) {
     left: "5%",
     width: "90%",
     height: "90%",
+  };
+
+  const killAll = (e) => {
+    dispatch(killAllProcs());
   };
 
   return (
@@ -55,6 +61,9 @@ export default function Windows(props) {
         }}
       >
         setrect
+      </button>
+      <button className="killall" onClick={killAll}>
+        kill all
       </button>
       {processes.map((proc) => (
         <Provider store={store} key={proc.id}>

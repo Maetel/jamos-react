@@ -3,8 +3,10 @@ import { useEffect, useRef, useState } from "react";
 import ReactDOM, { render } from "react-dom";
 import { useDispatch } from "react-redux";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
+import Log from "../features/log/Log";
 import ProcMgr from "../features/procmgr/ProcMgr";
 import {
+  killProc,
   selectProcProp,
   setActiveWindow,
   setProcProps,
@@ -16,7 +18,6 @@ import styles from "../styles/Window.module.css";
 
 const procmgr = ProcMgr.getInstance();
 
-const onCloseBtn = (e) => {};
 const onMaximizeBtn = (e: any) => {};
 
 let pos1 = 0,
@@ -96,12 +97,21 @@ function closeDragElement(el: HTMLElement) {
   // contentElem.classList.remove("dragging");
 }
 
-let winElem: HTMLElement | undefined;
-let navElem: HTMLElement | undefined;
-const winId: string = randomId();
-const navId: string = randomId();
-
 export default function Window(props) {
+  let winElem: HTMLElement | undefined;
+  let navElem: HTMLElement | undefined;
+  const winId: string = randomId();
+  const navId: string = randomId();
+  let effectCalled = 1;
+  useEffect(() => {
+    // console.log("Use effect called :", effectCalled++);
+    winElem = document.querySelector(`#${winId}`) as HTMLElement;
+    navElem = document.querySelector(`#${navId}`) as HTMLElement;
+    if (winElem) {
+      // dispatchRect();
+    }
+  });
+
   const dispatch = useAppDispatch();
   const proc: Process = props.proc;
   const rect: Rect = useAppSelector(selectProcProp(proc.id, "rect"));
@@ -122,29 +132,25 @@ export default function Window(props) {
       width: s.width,
       height: s.height,
     };
-    dispatch(
-      setProcProps({
-        id: proc.id,
-        props: {
-          rect: retval,
-        },
-      })
-    );
+    const payload = {
+      id: proc.id,
+      props: {
+        rect: retval,
+      },
+    };
+    dispatch(setProcProps(payload));
 
-    console.log("dispatchRect :", retval);
+    // console.log("dispatchRect :", payload);
     return retval;
   };
-  const style = buildStyle(rect, proc.id);
 
-  let effectCalled = 1;
-  useEffect(() => {
-    console.log("Use effect called :", effectCalled++);
-    winElem = document.querySelector(`#${winId}`) as HTMLElement;
-    navElem = document.querySelector(`#${navId}`) as HTMLElement;
-    if (winElem) {
-      // dispatchRect();
-    }
-  }, []);
+  const dispatchCloseWindow = () => {
+    Log.log(`Kill proc:` + proc.id);
+    dispatch(killProc(proc.id));
+  };
+  const onCloseBtn = dispatchCloseWindow;
+
+  const style = buildStyle(rect, proc.id);
 
   // console.log(ReactDOM.findDOMNode(this.refs.container));
 
@@ -153,6 +159,10 @@ export default function Window(props) {
       className={styles["window-container"]}
       id={winId}
       onMouseDown={(e) => {
+        if ((e.target as HTMLElement).classList.contains("btn-close")) {
+          onCloseBtn();
+          return;
+        }
         dispatch(setActiveWindow(proc.id));
       }}
       style={style}
@@ -168,7 +178,10 @@ export default function Window(props) {
         }}
       >
         <ul className={styles["button-container"]}>
-          <li className={styles["btn-close"]} onClick={onCloseBtn} />
+          <li
+            className={`${styles["btn-close"]} btn-close`}
+            onClick={onCloseBtn}
+          />
           <li className={styles["btn-minimize"]} />
           <li className={styles["btn-maximize"]} onClick={onMaximizeBtn} />
         </ul>
