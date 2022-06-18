@@ -8,7 +8,11 @@ import styles from "../styles/Windows.module.css";
 import TestWindow from "../windows/TestWindow";
 import Logger from "../windows/Logger";
 import { useAppDispatch } from "../app/hooks";
-import { killAllProcs, setProcProps } from "../features/procmgr/procSlice";
+import {
+  addProc,
+  killAllProcs,
+  setProcProps,
+} from "../features/procmgr/procSlice";
 import { Rect } from "../features/procmgr/ProcTypes";
 import Terminal from "../windows/Terminal";
 
@@ -64,6 +68,14 @@ export default function Windows(props) {
       </button>
       <button className="killall" onClick={killAll}>
         kill all
+      </button>
+      <button
+        className="addterminal"
+        onClick={(e) => {
+          procmgr.add("terminal");
+        }}
+      >
+        terminal
       </button>
       {processes.map((proc) => (
         <Provider store={store} key={proc.id}>

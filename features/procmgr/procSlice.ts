@@ -1,9 +1,10 @@
 import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { WritableDraft } from 'immer/dist/internal';
 import type { AppState, AppThunk } from '../../app/store'
+import ProcMgr from './ProcMgr';
 
 
-import Process, { Rect } from "./ProcTypes";
+import Process, { ProcessCommands, Rect } from "./ProcTypes";
 
 
 export interface ProcState {
@@ -19,11 +20,17 @@ export const procSlice = createSlice({
   initialState,
   reducers:{
     addProc:(state, action:PayloadAction<Process>)=>{
+      if(!ProcessCommands.includes(action.payload.comp)){
+        console.error('no such app : ',action.payload.comp)
+        return;
+      }
+
       const actionId = action.payload.id;
       const sameFound = state.procs.find(proc=>proc.id===actionId);
       if(sameFound){
-        throw new Error("Samd id process found");
+        throw new Error("Samd id process found error");
       }
+      
       state.procs.push(action.payload);
     },
 

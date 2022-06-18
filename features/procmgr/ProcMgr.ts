@@ -1,6 +1,7 @@
 import { useSelector } from "react-redux";
 import store from "../../app/store";
-import { addError, addLog } from "../../scripts/Path";
+import Path, { addError, addLog } from "../../scripts/Path";
+import { selectFile } from "../file/fileSlice";
 
 import {
   addProc,
@@ -29,6 +30,42 @@ export default class ProcMgr{
 
   private _prepareNewWindow(){
     store.dispatch(increaseIndices());
+  }
+
+  public exeFile(path: Path, args?: { [key: string]: any }) {
+    
+    const f = selectFile(path.path)?.(store.getState())
+    if (!f) {
+      return;
+    }
+    this.exeCmd(f.node.exeCmd, { ...f.node.data, ...args, node: f.node });
+  }
+
+  public exeCmd(cmds: string, args?: { [key: string]: any }) {
+    const _cmds = cmds.split(" ").filter((cmd) => cmd !== "" && cmd !== " ");
+    const cmdCount = _cmds.length;
+    if (cmdCount === 0) {
+      return;
+    }
+    const cmd = _cmds.at(0);
+    if (cmdCount === 1) {
+      this.add(_cmds.at(0), args);
+      return;
+    }
+
+    //parse commadnds that take path as the rest of the arguments
+    switch (cmd) {
+      case "finder":
+      case "notepad":
+      case "markdown":
+      case "browser":
+      case "viewer":
+        const path = _cmds.slice(1).join(" ");
+        this.add(cmd, { path: path, ...args });
+        break;
+      default:
+        break;
+    }
   }
 
   public add(procType:string, args:{}={}){

@@ -121,7 +121,7 @@ export const selectDir = (path:string)=>((state:AppState)=>{
 
 export const selectFile = (path:string)=>((state:AppState)=>{
 
-  return bfsDir(state.file.root, path)?.files.filter(file=>Path.areSame(file.node.path, path))
+  return bfsDir(state.file.root, path)?.files.filter(file=>Path.areSame(file.node.path, path)).at(0);
 })
 
 ////////////////////////
