@@ -64,10 +64,21 @@ export const procSlice = createSlice({
     setProcProps:(state, action:PayloadAction<{id:string,props:{}}>)=>{
       const proc = state.procs.find(proc=>proc.id===action.payload.id)
       
-      if(proc){
-        // console.log("set prop : ", action.payload.props)
-        for(let key in action.payload.props){
-          proc[key] = action.payload.props[key];
+      if(!proc){
+        return;
+      }
+      for(let key in action.payload.props){
+        proc[key] = action.payload.props[key];
+
+        //set along with key
+        switch (key) {
+          case 'rect':
+            const isMaximized = ()=>(proc.rect.width === '100%' && proc.rect.height === '100%') || (proc.rect.width === `${window.innerWidth}px` && proc.rect.height === `${window.innerHeight}px`);
+            proc.isMaximized = isMaximized();
+            break;
+        
+          default:
+            break;
         }
       }
     },
@@ -87,6 +98,37 @@ export const procSlice = createSlice({
       proc.zIndex = '0';
     },
     
+    toggleMaximize:(state, action:PayloadAction<string>)=>{
+      const proc = state.procs.find(proc=>proc.id===action.payload);
+      if(!proc){
+        return;
+      }
+      if(!proc.rect){
+        throw new Error("Win rect must exist");
+      }
+      // console.log(window.innerWidth, ',',window.innerHeight);
+      const isMaximized = ()=>(proc.rect.width === '100%' && proc.rect.height === '100%') || (proc.rect.width === `${window.innerWidth}px` && proc.rect.height === `${window.innerHeight}px`);
+      if(isMaximized()){
+        //restore rect
+        proc.rect = {...proc.prevRect};
+        proc.isMaximized = isMaximized();
+        return;
+      }
+
+      //maximize
+      proc.prevRect = {...proc.rect};
+      const max:Rect = {
+        top:'0%',
+        left:'0%',
+        width:'100%',
+        height:'100%'
+      };
+      for(let key in max){
+        proc['rect'][key] = max[key]
+      }
+      proc.isMaximized = isMaximized();
+    },
+
   },
 
   
@@ -103,8 +145,10 @@ export const selectProcInIndexOrder = (state:AppState)=>[...state.proc.procs].so
 export const selectProcProp = (id:string,prop:string)=>(state:AppState)=>{
   const proc = state.proc.procs.find(proc=>proc.id===id)
   // console.log(`selctProcProc id:${id}, proc:`,proc);
+  console.log("Select proc prop. proc:",proc);
+  console.log("Select proc prop. proc?.[prop]:",proc?.[prop]);
   return proc?.[prop]
 }
 
 export default procSlice.reducer;
-export const { addProc, killProc, killAllProcs, increaseIndices, setActiveWindow,setProcProps} = procSlice.actions
+export const { addProc, killProc, killAllProcs, increaseIndices, setActiveWindow,setProcProps, toggleMaximize} = procSlice.actions

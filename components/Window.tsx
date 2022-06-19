@@ -10,6 +10,7 @@ import {
   selectProcProp,
   setActiveWindow,
   setProcProps,
+  toggleMaximize,
 } from "../features/procmgr/procSlice";
 import Process, { Rect } from "../features/procmgr/ProcTypes";
 import { addError } from "../scripts/Path";
@@ -103,18 +104,27 @@ export default function Window(props) {
   const winId: string = randomId();
   const navId: string = randomId();
   let effectCalled = 1;
-  useEffect(() => {
-    // console.log("Use effect called :", effectCalled++);
+  const setElems = () => {
     winElem = document.querySelector(`#${winId}`) as HTMLElement;
     navElem = document.querySelector(`#${navId}`) as HTMLElement;
+  };
+  useEffect(() => {
+    // console.log("Use effect called :", effectCalled++);
+    setElems();
     if (winElem) {
-      // dispatchRect();
+      dispatchRect();
+      console.log("Dispatch rect");
     }
-  });
+  }, []);
 
   const dispatch = useAppDispatch();
   const proc: Process = props.proc;
   const rect: Rect = useAppSelector(selectProcProp(proc.id, "rect"));
+  console.log("Win rect updated. rect : ", rect);
+  const [prevRect, setPrevRect] = useState({});
+
+  const isMax = useAppSelector(selectProcProp(proc.id, "isMaximized"));
+  console.log("Ismax : ", isMax);
 
   const buildStyle = (rect: Rect, id: string) => {
     const retval = {};
@@ -124,7 +134,10 @@ export default function Window(props) {
     }
     return retval;
   };
-  const dispatchRect = () => {
+  const curRect = () => {
+    if (!winElem) {
+      setElems();
+    }
     const s = getComputedStyle(winElem);
     const retval: Rect = {
       top: s.top,
@@ -132,16 +145,21 @@ export default function Window(props) {
       width: s.width,
       height: s.height,
     };
+    return retval;
+  };
+  const dispatchRect = () => {
+    const _rect = curRect();
     const payload = {
       id: proc.id,
       props: {
-        rect: retval,
+        rect: _rect,
       },
     };
+
     dispatch(setProcProps(payload));
 
-    // console.log("dispatchRect :", payload);
-    return retval;
+    console.log("dispatchRect :", payload);
+    return _rect;
   };
 
   const dispatchCloseWindow = () => {
@@ -152,7 +170,9 @@ export default function Window(props) {
 
   const style = buildStyle(rect, proc.id);
 
-  // console.log(ReactDOM.findDOMNode(this.refs.container));
+  const toggleWindow = (e) => {
+    dispatch(toggleMaximize(proc.id));
+  };
 
   return (
     <section
@@ -183,7 +203,7 @@ export default function Window(props) {
             onClick={onCloseBtn}
           />
           <li className={styles["btn-minimize"]} />
-          <li className={styles["btn-maximize"]} onClick={onMaximizeBtn} />
+          <li className={styles["btn-maximize"]} onClick={toggleWindow} />
         </ul>
         <span className={styles["window-title"]}>Window - {proc.procId}</span>
       </div>

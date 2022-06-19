@@ -58,13 +58,15 @@ export default function PromptTableView(props) {
 
     return (
       <thead>
-        {data.heads.map((head, i) => {
-          return (
-            <th scope="col" key={i}>
-              {head}
-            </th>
-          );
-        })}
+        <tr>
+          {data.heads.map((head, i) => {
+            return (
+              <th scope="col" key={i}>
+                {head}
+              </th>
+            );
+          })}
+        </tr>
       </thead>
     );
   };
@@ -76,26 +78,28 @@ export default function PromptTableView(props) {
     return (
       <table className="table-content">
         <TableHeads {...props} />
-        {data.rows.map((row, i) => {
-          return (
-            <tr className="table-row" key={i}>
-              {row.map((col, j) => {
-                return (
-                  <td
-                    className="table-col"
-                    key={j}
-                    style={{
-                      fontWeight: "300",
-                      padding: "3px 20px",
-                    }}
-                  >
-                    {col}
-                  </td>
-                );
-              })}
-            </tr>
-          );
-        })}
+        <tbody>
+          {data.rows.map((row, i) => {
+            return (
+              <tr className="table-row" key={i}>
+                {row.map((col, j) => {
+                  return (
+                    <td
+                      className="table-col"
+                      key={j}
+                      style={{
+                        fontWeight: "300",
+                        padding: "3px 20px",
+                      }}
+                    >
+                      {col}
+                    </td>
+                  );
+                })}
+              </tr>
+            );
+          })}
+        </tbody>
       </table>
     );
   };

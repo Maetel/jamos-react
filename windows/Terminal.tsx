@@ -1,16 +1,28 @@
 import { useEffect, useState } from "react";
 import Window from "../components/Window";
 import styles from "../styles/Terminal.module.css";
-import { randomId } from "../scripts/utils";
+import { clamp, randomId } from "../scripts/utils";
 import PromptTextView from "../components/PromptTextView";
 import Path from "../scripts/Path";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
-import { mkdir, selectDir, selectFile } from "../features/file/fileSlice";
+import {
+  bfsDir,
+  dirExists,
+  fileExists,
+  mkdir,
+  selectDir,
+  selectFile,
+} from "../features/file/fileSlice";
 import ProcMgr from "../features/procmgr/ProcMgr";
 import { Provider } from "react-redux";
 import store from "../app/store";
 import React from "react";
 import PromptTableView, { TableData } from "../components/PromptTableView";
+import {
+  killProc,
+  setProcProps,
+  toggleMaximize,
+} from "../features/procmgr/procSlice";
 
 const viewMap = {
   PromptTextView: PromptTextView,
@@ -27,6 +39,7 @@ interface PromptItem {
 const procmgr = ProcMgr.getInstance();
 
 export default function (props) {
+  const proc = props.proc;
   /////////// init setup
   let contElem: HTMLElement, inputArea: HTMLElement, inputElem: HTMLElement;
   let contElemId = randomId(),
@@ -38,21 +51,43 @@ export default function (props) {
     inputElem = document.querySelector(`#${inputElemId}`);
   }, []);
 
-  const [cmdUser, setCmdUser] = useState("jam@127.0.0.1");
+  const [username, setUsername] = useState("jam@127.0.0.1");
   const [cmdValue, setCmdValue] = useState("");
 
   const dispatch = useAppDispatch();
-  const findFile = (path: string) => useAppSelector(selectFile(path));
-  const findDir = (path: string) => useAppSelector(selectDir(path));
+  // const findFile = (path: string) => useAppSelector(selectFile(path));
+  // const findDir = (path: string) => useAppSelector(selectDir(path));
 
   const pwd = new Path("~/");
 
   /////////// command history
-  let cmdHistory = [];
-  let cmdHistoryCursor = 0;
+  const [cmdHistory, setCmdHistory] = useState({ hist: [], cursor: 0 });
+  const getCmdValue = (cursor) => cmdHistory.hist.at(cursor) || "";
+  const getCmdCursor = () => cmdHistory.cursor;
   const setNewCmdHistory = (cmd: string) => {
-    cmdHistory.push(cmd);
-    cmdHistoryCursor = cmdHistory.length;
+    setCmdHistory((cmds) => ({
+      hist: [...cmds.hist, cmd],
+      cursor: cmds.hist.length + 1,
+    }));
+  };
+  const cmdHistoryUp = (e) => {
+    e.preventDefault();
+
+    const cursor = clamp(cmdHistory.cursor - 1, 0, cmdHistory.hist.length);
+    setCmdValue(getCmdValue(cursor));
+    setCmdHistory((cmds) => ({
+      hist: cmds.hist,
+      cursor: cursor,
+    }));
+  };
+  const cmdHistoryDown = (e) => {
+    e.preventDefault();
+    const cursor = clamp(cmdHistory.cursor + 1, 0, cmdHistory.hist.length);
+    setCmdValue(getCmdValue(cursor));
+    setCmdHistory((cmds) => ({
+      hist: cmds.hist,
+      cursor: cursor,
+    }));
   };
 
   /////////// Prompt view
@@ -193,7 +228,7 @@ export default function (props) {
   const clearCommand = (e) => {
     e.preventDefault();
     setCmdValue("");
-    cmdHistoryCursor = cmdHistory.length;
+    setCmdHistory((cmds) => ({ hist: cmds.hist, cursor: cmds.hist.length }));
   };
 
   const handleTerminalCmd = async (cmds: string[]) => {
@@ -211,7 +246,7 @@ export default function (props) {
 
     if (cmd.startsWith("./")) {
       const app = Path.join(pwd.path, cmd.slice(2));
-      if (findFile(app.path)) {
+      if (fileExists(app.path)) {
         procmgr.exeFile(app);
         addText("Execute " + app.last);
         return;
@@ -256,10 +291,15 @@ export default function (props) {
           addWarn("Path required");
           return;
         }
+        if (dirExists(mergedFilePath.path)) {
+          addWarn(`Directory '${mergedFilePath.path}' already exists`);
+          break;
+        }
         dispatch(mkdir(mergedFilePath.path));
-        if (!findDir(mergedFilePath.path)) {
+        if (!dirExists(mergedFilePath.path)) {
+          // if (!findDir(mergedFilePath.path)) {
           addError(`Failed to make directory at ${merged}`);
-          return;
+          break;
         }
         addSuccess(`Successfully made directory at ${merged}`);
         break;
@@ -467,28 +507,28 @@ export default function (props) {
       //   dest = cmds.at(1) || "";
       //   procmgr.add("browser", { path: dest });
       //   break;
-      // case "whoami":
-      //   addText(username);
-      //   break;
+      case "whoami":
+        addText(username);
+        break;
 
       // //Terminal commands
-      // case "pwd":
-      //   addText(`${pwd.path}`);
-      //   break;
-      // case "clear":
-      //   clearPrompt();
-      //   break;
+      case "pwd":
+        addText(`${pwd.path}`);
+        break;
+      case "clear":
+        setPromptItems((items) => []);
+        break;
       case "help":
         console.log("terminal help");
         addHelp();
         break;
-      // case "exit":
-      // case "quit":
-      //   closeWindow();
-      //   break;
-      // case "maximize":
-      //   maximizeWindow();
-      //   break;
+      case "exit":
+      case "quit":
+        dispatch(killProc(proc.id));
+        break;
+      case "maximize":
+        dispatch(toggleMaximize(proc.id));
+        break;
       default:
         addError("No command : " + cmds.join(" "));
         break;
@@ -499,9 +539,9 @@ export default function (props) {
     const keyMap = {
       Enter: handleCommand,
       // Tab: autoComplete,
-      // Escape: clearCommand,
-      // ArrowDown: cmdHistoryDown,
-      // ArrowUp: cmdHistoryUp,
+      Escape: clearCommand,
+      ArrowDown: cmdHistoryDown,
+      ArrowUp: cmdHistoryUp,
     };
     keyMap[e.key]?.(e);
   };
@@ -543,7 +583,9 @@ export default function (props) {
         id={contElemId}
       >
         <div className={`${styles.inputArea}`} id={inputAreaId}>
-          <span className={`${styles.inputLabel}`}>{cmdUser}</span>
+          <span className={`${styles.inputLabel}`}>
+            {username} {pwd.last}/
+          </span>
           <span className={`${styles.inputBoxWrapper}`}>
             <textarea
               spellCheck={false}

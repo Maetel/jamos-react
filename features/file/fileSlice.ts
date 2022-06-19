@@ -30,7 +30,7 @@ const _verifyPath = (path:string)=>{
   return true;
 }
 
-const bfsDir = (from:WritableDraft<Dir>|Dir, to:string):WritableDraft<Dir>|Dir=>{
+export const bfsDir = (from:WritableDraft<Dir>|Dir, to:string):WritableDraft<Dir>|Dir=>{
   if(Path.areSame(from.node.path, to)){
     return from;
   }
@@ -120,9 +120,11 @@ export const selectDir = (path:string)=>((state:AppState)=>{
 })
 
 export const selectFile = (path:string)=>((state:AppState)=>{
-
   return bfsDir(state.file.root, path)?.files.filter(file=>Path.areSame(file.node.path, path)).at(0);
 })
+
+export const dirExists = (path: string) =>!!bfsDir(store.getState().file.root, path);
+export const fileExists = (path: string) =>!!bfsDir(store.getState().file.root, new Path(path).parent).files.filter(file=>Path.areSame(file.node.path, path)).at(0);
 
 ////////////////////////
 
