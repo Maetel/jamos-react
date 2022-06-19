@@ -14,6 +14,19 @@ const abbreviate = (path: string) => {
 };
 
 export default function FinderIcon(props) {
+  let contElem: HTMLElement, highElem: HTMLElement, descElem: HTMLElement;
+  let contElemId = randomId(),
+    highElemId = randomId(),
+    descElemId = randomId();
+  const setElems = () => {
+    contElem = document.querySelector(`#${contElemId}`);
+    highElem = document.querySelector(`#${highElemId}`);
+    descElem = document.querySelector(`#${descElemId}`);
+  };
+  useEffect(() => {
+    setElems();
+  }, []);
+
   const procmgr = ProcMgr.getInstance();
   const nodepath: string = props.node.path;
   const node: Node = useAppSelector(selectNode(nodepath));
@@ -29,19 +42,6 @@ export default function FinderIcon(props) {
     borderRadius: width / 2,
   };
   const [hovered, setHovered] = useState(false);
-
-  let contElem: HTMLElement, highElem: HTMLElement, descElem: HTMLElement;
-  let contElemId = randomId(),
-    highElemId = randomId(),
-    descElemId = randomId();
-  const setElems = () => {
-    contElem = document.querySelector(`#${contElemId}`);
-    highElem = document.querySelector(`#${highElemId}`);
-    descElem = document.querySelector(`#${descElemId}`);
-  };
-  useEffect(() => {
-    setElems();
-  }, []);
 
   const hoverIn = () => {
     setHovered(true);
