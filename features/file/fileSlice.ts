@@ -84,6 +84,7 @@ const fileSlice = createSlice({
 
       _mkdir(_path);
     },   
+    
   }
 });
 
@@ -115,9 +116,30 @@ export const selectFiles = (state:AppState)=>{
       return retval;
 };
 
+
+export const selectNode = (path:string)=>((state:AppState)=>{
+  const dir = bfsDir(state.file.root, path);
+  if(dir){
+    return dir.node;
+  }
+  const file = bfsDir(state.file.root, new Path(path).parent).files.find(file=>file.node.path===path);
+  return file?.node;
+})
+
+export const selectNodesInDir = (path:string)=>((state:AppState)=>{
+  const dir = bfsDir(state.file.root, path);
+  if(!dir){
+    return;
+  }
+  const nodes:Node[] = [];
+  dir.dirs.forEach(dir=>{nodes.push(dir.node)});
+  dir.files.forEach(file=>{nodes.push(file.node)});
+  return nodes;
+})
 export const selectDir = (path:string)=>((state:AppState)=>{
   return bfsDir(state.file.root, path);
 })
+
 
 export const selectFile = (path:string)=>((state:AppState)=>{
   return bfsDir(state.file.root, path)?.files.filter(file=>Path.areSame(file.node.path, path)).at(0);

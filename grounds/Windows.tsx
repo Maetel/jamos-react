@@ -39,7 +39,7 @@ export default function Windows(props) {
 
   return (
     <div className={styles.container}>
-      <button
+      {/* <button
         className="add"
         onClick={() => {
           // setWindows([...windows, "testwindosw"])
@@ -76,7 +76,7 @@ export default function Windows(props) {
         }}
       >
         terminal
-      </button>
+      </button> */}
       {processes.map((proc) => (
         <Provider store={store} key={proc.id}>
           {React.createElement(winCmdMap[proc.comp], {
