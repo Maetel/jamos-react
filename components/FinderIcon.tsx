@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useAppSelector } from "../app/hooks";
 import { selectFile, selectNode } from "../features/file/fileSlice";
 import { Node } from "../features/file/FileTypes";
@@ -29,40 +29,22 @@ export default function FinderIcon(props) {
   let contElemId = randomId(),
     highElemId = randomId(),
     descElemId = randomId();
-  const findElems = () => {
-    contElem = contElem ?? document.querySelector(`#${contElemId}`);
-    highElem = highElem ?? document.querySelector(`#${highElemId}`);
-    descElem = descElem ?? document.querySelector(`#${descElemId}`);
+  const setElems = () => {
+    contElem = document.querySelector(`#${contElemId}`);
+    highElem = document.querySelector(`#${highElemId}`);
+    descElem = document.querySelector(`#${descElemId}`);
   };
-  const highElemRef = useRef(null);
   useEffect(() => {
-    findElems();
-    const mouseenter = (e) => {
-      setHovered(true);
-      findElems();
-      contElem.style.overflow = "show";
-    };
-    const mouseleave = (e) => {
-      setHovered(false);
-      findElems();
-      contElem.style.overflow = "hidden";
-    };
-    const elem = highElemRef.current;
-    elem.addEventListener("mouseenter", mouseenter);
-    elem.addEventListener("mouseleave", mouseleave);
-    return () => {
-      elem.removeEventListener("mouseenter", mouseenter);
-      elem.removeEventListener("mouseleave", mouseleave);
-    };
+    setElems();
   }, []);
 
   const procmgr = ProcMgr.getInstance();
   const nodepath: string = props.node.path;
   const node: Node = useAppSelector(selectNode(nodepath));
-  if (!node) {
-    Log.warn("No such file : " + nodepath);
-    return;
-  }
+  // if (!node) {
+  //   Log.warn("No such file : " + nodepath);
+  //   return;
+  // }
   const src: string = node.iconPath;
   const width = 90;
   const imgContainerStyle = {
@@ -72,18 +54,32 @@ export default function FinderIcon(props) {
   };
   const [hovered, setHovered] = useState(false);
 
-  const filename = new Path(node.path).last;
-  //const dispFilename = hovered ? filename : abbreviate(filename);
+  const callHover = (e, hoverIn) => {
+    setHovered(hoverIn);
+    if (!contElem) {
+      setElems();
+    }
+    contElem.style.overflow = hoverIn ? "show" : "hidden";
+  };
 
-  return (
+  const filename = new Path(node.path).last;
+  const dispFilename = hovered ? filename : abbreviate(filename);
+
+  return node ? (
     <div
       className={styles.container}
       id={contElemId}
       onClick={(e) => {
         procmgr.exeFile(new Path(node.path));
       }}
+      onMouseOver={(e) => {
+        callHover(e, true);
+      }}
+      onMouseOut={(e) => {
+        callHover(e, false);
+      }}
     >
-      <span className={styles.highlight} id={highElemId} ref={highElemRef} />
+      <span className={styles.highlight} id={highElemId} />
       <div className={styles.imgContainer} style={imgContainerStyle}>
         <Image
           src={src}
@@ -102,8 +98,8 @@ export default function FinderIcon(props) {
         ></Image>
       </div>
       <div className={styles.desc} id={descElemId}>
-        {hovered ? filename : abbreviate(filename)}
+        {dispFilename}
       </div>
     </div>
-  );
+  ) : undefined;
 }
