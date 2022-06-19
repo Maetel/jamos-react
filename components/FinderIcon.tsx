@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useAppSelector } from "../app/hooks";
 import { selectFile, selectNode } from "../features/file/fileSlice";
@@ -11,6 +12,16 @@ import styles from "../styles/FinderIcon.module.css";
 const abbreviate = (path: string) => {
   const max = 15;
   return path.slice(0, max) + (path.length > max ? "..." : "");
+};
+
+const windowIconStyle = {
+  display: "inline-block",
+  borderRadius: "5px",
+  width: "70%",
+  height: "70%",
+  /* background-color: #dbdbdb; */
+  objectFit: "contain",
+  objectPosition: "center center",
 };
 
 export default function FinderIcon(props) {
@@ -52,7 +63,7 @@ export default function FinderIcon(props) {
   };
 
   const filename = new Path(node.path).last;
-  const dispFilename = hovered ? filename : abbreviate(filename);
+  //const dispFilename = hovered ? filename : abbreviate(filename);
 
   return (
     <div
@@ -61,23 +72,33 @@ export default function FinderIcon(props) {
       onClick={(e) => {
         procmgr.exeFile(new Path(node.path));
       }}
-      onMouseEnter={(e) => {
+      onMouseOver={(e) => {
         callHover(e, true);
       }}
-      onMouseLeave={(e) => {
+      onMouseOut={(e) => {
         callHover(e, false);
       }}
     >
       <span className={styles.highlight} id={highElemId} />
       <div className={styles.imgContainer} style={imgContainerStyle}>
-        <img
+        <Image
           src={src}
           alt={`${node.type} icon of ${node.path}`}
-          className={styles.windowIcon}
-        />
+          style={{
+            display: "inline-block",
+            borderRadius: "5px",
+            // width: "70%",
+            // height: "70%",
+            /* background-color: #dbdbdb; */
+            objectFit: "contain",
+            objectPosition: "center center",
+          }}
+          width={"70%"}
+          height={"70%"}
+        ></Image>
       </div>
       <div className={styles.desc} id={descElemId}>
-        {dispFilename}
+        {hovered ? filename : abbreviate(filename)}
       </div>
     </div>
   );
