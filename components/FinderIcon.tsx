@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useAppSelector } from "../app/hooks";
 import { selectFile, selectNode } from "../features/file/fileSlice";
 import { Node } from "../features/file/FileTypes";
@@ -34,8 +34,26 @@ export default function FinderIcon(props) {
     highElem = highElem ?? document.querySelector(`#${highElemId}`);
     descElem = descElem ?? document.querySelector(`#${descElemId}`);
   };
+  const highElemRef = useRef(null);
   useEffect(() => {
     findElems();
+    const mouseenter = (e) => {
+      setHovered(true);
+      findElems();
+      contElem.style.overflow = "show";
+    };
+    const mouseleave = (e) => {
+      setHovered(false);
+      findElems();
+      contElem.style.overflow = "hidden";
+    };
+    const elem = highElemRef.current;
+    elem.addEventListener("mouseenter", mouseenter);
+    elem.addEventListener("mouseleave", mouseleave);
+    return () => {
+      elem.removeEventListener("mouseenter", mouseenter);
+      elem.removeEventListener("mouseleave", mouseleave);
+    };
   }, []);
 
   const procmgr = ProcMgr.getInstance();
@@ -64,18 +82,8 @@ export default function FinderIcon(props) {
       onClick={(e) => {
         procmgr.exeFile(new Path(node.path));
       }}
-      onMouseOver={(e) => {
-        setHovered(true);
-        findElems();
-        contElem.style.overflow = "hidden";
-      }}
-      onMouseOut={(e) => {
-        setHovered(false);
-        findElems();
-        contElem.style.overflow = "hidden";
-      }}
     >
-      <span className={styles.highlight} id={highElemId} />
+      <span className={styles.highlight} id={highElemId} ref={highElemRef} />
       <div className={styles.imgContainer} style={imgContainerStyle}>
         <Image
           src={src}
