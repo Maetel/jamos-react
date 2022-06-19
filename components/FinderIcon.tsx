@@ -43,19 +43,12 @@ export default function FinderIcon(props) {
   };
   const [hovered, setHovered] = useState(false);
 
-  const hoverIn = () => {
-    setHovered(true);
+  const callHover = (e, hoverIn) => {
+    setHovered(hoverIn);
     if (!contElem) {
       setElems();
     }
-    contElem.style.overflow = "show";
-  };
-  const hoverOut = () => {
-    setHovered(false);
-    if (!contElem) {
-      setElems();
-    }
-    contElem.style.overflow = "hidden";
+    contElem.style.overflow = hoverIn ? "show" : "hidden";
   };
 
   const filename = new Path(node.path).last;
@@ -68,8 +61,12 @@ export default function FinderIcon(props) {
       onClick={(e) => {
         procmgr.exeFile(new Path(node.path));
       }}
-      onMouseEnter={hoverIn}
-      onMouseLeave={hoverOut}
+      onMouseEnter={(e) => {
+        callHover(e, true);
+      }}
+      onMouseLeave={(e) => {
+        callHover(e, false);
+      }}
     >
       <span className={styles.highlight} id={highElemId} />
       <div className={styles.imgContainer} style={imgContainerStyle}>
