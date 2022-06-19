@@ -44,17 +44,17 @@ export default function FinderIcon(props) {
   }, []);
 
   const hoverIn = () => {
+    setHovered(true);
     if (!contElem) {
       setElems();
     }
-    setHovered(true);
     contElem.style.overflow = "show";
   };
   const hoverOut = () => {
+    setHovered(false);
     if (!contElem) {
       setElems();
     }
-    setHovered(false);
     contElem.style.overflow = "hidden";
   };
 
