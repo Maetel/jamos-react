@@ -54,12 +54,6 @@ export default function FinderIcon(props) {
   };
   const [hovered, setHovered] = useState(false);
 
-  const callHover = (e, hoverIn) => {
-    setHovered(hoverIn);
-    findElems();
-    contElem.style.overflow = hoverIn ? "show" : "hidden";
-  };
-
   const filename = new Path(node.path).last;
   //const dispFilename = hovered ? filename : abbreviate(filename);
 
@@ -71,10 +65,14 @@ export default function FinderIcon(props) {
         procmgr.exeFile(new Path(node.path));
       }}
       onMouseOver={(e) => {
-        callHover(e, true);
+        setHovered(true);
+        findElems();
+        contElem.style.overflow = "hidden";
       }}
       onMouseOut={(e) => {
-        callHover(e, false);
+        setHovered(false);
+        findElems();
+        contElem.style.overflow = "hidden";
       }}
     >
       <span className={styles.highlight} id={highElemId} />
