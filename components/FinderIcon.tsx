@@ -29,13 +29,13 @@ export default function FinderIcon(props) {
   let contElemId = randomId(),
     highElemId = randomId(),
     descElemId = randomId();
-  const setElems = () => {
-    contElem = document.querySelector(`#${contElemId}`);
-    highElem = document.querySelector(`#${highElemId}`);
-    descElem = document.querySelector(`#${descElemId}`);
+  const findElems = () => {
+    contElem = contElem ?? document.querySelector(`#${contElemId}`);
+    highElem = highElem ?? document.querySelector(`#${highElemId}`);
+    descElem = descElem ?? document.querySelector(`#${descElemId}`);
   };
   useEffect(() => {
-    setElems();
+    findElems();
   }, []);
 
   const procmgr = ProcMgr.getInstance();
@@ -56,9 +56,7 @@ export default function FinderIcon(props) {
 
   const callHover = (e, hoverIn) => {
     setHovered(hoverIn);
-    if (!contElem) {
-      setElems();
-    }
+    findElems();
     contElem.style.overflow = hoverIn ? "show" : "hidden";
   };
 
