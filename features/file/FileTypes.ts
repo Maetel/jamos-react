@@ -7,7 +7,6 @@ export interface Node {
   type:string,
   exeCmd: string,
   iconPath: string,
-  data : {},
 }
 
 export class NodeControl {

@@ -113,18 +113,15 @@ export default function Window(props) {
     setElems();
     if (winElem) {
       dispatchRect();
-      console.log("Dispatch rect");
     }
   }, []);
 
   const dispatch = useAppDispatch();
   const proc: Process = props.proc;
   const rect: Rect = useAppSelector(selectProcProp(proc.id, "rect"));
-  console.log("Win rect updated. rect : ", rect);
   const [prevRect, setPrevRect] = useState({});
 
   const isMax = useAppSelector(selectProcProp(proc.id, "isMaximized"));
-  console.log("Ismax : ", isMax);
 
   const buildStyle = (rect: Rect, id: string) => {
     const retval = {};
@@ -158,7 +155,6 @@ export default function Window(props) {
 
     dispatch(setProcProps(payload));
 
-    console.log("dispatchRect :", payload);
     return _rect;
   };
 

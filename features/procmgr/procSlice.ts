@@ -144,9 +144,6 @@ export const selectProcInIndexOrder = (state:AppState)=>[...state.proc.procs].so
 });
 export const selectProcProp = (id:string,prop:string)=>(state:AppState)=>{
   const proc = state.proc.procs.find(proc=>proc.id===id)
-  // console.log(`selctProcProc id:${id}, proc:`,proc);
-  console.log("Select proc prop. proc:",proc);
-  console.log("Select proc prop. proc?.[prop]:",proc?.[prop]);
   return proc?.[prop]
 }
 

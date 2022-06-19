@@ -1,7 +1,7 @@
 import { useSelector } from "react-redux";
 import store from "../../app/store";
 import Path, { addError, addLog } from "../../scripts/Path";
-import { selectFile } from "../file/fileSlice";
+import { fileValue, selectFile } from "../file/fileSlice";
 
 import {
   addProc,
@@ -33,12 +33,11 @@ export default class ProcMgr{
   }
 
   public exeFile(path: Path, args?: { [key: string]: any }) {
-    
-    const f = selectFile(path.path)?.(store.getState())
+    const f = fileValue(path.path);
     if (!f) {
       return;
     }
-    this.exeCmd(f.node.exeCmd, { ...f.node.data, ...args, node: f.node });
+    this.exeCmd(f.node.exeCmd, { ...f.data, ...args, node: f.node });
   }
 
   public exeCmd(cmds: string, args?: { [key: string]: any }) {

@@ -84,7 +84,20 @@ const fileSlice = createSlice({
 
       _mkdir(_path);
     },   
-    
+    addFile:(state,action:PayloadAction<File>)=>{
+      const path = action.payload.node.path;
+      const refined = new Path(path);
+      if(!_verifyPath(path)){
+        log(`Path must begin with '${initialHomePath}'`);
+        return;
+      }
+      const parent = findDir(state, refined.parent);
+      if(!parent){
+        log(`Parent directory not found : '${refined.path}'`);
+        return;
+      }
+      parent.files.push(action.payload);
+    }
   }
 });
 
@@ -145,10 +158,16 @@ export const selectFile = (path:string)=>((state:AppState)=>{
   return bfsDir(state.file.root, path)?.files.filter(file=>Path.areSame(file.node.path, path)).at(0);
 })
 
-export const dirExists = (path: string) =>!!bfsDir(store.getState().file.root, path);
-export const fileExists = (path: string) =>!!bfsDir(store.getState().file.root, new Path(path).parent).files.filter(file=>Path.areSame(file.node.path, path)).at(0);
+export const dirValue = (path: string) =>bfsDir(store.getState().file.root, path);
+export const dirExists = (path: string) =>!!dirValue(path);
+
+
+export const fileValue = (path: string) =>bfsDir(store.getState().file.root, new Path(path).parent).files.filter(file=>Path.areSame(file.node.path, path)).at(0);
+export const fileExists = (path:string)=>!!fileValue(path)
+
+
 
 ////////////////////////
 
 export default fileSlice.reducer;
-export const { mkdir } = fileSlice.actions;
+export const { mkdir, addFile } = fileSlice.actions;
