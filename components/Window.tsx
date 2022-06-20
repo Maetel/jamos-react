@@ -115,7 +115,7 @@ export default function Window(props) {
   ////////////////// rect / style / theme
   const [transition, setTransition] = useState("0.3s");
   const themeReadable = SetMgr.getInstance().themeReadable(useAppSelector);
-  console.log("Cur theme name : ", themeReadable.name);
+  // console.log("Cur theme name : ", themeReadable.name);
   const _colors = themeReadable.colors;
   const buildNavStyle = () => {
     return {
@@ -158,7 +158,7 @@ export default function Window(props) {
       retval["backgroundColor"] = _colors["2"];
       retval["boxShadow"] = _colors["boxShadow"];
     }
-    console.log("Buildstyle : ", retval);
+    // console.log("Buildstyle : ", retval);
     return retval;
   };
   const curRect = () => {
@@ -204,9 +204,6 @@ export default function Window(props) {
     dispatch(toggleMaximize(proc.id));
   };
 
-  {
-    console.log("Props.proc : ", props.proc);
-  }
   return (
     <section
       className={styles["window-container"]}

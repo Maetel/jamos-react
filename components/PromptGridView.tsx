@@ -56,7 +56,7 @@ export default function PromptGridView(props) {
                       // bind:this={items[i][j].elem}
                       onClick={(e) => {
                         // console.log("Cmds/j : ", group.cmds, ", ", j);
-                        console.log("Cmd : ", group.cmds?.at(j));
+                        // console.log("Cmd : ", group.cmds?.at(j));
                         if (group.cmds?.at(j)) {
                           ProcMgr.getInstance().exeCmd(group.cmds.at(j));
                         }

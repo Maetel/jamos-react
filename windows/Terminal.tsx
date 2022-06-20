@@ -447,7 +447,7 @@ export default function (props) {
         if (merged.length === 0) {
           procmgr.add("notepad");
         } else {
-          console.log(merged);
+          // console.log(merged);
           procmgr.add("notepad", { path: mergedFilePath.path });
         }
         break;
@@ -753,7 +753,7 @@ export default function (props) {
         setPromptItems((items) => []);
         break;
       case "help":
-        console.log("terminal help");
+        // console.log("terminal help");
         addHelp();
         break;
       case "exit":

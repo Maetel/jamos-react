@@ -5,7 +5,7 @@ import { useState } from "react";
 import ProcMgr from "../features/procmgr/ProcMgr";
 
 export default function Browser(props) {
-  console.log("Browser prsop : ", props);
+  // console.log("Browser prsop : ", props);
   const proc = props.proc;
   const currentPath = proc.path;
   let contentSrc = currentPath ?? "";

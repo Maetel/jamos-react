@@ -19,7 +19,7 @@ const settingsSlice = createSlice({
     setSetting:(state,action:PayloadAction<{}>)=>{
       for (let key in action.payload){
         state[key] = action.payload[key];
-        console.log(`Set setting : ${key} = ${action.payload[key]}`)
+        // console.log(`Set setting : ${key} = ${action.payload[key]}`)
       }
     }
   }
