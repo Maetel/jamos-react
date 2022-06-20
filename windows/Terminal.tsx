@@ -20,6 +20,8 @@ import PromptGridView, {
   PromptFileViewGroup,
 } from "../components/PromptGridView";
 import { Dir } from "../features/file/FileTypes";
+import Log from "../features/log/Log";
+import Commands from "../scripts/CommandParser";
 
 const viewMap = {
   PromptTextView: PromptTextView,
@@ -580,10 +582,14 @@ export default function (props) {
     }
   };
 
+  let tobeset = cmdValue;
   const handleKeydown = (e) => {
     const keyMap = {
       Enter: handleCommand,
-      // Tab: autoComplete,
+      Tab: (e) => {
+        autoComplete(e);
+        setCmdValue(() => tobeset);
+      },
       Escape: clearCommand,
       ArrowDown: cmdHistoryDown,
       ArrowUp: cmdHistoryUp,
@@ -620,6 +626,124 @@ export default function (props) {
     // addText("Command : " + words.join(" "));
     addText(words.join(" "));
   };
+  const commands = new Commands();
+  const autoComplete = (e) => {
+    e.preventDefault();
+    //path auto complete
+    {
+      const detachPwd = (path: string) => {
+        if (!path.startsWith(pwd.path)) {
+          //if input path does not begin with pwd, then return input value untouched
+          return path;
+        }
+        return new Path(path.slice(pwd.path.length)).path;
+      };
+
+      const vals = cmdValue
+        .split(" ")
+        .filter((str) => str !== " " && str !== "");
+      if (!vals.at(0)) {
+        return;
+      }
+      const cmd = vals.at(0);
+      const cmdRequiresPath = [
+        "cd",
+        "ls",
+        "touch",
+        "rm",
+        "rmdir",
+        "mv",
+        "mkdir",
+        "cat",
+        "finder",
+        "notepad",
+        "markdown",
+        "viewer",
+      ];
+      if (cmd.startsWith("./") && cmd.length >= 3 && vals.length === 1) {
+        const input = cmd.slice(2);
+        const pathToInput = Path.join(pwd.path, input);
+        const dir = filemgr.dirValue(new Path(pathToInput.parent).path);
+        if (!dir) {
+          addWarn("Cannot execute : " + cmd);
+          return;
+        }
+        const startWiths = dir.files.filter((file) =>
+          file.node.path.startsWith(pathToInput.path)
+        );
+        if (startWiths.length === 0) {
+          addWarn("No executable : " + cmd);
+          return;
+        }
+        tobeset = `./${detachPwd(startWiths.at(0).node.path)}`;
+
+        return;
+      }
+      if (cmdRequiresPath.includes(cmd) && vals.length === 1) {
+        addWarn(`Add path to interact : ${vals.at(0)} path/to/a/file`);
+        return;
+      }
+      if (cmdRequiresPath.includes(cmd) && vals.length >= 2) {
+        let p = Path.join(pwd.path, vals.at(1));
+        if (vals.at(1) && vals.at(1).startsWith("~/")) {
+          p = new Path(vals.at(1));
+        }
+        Log.log("path : " + p.path + " , parent : " + p.parent);
+        const dir = filemgr.dirValue(p.parent);
+        if (dir) {
+          //auto complete
+          const startsWithsDir: string[] = [];
+          const startsWithsFiles: string[] = [];
+          dir.dirs
+            .filter((node) => node.node.path.startsWith(p.path))
+            .forEach((dir) => startsWithsDir.push(dir.node.path));
+          dir.files
+            .filter((node) => node.node.path.startsWith(p.path))
+            .forEach((file) => startsWithsFiles.push(file.node.path));
+
+          const dirCount = startsWithsDir.length,
+            fileCount = startsWithsFiles.length;
+          if (dirCount + fileCount <= 0) {
+            //no match
+            return;
+          }
+
+          if (dirCount + fileCount === 1) {
+            if (dirCount === 1) {
+              tobeset = `${vals.at(0)} ${detachPwd(startsWithsDir.at(0))}/`;
+              return;
+            }
+            if (fileCount === 1) {
+              tobeset = `${vals.at(0)} ${detachPwd(startsWithsFiles.at(0))}`;
+              return;
+            }
+          }
+          // return directory of shortest first if multiple matches, else file shortest path
+          if (dirCount + fileCount > 1) {
+            if (dirCount > 0) {
+              tobeset = `${vals.at(0)} ${detachPwd(startsWithsDir.at(0))}/`;
+              return;
+            }
+            tobeset = `${vals.at(0)} ${detachPwd(startsWithsFiles.at(0))}`;
+            return;
+          }
+        }
+      }
+    }
+
+    const cmds = commands.autoCompleteCommand(cmdValue);
+    // addLog(cmds);
+    if (cmds.length === 0) {
+      addWarn(`No app begins with : "${cmdValue}"`);
+      return;
+    }
+    if (cmds.length === 1) {
+      Log.log("set auto complete");
+      tobeset = cmds.at(0);
+      return;
+    }
+    addText("Possible commands : " + cmds.join(", "));
+  };
 
   return (
     <Window {...props}>
@@ -634,9 +758,9 @@ export default function (props) {
           </span>
           <span className={`${styles.inputBoxWrapper}`}>
             <textarea
+              className={`${styles.inputBox}`}
               spellCheck={false}
               rows={1}
-              className={`${styles.inputBox}`}
               id={inputElemId}
               value={cmdValue}
               onChange={(e) => {

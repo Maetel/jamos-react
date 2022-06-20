@@ -35,6 +35,9 @@
   /* keep in single line */
   white-space: nowrap;
   overflow: hidden;
+  padding:0;
+  margin:0;
+  padding-left:10px;
 }
 .inputBox::selection {
   color: #333;
