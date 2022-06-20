@@ -5,14 +5,6 @@ import { clamp, randomId } from "../scripts/utils";
 import PromptTextView from "../components/PromptTextView";
 import Path from "../scripts/Path";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
-import {
-  bfsDir,
-  dirExists,
-  fileExists,
-  mkdir,
-  selectDir,
-  selectFile,
-} from "../features/file/fileSlice";
 import ProcMgr from "../features/procmgr/ProcMgr";
 import { Provider } from "react-redux";
 import store from "../app/store";
@@ -23,6 +15,7 @@ import {
   setProcProps,
   toggleMaximize,
 } from "../features/procmgr/procSlice";
+import FileMgr from "../features/file/FileMgr";
 
 const viewMap = {
   PromptTextView: PromptTextView,
@@ -36,9 +29,9 @@ interface PromptItem {
   data: {};
 }
 
-const procmgr = ProcMgr.getInstance();
-
 export default function (props) {
+  const procmgr = ProcMgr.getInstance();
+  const filemgr = FileMgr.getInstance();
   const proc = props.proc;
   /////////// init setup
   let contElem: HTMLElement, inputArea: HTMLElement, inputElem: HTMLElement;
@@ -246,7 +239,7 @@ export default function (props) {
 
     if (cmd.startsWith("./")) {
       const app = Path.join(pwd.path, cmd.slice(2));
-      if (fileExists(app.path)) {
+      if (filemgr.fileExists(app.path)) {
         procmgr.exeFile(app);
         addText("Execute " + app.last);
         return;
@@ -291,12 +284,14 @@ export default function (props) {
           addWarn("Path required");
           return;
         }
-        if (dirExists(mergedFilePath.path)) {
+        if (filemgr.dirExists(mergedFilePath.path)) {
           addWarn(`Directory '${mergedFilePath.path}' already exists`);
           break;
         }
-        dispatch(mkdir(mergedFilePath.path));
-        if (!dirExists(mergedFilePath.path)) {
+
+        // dispatch(mkdir(mergedFilePath.path));
+        filemgr.mkdir(mergedFilePath.path);
+        if (!filemgr.dirExists(mergedFilePath.path)) {
           // if (!findDir(mergedFilePath.path)) {
           addError(`Failed to make directory at ${merged}`);
           break;
@@ -335,25 +330,25 @@ export default function (props) {
       //   addSuccess(`Successfully made file at ${merged}`);
       //   break;
 
-      // case "rm":
-      //   if (!merged) {
-      //     addWarn("Path required");
-      //     return;
-      //   }
-      //   const rmf = findFile(mergedFilePath);
-      //   if (!rmf) {
-      //     addError("No file! " + mergedFilePath.path);
-      //     if (findDir(mergedFilePath)) {
-      //       addWarn("If you want to remove a directory, use 'rmdir'.");
-      //     }
-      //     return;
-      //   }
-      //   if (filemgr.rm(mergedFilePath)) {
-      //     addText("File removed");
-      //   } else {
-      //     addWarn("Failed to remove file");
-      //   }
-      //   return;
+      case "rm":
+        if (!merged) {
+          addWarn("Path required");
+          return;
+        }
+        const rmf = filemgr.fileExists(mergedFilePath.path);
+        if (!rmf) {
+          addError("No file! " + mergedFilePath.path);
+          if (filemgr.dirExists(mergedFilePath.path)) {
+            addWarn("If you want to remove a directory, use 'rmdir'.");
+          }
+          return;
+        }
+        if (filemgr.rm(mergedFilePath.path)) {
+          addText("File removed");
+        } else {
+          addWarn("Failed to remove file");
+        }
+        return;
       // case "savebread":
       // case "loadbread":
       // case "resetbread":

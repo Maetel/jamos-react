@@ -1,6 +1,6 @@
 import store from "../../app/store";
 import Path from "../../scripts/Path";
-import { addFile, dirExists, fileExists, mkdir } from "./fileSlice";
+import { addFile, dirExists, dirValue, fileExists, fileValue, mkdir, rm } from "./fileSlice";
 import type { File } from "./FileTypes";
 
 export default class FileMgr {
@@ -15,12 +15,37 @@ export default class FileMgr {
     return this.instance;
   }
 
+  public fileExists(path:string){
+    return fileExists(path);
+  }
+
+  public fileValue(path:string){
+    return fileValue(path);
+  }
+
+  public ls (path:string){return dirValue(path)}
+  public dirValue(path:string){
+    return dirValue(path);
+  }
+
+  public dirExists(path:string){
+    return dirExists(path);
+  }
+
   public mkdir(path:string){
     if (dirExists(path)) {
       // console.warn(`Directory '${path}' already exists`);
       return true;
     }
     store.dispatch(mkdir(path));
+    return true;
+  }
+
+  public rm(path:string){
+    if(!this.fileExists(path)){
+      return false;
+    }
+    store.dispatch(rm(path));
     return true;
   }
 

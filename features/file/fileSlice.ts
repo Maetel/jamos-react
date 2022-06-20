@@ -38,7 +38,7 @@ export const bfsDir = (from:WritableDraft<Dir>|Dir, to:string):WritableDraft<Dir
 }
 
 //slice internal use only
-const findDir = (state:WritableDraft<FileState>, path:string):Dir|undefined=>{
+const findDir = (state:WritableDraft<FileState>, path:string):WritableDraft<Dir>|Dir=>{
   // return bfsDir(state.root, new Path(path));
   const query = new Path(path);
   const dir = state.root;
@@ -47,6 +47,10 @@ const findDir = (state:WritableDraft<FileState>, path:string):Dir|undefined=>{
   }
 
   return bfsDir(dir, path);
+}
+const findFile = (state:WritableDraft<FileState>, path:string):WritableDraft<File>|File=>{
+  const p = new Path(path);
+  return findDir(state, p.parent)?.files.find(file=>Path.areSame(file.node.path, path))
 }
 
 const log = console.log;
@@ -85,9 +89,9 @@ const fileSlice = createSlice({
       _mkdir(_path);
     },   
     addFile:(state,action:PayloadAction<File>)=>{
-      const path = action.payload.node.path;
-      const refined = new Path(path);
-      if(!_verifyPath(path)){
+      const _path = action.payload.node.path;
+      const refined = new Path(_path);
+      if(!_verifyPath(refined.path)){
         log(`Path must begin with '${initialHomePath}'`);
         return;
       }
@@ -96,7 +100,27 @@ const fileSlice = createSlice({
         log(`Parent directory not found : '${refined.path}'`);
         return;
       }
+      if(parent.files.some(file=>Path.areSame(file.node.path ,refined.path))){
+        log(`File already exists : '${refined.path}'`);
+        return;
+      }
+
+      //then finally add
       parent.files.push(action.payload);
+    },
+    rm : (state,action:PayloadAction<string>)=>{
+      const path = new Path(action.payload);
+      const f = findFile(state, path.path);
+      if(!f){
+        log(`Failed to remove file. No file : '${path.path}'`);
+        return;
+      }
+      //parent dir must exist by here
+      const parent = findDir(state, path.parent);
+      parent.files = parent.files.filter(file=>!Path.areSame(file.node.path, path.path));
+    },
+    rmdir : (state,action:PayloadAction<string>)=>{
+      //pass
     }
   }
 });
@@ -170,4 +194,4 @@ export const fileExists = (path:string)=>!!fileValue(path)
 ////////////////////////
 
 export default fileSlice.reducer;
-export const { mkdir, addFile } = fileSlice.actions;
+export const { mkdir, addFile, rm, rmdir } = fileSlice.actions;
