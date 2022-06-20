@@ -13,19 +13,17 @@ import {
   toggleMaximize,
 } from "../features/procmgr/procSlice";
 import Process, { Rect } from "../features/procmgr/ProcTypes";
+import SetMgr from "../features/settings/SetMgr";
+import officialThemes from "../features/settings/Themes";
 import { addError } from "../scripts/Path";
 import { clamp, randomId } from "../scripts/utils";
 import styles from "../styles/Window.module.css";
-
-const procmgr = ProcMgr.getInstance();
-
-const onMaximizeBtn = (e: any) => {};
 
 let pos1 = 0,
   pos2 = 0,
   pos3 = 0,
   pos4 = 0;
-
+let defaultTransition = "0.3s";
 function dragMouseDown(e: any) {
   const el = e.currentTarget.parentElement;
   if (!el) {
@@ -49,10 +47,6 @@ function dragMouseDown(e: any) {
 }
 
 function elementDrag(e: any, el: HTMLElement) {
-  if (!el) {
-    return;
-  }
-
   e = e || window.event;
   e.preventDefault();
 
@@ -84,16 +78,12 @@ function closeDragElement(el: HTMLElement) {
   document.onmouseup = null;
   document.onmousemove = null;
 
-  if (!el) {
-    return;
-  }
-
   // {
   //   //for store update
   //   Updater.rect("top", winElem.style.top).rect("left", winElem.style.left);
   // }
   //restore transition
-  // winElem.style.transition = maximizeTransition;
+  el.style.transition = defaultTransition;
   // win.style.transition = transition;
   // contentElem.classList.remove("dragging");
 }
@@ -122,6 +112,17 @@ export default function Window(props) {
 
   const isMax = useAppSelector(selectProcProp(proc.id, "isMaximized"));
 
+  ////////////////// rect / style / theme
+  const [transition, setTransition] = useState("0.3s");
+  const themeReadable = SetMgr.getInstance().themeReadable(useAppSelector);
+  console.log("Cur theme name : ", themeReadable.name);
+  const _colors = themeReadable.colors;
+  const buildNavStyle = () => {
+    return {
+      color: _colors["2"],
+      backgroundColor: _colors["1"],
+    };
+  };
   const buildStyle = (rect: Rect, id: string) => {
     const retval = {};
     // console.log(`Buildstyle from id:${id}, rect : ${JSON.stringify(rect)}`);
@@ -149,6 +150,12 @@ export default function Window(props) {
       if (!(retval["width"] | retval["aspectRatio"])) {
         retval["height"] = "70%";
       }
+    }
+
+    //theme
+    {
+      retval["color"] = _colors["1"];
+      retval["backgroundColor"] = _colors["2"];
     }
     console.log("Buildstyle : ", retval);
     return retval;
@@ -186,7 +193,11 @@ export default function Window(props) {
   };
   const onCloseBtn = dispatchCloseWindow;
 
-  const style = buildStyle(rect, proc.id);
+  const contElemStyle = buildStyle(rect, proc.id);
+  const navElemStyle = buildNavStyle();
+  const closeBtnStyle = { backgroundColor: _colors["error"] };
+  const minBtnStyle = { backgroundColor: _colors["warn"] };
+  const maxBtnStyle = { backgroundColor: _colors["okay"] };
 
   const toggleWindow = (e) => {
     dispatch(toggleMaximize(proc.id));
@@ -203,7 +214,7 @@ export default function Window(props) {
         }
         dispatch(setActiveWindow(proc.id));
       }}
-      style={style}
+      style={contElemStyle}
     >
       <div
         className={styles["window-container-header"]}
@@ -214,14 +225,20 @@ export default function Window(props) {
         onMouseUp={(e) => {
           dispatchRect();
         }}
+        style={navElemStyle}
       >
         <ul className={styles["button-container"]}>
           <li
             className={`${styles["btn-close"]} btn-close`}
             onClick={onCloseBtn}
+            style={closeBtnStyle}
           />
-          <li className={styles["btn-minimize"]} />
-          <li className={styles["btn-maximize"]} onClick={toggleWindow} />
+          <li className={styles["btn-minimize"]} style={minBtnStyle} />
+          <li
+            className={styles["btn-maximize"]}
+            onClick={toggleWindow}
+            style={maxBtnStyle}
+          />
         </ul>
         <span className={styles["window-title"]}>Window - {proc.procId}</span>
       </div>

@@ -22,6 +22,11 @@ import PromptGridView, {
 import { Dir } from "../features/file/FileTypes";
 import Log from "../features/log/Log";
 import Commands from "../scripts/CommandParser";
+import SetMgr from "../features/settings/SetMgr";
+import officialThemes, {
+  defaultTheme,
+  themeExists,
+} from "../features/settings/Themes";
 
 const viewMap = {
   PromptTextView: PromptTextView,
@@ -38,6 +43,7 @@ interface PromptItem {
 export default function (props) {
   const procmgr = ProcMgr.getInstance();
   const filemgr = FileMgr.getInstance();
+  const setmgr = SetMgr.getInstance();
   const proc = props.proc;
 
   /////////// init setup
@@ -178,60 +184,152 @@ export default function (props) {
     };
     _add(processItem);
   };
+  // [command, usage, short description, long description]
   const appHelpData = [
-    ["about", "about", "About JamOS🍞"],
-    ["bakery", "bakery", "Let's begin from here"],
-    ["terminal", "terminal", "CLI interface that can control JamOS"],
+    ["about", "about", "About JamOS🍞", "Brief explanation about JamOS."],
+    [
+      "bakery",
+      "bakery",
+      "Appstore for JamOS🍞",
+      `Bakery lets you add and remove apps on your desktop. It's like an appstore for JamOS.`,
+    ],
+    [
+      "terminal",
+      "terminal",
+      "CLI interface that can control JamOS",
+      `Terminal is basically all you need to control the whole OS. You can add/remove files and directories from termianl, and also execute apps. Type 'help' on terminal to get more information.`,
+    ],
     [
       "finder",
       "finder [$path]",
       "displays and interacts with directories and files",
+      `Finder is 'finder' in macOS, and 'explorer' in Windows. You can browse and control files in GUI form.`,
     ],
-    ["notepad", "notepad [$path]", "easy and simple text editor"],
-    ["markdown", "markdown [$path]", "markdown editor and viewer"],
-    ["browser", "browser [$url]", "JamBrowser"],
-    ["broom", "broom", "close all process"],
-    ["settings", "settings", "open user settings"],
-    ["styler", "styler", "JamOS Styler"],
-    ["atelier", "atelier", "Interactive canvas with generative art"],
+    [
+      "notepad",
+      "notepad [$path]",
+      "easy and simple text editor",
+      "easy and simple text editor",
+    ],
+    [
+      "markdown",
+      "markdown [$path]",
+      "markdown editor and viewer",
+      "markdown editor and viewer",
+    ],
+    ["browser", "browser [$url]", "JamBrowser", "JamBrowser"],
+    ["broom", "broom", "close all process", "close all process"],
+    ["settings", "settings", "open user settings", "open user settings"],
+    [
+      "styler",
+      "styler [$style]",
+      "JamOS Styler",
+      `Set theme for JamOS. $style is case insensitive. Current style is [${
+        setmgr.themeValue().name
+      }]. To see possible styles, type 'styler -l'`,
+    ],
+    [
+      "atelier",
+      "atelier",
+      "Interactive canvas with generative art",
+      "Interactive canvas with generative art",
+    ],
   ];
   const terminalHelpData = [
-    ["ls", "ls [$path]", "list all directories and files"],
-    ["cd", "cd <$path>", "goes to the path"],
-    ["mkdir", "mkdir <$path>", "makes directories recursively to the path"],
-    ["cat", "cat <$path>", "reads a text file"],
-    ["rm", "rm <$path>", "removes a file"],
-    ["rmdir", "rmdir <$path>", "removes a directory recursively"],
-    ["clear", "clear", "clears prompt"],
-    ["get", "get <$url>", "sends get request to url"],
-    ["whoami", "whoami", "shows your username"],
-    ["maximize", "maximize", "toggle window maximize"],
-    ["quit", "quit, exit", "quits this terminal"],
-    ["ps", "ps", "process list"],
-    ["kill", "kill <$processId>", "closes process"],
-    ["killall", "killall", "closes all processes"],
+    [
+      "ls",
+      "ls [$path]",
+      "list all directories and files",
+      "list all directories and files",
+    ],
+    [
+      "cd",
+      "cd <$path>",
+      "goes to the path",
+      "Browse in terminal using cd. ex) cd ../../Directory",
+    ],
+    [
+      "mkdir",
+      "mkdir <$path>",
+      "makes directories recursively to the path",
+      "makes directories recursively to the path",
+    ],
+    ["cat", "cat <$path>", "reads a text file", "reads a text file"],
+    ["rm", "rm <$path>", "removes a file", "removes a file"],
+    [
+      "rmdir",
+      "rmdir <$path>",
+      "removes a directory recursively",
+      "removes a directory and all its including directories and files recursively",
+    ],
+    ["clear", "clear", "clears prompt", "clears prompt"],
+    [
+      "get",
+      "get <$url>",
+      "sends get request to url",
+      "sends get request to url",
+    ],
+    ["whoami", "whoami", "shows your username", "shows your username"],
+    [
+      "maximize",
+      "maximize",
+      "toggle window maximize",
+      "toggle window maximize",
+    ],
+    ["quit", "quit, exit", "quits this terminal", "quits this terminal"],
+    ["ps", "ps", "process list", "process list"],
+    ["kill", "kill <$processId>", "closes process", "closes process"],
+    ["killall", "killall", "closes all processes", "closes all processes"],
     [
       "touch",
       "touch <$path>",
-      "makes a file in text mode and creates directories to the file",
+      "makes a file in text mode",
+      "makes a file in text mode and creates directories to the file path",
     ],
   ];
   const systemHelpData = [
-    ["savebread", "savebread", "save current status"],
-    ["loadbread", "loadbread", "load saved"],
-    ["resetbread", "resetbread", "reset all data and settings and reboot"],
-    ["get", "get <$url>", "<DEV> send get request and display response"],
-    ["postman", "postman", "<DEV> send request and receive response"],
+    ["savebread", "savebread", "save current status", "save current status"],
+    ["loadbread", "loadbread", "load saved", "load saved"],
+    [
+      "resetbread",
+      "resetbread",
+      "reset all data and settings and reboot",
+      "reset all data and settings and reboot",
+    ],
+    [
+      "get",
+      "get <$url>",
+      "<DEV> send get request and display response",
+      "<DEV> send get request and display response",
+    ],
+    [
+      "postman",
+      "postman",
+      "<DEV> send request and receive response",
+      "<DEV> send request and receive response",
+    ],
     [
       "logger",
       "logger",
       "<DEV>A logger watches over the whole OS and displays changes",
+      "<DEV>A logger watches over the whole OS and displays changes",
     ],
-    ["mv", "mv <$path:from> <$path:to>", "<To be updated>moves a file"],
-    ["cp", "cp <$path:from> <$path:to>", "<To be updated>copies a file"],
+    [
+      "mv",
+      "mv <$path:from> <$path:to>",
+      "<To be updated>moves a file",
+      "<To be updated>moves a file",
+    ],
+    [
+      "cp",
+      "cp <$path:from> <$path:to>",
+      "<To be updated>copies a file",
+      "<To be updated>copies a file",
+    ],
     [
       "hub",
       "hub",
+      "<To be updated> where you can create and share your bread with your friends.",
       "<To be updated> where you can create and share your bread with your friends.",
     ],
   ];
@@ -304,11 +402,13 @@ export default function (props) {
       const helpDataRowFound = helpdata.find((datum) => datum.at(0) === cmd);
       if (helps.includes(merged.toLowerCase()) && !!helpDataRowFound) {
         const helpTable: TableData = {
-          title: `${cmd} - help page`,
-          desc: `<$var> : var required  [$var] var is optional"`,
+          title: `${cmd} - ${helpDataRowFound[2]}`,
+          desc: `<$var> : var required  [$var] var is optional`,
           // firstColumnColor: _colors["okay"],
           heads: ["Command", "Usage", "Description"],
-          rows: [helpDataRowFound],
+          rows: [
+            [helpDataRowFound[0], helpDataRowFound[1], helpDataRowFound[3]],
+          ],
         };
         const helpItem: PromptItem = {
           comp: "PromptTableView",
@@ -339,7 +439,6 @@ export default function (props) {
       case "bakery":
       case "broom":
       case "about":
-      case "styler":
       case "settings":
         procmgr.add(cmd);
         break;
@@ -350,6 +449,44 @@ export default function (props) {
           console.log(merged);
           procmgr.add("notepad", { path: mergedFilePath.path });
         }
+        break;
+      case "styler":
+        if (merged.length === 0) {
+          procmgr.add("styler");
+          break;
+        }
+        if (["-l", "--l", "-list", "--list"].includes(merged.toLowerCase())) {
+          const buildStylerGrid = (): PromptItem => {
+            const item: PromptItem = {
+              comp: "PromptGridView",
+              data: { groups: [] },
+            };
+
+            const groups: PromptFileViewGroup[] = officialThemes.map((_th) => {
+              const retval: PromptFileViewGroup = {
+                type: _th.name,
+                items: [_th.name],
+                cmds: [`styler ${_th.name}`],
+                color: _th.colors["1"],
+                bgColor: _th.colors["2"],
+              };
+              return retval;
+            });
+            item.data["groups"] = groups;
+            return item;
+          };
+
+          _add(buildStylerGrid());
+          break;
+        }
+        if (!themeExists(merged)) {
+          addWarn(
+            `Theme '${merged}' does not exists. Type 'styler --help' or 'style -h' for more info.`
+          );
+          break;
+        }
+        setmgr.setTheme(merged);
+        addSuccess(`Theme '${merged} applied'`);
         break;
       case "viewer":
         if (merged.length === 0) {
@@ -517,31 +654,37 @@ export default function (props) {
           const groups: PromptFileViewGroup[] = [];
           const _dirs: PromptFileViewGroup = {
             type: "Directory",
-            color: "#27e8a7",
+            // color: "#27e8a7",
             // color: _colors["1"],
             items: [],
+            cmds: [],
           };
           const _apps: PromptFileViewGroup = {
             type: "Application",
-            color: "#add7ff",
+            // color: "#add7ff",
             // color: _colors["1"],
             items: [],
+            cmds: [],
           };
           const _texts: PromptFileViewGroup = {
             type: "Text file",
-            color: "#dbdbdb",
+            // color: "#dbdbdb",
             // color: _colors["1"],
             items: [],
+            cmds: [],
           };
           dir.dirs.forEach((_) => {
             _dirs.items.push(new Path(_.node.path).last + "/");
+            _dirs.cmds.push(_.node.exeCmd);
           });
           dir.files.forEach((_) => {
             if (_.node.type === "text") {
               _texts.items.push(new Path(_.node.path).last);
+              _texts.cmds.push(_.node.exeCmd);
               return;
             }
             _apps.items.push("./" + new Path(_.node.path).last);
+            _apps.cmds.push(_.node.exeCmd);
           });
           const pushIfExists = (arr) => {
             if (arr.items.length) {

@@ -3,6 +3,7 @@ import { configureStore, ThunkAction, Action } from '@reduxjs/toolkit'
 import procReducer from '../features/procmgr/procSlice';
 import logReducer from '../features/log/logSlice';
 import fileReducer from '../features/file/fileSlice';
+import settingsReducer from '../features/settings/settingsSlice';
 
 export function makeStore() {
   return configureStore({
@@ -10,6 +11,7 @@ export function makeStore() {
       proc: procReducer,
       log: logReducer,
       file: fileReducer,
+      settings: settingsReducer,
     },
   })
 }

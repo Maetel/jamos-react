@@ -2,6 +2,7 @@ import { useSelector } from "react-redux";
 import store from "../../app/store";
 import Path, { addError, addLog } from "../../scripts/Path";
 import { dirValue, fileValue, selectFile } from "../file/fileSlice";
+import SetMgr from "../settings/SetMgr";
 
 import {
   addProc,
@@ -75,7 +76,7 @@ public psValue(){
       return;
     }
 
-    //parse commadnds that take path as the rest of the arguments
+    //parse commands with multiple arguments
     switch (cmd) {
       case "finder":
       case "notepad":
@@ -84,6 +85,11 @@ public psValue(){
       case "viewer":
         const path = _cmds.slice(1).join(" ");
         this.add(cmd, { path: path, ...args });
+        break;
+        case "styler":
+          const style = _cmds.slice(1).join(" ");
+          SetMgr.getInstance().setTheme(style);
+        // this.add(cmd, { style: style, ...args });
         break;
       default:
         break;

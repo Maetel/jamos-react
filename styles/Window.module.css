@@ -19,7 +19,7 @@
   height: 30px;
   top: 0;
   left: 0;
-  background-color: #3c3a38;
+  /* background-color: #3c3a38; */
   cursor: move; /* fallback if grab cursor is unsupported */
     cursor: grab;
     cursor: -moz-grab;
@@ -46,7 +46,7 @@
   height: calc(100% - 30px);
   box-sizing: border-box;
   overflow: auto;
-  background-color: #dbdbdb;
+  /* background-color: #dbdbdb; */
 }
 
 .grabbable .window-container {
@@ -98,21 +98,21 @@
   right: 0;
 }
 .btn-close {
-  background-color: #ff605c;
+  /* background-color: #ff605c; */
   width: 10px;
   height: 10px;
   border-radius: 5px;
   cursor: pointer;
 }
 .btn-minimize {
-  background-color: #ffbd44;
+  /* background-color: #ffbd44; */
   width: 10px;
   height: 10px;
   border-radius: 5px;
   cursor: pointer;
 }
 .btn-maximize {
-  background-color: #00ca4e;
+  /* background-color: #00ca4e; */
   width: 10px;
   height: 10px;
   border-radius: 5px;

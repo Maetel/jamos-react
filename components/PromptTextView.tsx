@@ -1,3 +1,5 @@
+import { useAppSelector } from "../app/hooks";
+import SetMgr from "../features/settings/SetMgr";
 const styles = {
   container: {
     position: "relative",
@@ -27,6 +29,18 @@ export default function PromptTextView(props) {
     if (!props.text) {
       return;
     }
+    const setmgr = SetMgr.getInstance();
+    const selector = useAppSelector;
+    const theme = setmgr.themeReadable(selector);
+    const _colors = theme.colors;
+    const textColor = () => {
+      let retval = _colors["1"];
+      const type = props.colorType;
+      if (type) {
+        retval = _colors[type];
+      }
+      return retval;
+    };
     return (
       <div
         className="text"
@@ -35,7 +49,7 @@ export default function PromptTextView(props) {
           lineHeight: "2rem",
           //not compatible in react?
           overflowWrap: "break-word",
-          color: "#333",
+          color: textColor(),
         }}
       >
         &nbsp;&gt;&nbsp;{props.text}

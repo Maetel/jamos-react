@@ -110,7 +110,7 @@ export default function PromptTableView(props) {
       style={{
         position: "relative",
         width: "100%",
-        color: "#333",
+        // color: "#333",
         /* padding-bottom: 10px, */
       }}
     >
