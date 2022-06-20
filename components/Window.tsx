@@ -119,16 +119,38 @@ export default function Window(props) {
   const dispatch = useAppDispatch();
   const proc: Process = props.proc;
   const rect: Rect = useAppSelector(selectProcProp(proc.id, "rect"));
-  const [prevRect, setPrevRect] = useState({});
 
   const isMax = useAppSelector(selectProcProp(proc.id, "isMaximized"));
 
   const buildStyle = (rect: Rect, id: string) => {
     const retval = {};
     // console.log(`Buildstyle from id:${id}, rect : ${JSON.stringify(rect)}`);
-    for (let key in rect) {
-      retval[key] = rect[key];
+
+    //rect
+    {
+      if (!!rect) {
+        for (let key in rect) {
+          retval[key] = rect[key];
+        }
+      }
+      const calcInitLeft = (count: number) => {
+        return `${3 + Math.floor(count / 20) + (count % 20) * 2}%`;
+      };
+      const calcInitTop = (count: number) => {
+        return `${5 + 3 * Math.floor(count / 20) + (count % 20) * 2}%`;
+      };
+      if (!(retval["top"] | retval["bottom"])) {
+        retval["top"] = calcInitTop(parseInt(proc.id));
+      }
+      if (!(retval["left"] | retval["right"])) {
+        retval["left"] = calcInitLeft(parseInt(proc.id));
+      }
+      retval["width"] = retval["width"] ?? "50%";
+      if (!(retval["width"] | retval["aspectRatio"])) {
+        retval["height"] = "70%";
+      }
     }
+    console.log("Buildstyle : ", retval);
     return retval;
   };
   const curRect = () => {
