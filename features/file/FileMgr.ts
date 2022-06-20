@@ -1,6 +1,6 @@
 import store from "../../app/store";
 import Path from "../../scripts/Path";
-import { addFile, dirExists, dirValue, fileExists, fileValue, mkdir, rm } from "./fileSlice";
+import { addFile, dirExists, dirValue, fileExists, fileValue, mkdir, rm, rmdir } from "./fileSlice";
 import type { File } from "./FileTypes";
 
 export default class FileMgr {
@@ -46,6 +46,14 @@ export default class FileMgr {
       return false;
     }
     store.dispatch(rm(path));
+    return true;
+  }
+
+  public rmdir(path:string){
+    if(!this.dirExists(path)){
+      return false;
+    }
+    store.dispatch(rmdir(path));
     return true;
   }
 

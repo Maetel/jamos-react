@@ -53,6 +53,18 @@ const findFile = (state:WritableDraft<FileState>, path:string):WritableDraft<Fil
   return findDir(state, p.parent)?.files.find(file=>Path.areSame(file.node.path, path))
 }
 
+const _rm = (state,path:string)=>{
+  const p = new Path(path);
+  const f = findFile(state, p.path);
+  if(!f){
+    log(`Failed to remove file. No file : '${p.path}'`);
+    return;
+  }
+  //parent dir must exist by here
+  const parent = findDir(state, p.parent);
+  parent.files = parent.files.filter(file=>!Path.areSame(file.node.path, p.path));
+}
+
 const log = console.log;
 const fileSlice = createSlice({
   name:'files',
@@ -109,18 +121,30 @@ const fileSlice = createSlice({
       parent.files.push(action.payload);
     },
     rm : (state,action:PayloadAction<string>)=>{
-      const path = new Path(action.payload);
-      const f = findFile(state, path.path);
-      if(!f){
-        log(`Failed to remove file. No file : '${path.path}'`);
-        return;
-      }
-      //parent dir must exist by here
-      const parent = findDir(state, path.parent);
-      parent.files = parent.files.filter(file=>!Path.areSame(file.node.path, path.path));
+      _rm(state, action.payload);
     },
     rmdir : (state,action:PayloadAction<string>)=>{
       //pass
+
+      //delete recursively
+      const _rmdir=(dir:Dir|WritableDraft<Dir>, path:Path)=>{
+        if(!dir || path.isEmpty || path.isHome){
+          return false;
+        }
+        dir.files.forEach(f=>_rm(state, f.node.path));
+        dir.dirs.forEach(_dir=>_rmdir(_dir,new Path( _dir.node.path)));
+
+        const parent = findDir(state, path.parent);
+        parent.dirs = parent.dirs.filter(dir=>!Path.areSame(dir.node.path, path.path));
+        return true;
+      }
+      const path = action.payload;
+      const dir = findDir(state, path);
+      if(!dir){
+        //no such directory
+        return;
+      }
+      _rmdir(dir, new Path(path));
     }
   }
 });

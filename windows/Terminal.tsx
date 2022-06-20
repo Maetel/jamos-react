@@ -358,53 +358,54 @@ export default function (props) {
       //   }
       //   procmgr.exeCmd(cmd, { force: forceAction });
       //   return;
-      // case "rmdir":
-      //   if (!merged) {
-      //     addWarn("Path required");
-      //     return;
-      //   }
-      //   if (!filemgr.findDirValue(mergedFilePath)) {
-      //     addError("No directory! " + mergedFilePath.path);
-      //     return;
-      //   }
-      //   const info = filesInDirectory(filemgr.findDirValue(mergedFilePath));
-      //   focusout();
-      //   procmgr.openModal({
-      //     title: "Remove directory",
-      //     descs: [
-      //       `Directory ${mergedFilePath.path} and its files will be removed,`,
-      //       `which contains ${info.totalDirs} directories and ${info.totalFiles} files.`,
-      //     ],
-      //     buttons: ["Remove", "Cancel"],
-      //     callbacks: [
-      //       () => {
-      //         // procmgr.modalResult = { result: "remove" };
-      //         if (filemgr.rmdir(mergedFilePath)) {
-      //           addText("Directory removed");
-      //         } else {
-      //           addWarn(
-      //             `Failed to remove directory. ${
-      //               mergedFilePath.isHome ? 'Directory was "home".' : ""
-      //             }`
-      //           );
-      //         }
-      //         procmgr.closeModal();
-      //         {
-      //           console.log("InputELem focus");
-      //           inputElem.focus();
-      //         }
-      //       },
-      //       () => {
-      //         // procmgr.modalResult = { result: "cancel" };
-      //         addWarn("Canceled.");
-      //         procmgr.closeModal();
-      //         console.log("InputELem focus");
-      //         inputElem.focus();
-      //       },
-      //     ],
-      //   });
+      case "rmdir":
+        if (!merged) {
+          addWarn("Path required");
+          return;
+        }
+        if (!filemgr.dirExists(mergedFilePath.path)) {
+          addError("No directory! " + mergedFilePath.path);
+          return;
+        }
+        filemgr.rmdir(mergedFilePath.path);
+        // const info = filesInDirectory(filemgr.findDirValue(mergedFilePath));
+        // focusout();
+        // procmgr.openModal({
+        //   title: "Remove directory",
+        //   descs: [
+        //     `Directory ${mergedFilePath.path} and its files will be removed,`,
+        //     `which contains ${info.totalDirs} directories and ${info.totalFiles} files.`,
+        //   ],
+        //   buttons: ["Remove", "Cancel"],
+        //   callbacks: [
+        //     () => {
+        //       // procmgr.modalResult = { result: "remove" };
+        //       if (filemgr.rmdir(mergedFilePath)) {
+        //         addText("Directory removed");
+        //       } else {
+        //         addWarn(
+        //           `Failed to remove directory. ${
+        //             mergedFilePath.isHome ? 'Directory was "home".' : ""
+        //           }`
+        //         );
+        //       }
+        //       procmgr.closeModal();
+        //       {
+        //         console.log("InputELem focus");
+        //         inputElem.focus();
+        //       }
+        //     },
+        //     () => {
+        //       // procmgr.modalResult = { result: "cancel" };
+        //       addWarn("Canceled.");
+        //       procmgr.closeModal();
+        //       console.log("InputELem focus");
+        //       inputElem.focus();
+        //     },
+        //   ],
+        // });
 
-      //   return;
+        return;
       // case "ls":
       //   //join path if exists
       //   const dir = filemgr.lsValue(mergedFilePath);
