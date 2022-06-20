@@ -16,11 +16,15 @@ import {
   toggleMaximize,
 } from "../features/procmgr/procSlice";
 import FileMgr from "../features/file/FileMgr";
+import PromptGridView, {
+  PromptFileViewGroup,
+} from "../components/PromptGridView";
+import { Dir } from "../features/file/FileTypes";
 
 const viewMap = {
   PromptTextView: PromptTextView,
   PromptTableView: PromptTableView,
-  // PromptGridView: PromptGridView,
+  PromptGridView: PromptGridView,
 };
 
 interface PromptItem {
@@ -452,62 +456,62 @@ export default function (props) {
         // });
 
         return;
-      // case "ls":
-      //   //join path if exists
-      //   const dir = filemgr.lsValue(mergedFilePath);
-      //   if (!dir) {
-      //     addError(`No directory : ${mergedFilePath.path}`);
-      //     break;
-      //   }
-      //   const buildPromptGridGroups = (dir: Dir): PromptItem => {
-      //     const item: PromptItem = {
-      //       comp: "PromptGridView",
-      //       data: { pwd: dir.node.path, groups: <PromptFileViewGroup[]>[] },
-      //     };
+      case "ls":
+        //join path if exists
+        const dir = filemgr.dirValue(mergedFilePath.path);
+        if (!dir) {
+          addError(`No directory : ${mergedFilePath.path}`);
+          break;
+        }
+        const buildPromptGridGroups = (dir: Dir): PromptItem => {
+          const item: PromptItem = {
+            comp: "PromptGridView",
+            data: { pwd: dir.node.path, groups: [] },
+          };
 
-      //     const groups: PromptFileViewGroup[] = [];
-      //     const _dirs: PromptFileViewGroup = {
-      //       type: "Directory",
-      //       // color: "#27e8a7",
-      //       color: _colors["1"],
-      //       items: [],
-      //     };
-      //     const _apps: PromptFileViewGroup = {
-      //       type: "Application",
-      //       // color: "#add7ff",
-      //       color: _colors["1"],
-      //       items: [],
-      //     };
-      //     const _texts: PromptFileViewGroup = {
-      //       type: "Text file",
-      //       // color: "#dbdbdb",
-      //       color: _colors["1"],
-      //       items: [],
-      //     };
-      //     dir.dirs.forEach((_) => {
-      //       _dirs.items.push(_.node.path.last + "/");
-      //     });
-      //     dir.files.forEach((_) => {
-      //       if (_.node.type === "text") {
-      //         _texts.items.push(_.node.path.last);
-      //         return;
-      //       }
-      //       _apps.items.push("./" + _.node.path.last);
-      //     });
-      //     const pushIfExists = (arr) => {
-      //       if (arr.items.length) {
-      //         item.data["groups"].push(arr);
-      //       }
-      //     };
-      //     pushIfExists(_dirs);
-      //     pushIfExists(_apps);
-      //     pushIfExists(_texts);
+          const groups: PromptFileViewGroup[] = [];
+          const _dirs: PromptFileViewGroup = {
+            type: "Directory",
+            color: "#27e8a7",
+            // color: _colors["1"],
+            items: [],
+          };
+          const _apps: PromptFileViewGroup = {
+            type: "Application",
+            color: "#add7ff",
+            // color: _colors["1"],
+            items: [],
+          };
+          const _texts: PromptFileViewGroup = {
+            type: "Text file",
+            color: "#dbdbdb",
+            // color: _colors["1"],
+            items: [],
+          };
+          dir.dirs.forEach((_) => {
+            _dirs.items.push(new Path(_.node.path).last + "/");
+          });
+          dir.files.forEach((_) => {
+            if (_.node.type === "text") {
+              _texts.items.push(new Path(_.node.path).last);
+              return;
+            }
+            _apps.items.push("./" + new Path(_.node.path).last);
+          });
+          const pushIfExists = (arr) => {
+            if (arr.items.length) {
+              item.data["groups"].push(arr);
+            }
+          };
+          pushIfExists(_dirs);
+          pushIfExists(_apps);
+          pushIfExists(_texts);
 
-      //     return item;
-      //   };
+          return item;
+        };
 
-      //   _add(buildPromptGridGroups(dir));
-      //   break;
+        _add(buildPromptGridGroups(dir));
+        break;
       case "ps":
         addPs();
         break;

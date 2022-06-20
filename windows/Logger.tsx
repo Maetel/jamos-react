@@ -7,7 +7,7 @@ import Process from "../features/procmgr/ProcTypes";
 
 import styles from "../styles/Logger.module.css";
 
-export default function TestWindow(props) {
+export default function Logger(props) {
   const proc: Process = props.proc;
   const logs = [...useAppSelector(selectLogAll)].reverse();
 
@@ -30,7 +30,7 @@ export default function TestWindow(props) {
           <ul className="procs">
             {procs.map((proc, i) => {
               return (
-                <li className="procText">
+                <li className="procText" key={i}>
                   {i}. {JSON.stringify(proc)}
                 </li>
               );
