@@ -64,6 +64,18 @@ const _rm = (state,path:string)=>{
   const parent = findDir(state, p.parent);
   parent.files = parent.files.filter(file=>!Path.areSame(file.node.path, p.path));
 }
+const _rmdir=(state, dir:Dir|WritableDraft<Dir>, path:Path)=>{
+  if(!dir || path.isEmpty || path.isHome){
+    return false;
+  }
+  dir.files.forEach(f=>_rm(state, f.node.path));
+  dir.dirs.forEach(_dir=>_rmdir(state, _dir,new Path( _dir.node.path)));
+
+  const parent = findDir(state, path.parent);
+  parent.dirs = parent.dirs.filter(dir=>!Path.areSame(dir.node.path, path.path));
+  return true;
+}
+
 
 const log = console.log;
 const fileSlice = createSlice({
@@ -127,24 +139,14 @@ const fileSlice = createSlice({
       //pass
 
       //delete recursively
-      const _rmdir=(dir:Dir|WritableDraft<Dir>, path:Path)=>{
-        if(!dir || path.isEmpty || path.isHome){
-          return false;
-        }
-        dir.files.forEach(f=>_rm(state, f.node.path));
-        dir.dirs.forEach(_dir=>_rmdir(_dir,new Path( _dir.node.path)));
-
-        const parent = findDir(state, path.parent);
-        parent.dirs = parent.dirs.filter(dir=>!Path.areSame(dir.node.path, path.path));
-        return true;
-      }
+      
       const path = action.payload;
       const dir = findDir(state, path);
       if(!dir){
         //no such directory
         return;
       }
-      _rmdir(dir, new Path(path));
+      _rmdir(state, dir, new Path(path));
     }
   }
 });

@@ -495,10 +495,10 @@ export default function (props) {
       //   }
       //   addText((f.data as any)?.text);
       //   break;
-      // case "finder":
-      //   dest = Path.join(pwd.path, cmds.at(1)).path;
-      //   procmgr.add("finder", { path: dest });
-      //   break;
+      case "finder":
+        dest = Path.join(pwd.path, cmds.at(1)).path;
+        procmgr.add("finder", { path: dest });
+        break;
       // case "browser":
       //   dest = cmds.at(1) || "";
       //   procmgr.add("browser", { path: dest });

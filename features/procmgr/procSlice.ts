@@ -50,7 +50,8 @@ export const procSlice = createSlice({
         }
       ).filter(proc=>proc.id !== inputId);
     },
-    killAllProcs:(state, action:PayloadAction<void>)=>{
+    killAllProcs:(state, action:PayloadAction<string>)=>{
+      console.warn(`Process [${action.payload}] called kill all processes.`)
       state.procs = [];
     },
 

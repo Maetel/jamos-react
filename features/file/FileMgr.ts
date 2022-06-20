@@ -1,6 +1,6 @@
 import store from "../../app/store";
 import Path from "../../scripts/Path";
-import { addFile, dirExists, dirValue, fileExists, fileValue, mkdir, rm, rmdir } from "./fileSlice";
+import { addFile, dirExists, dirValue, fileExists, fileValue, mkdir, rm, rmdir, selectDir, selectNodesInDir } from "./fileSlice";
 import type { File } from "./FileTypes";
 
 export default class FileMgr {
@@ -23,9 +23,18 @@ export default class FileMgr {
     return fileValue(path);
   }
 
-  public ls (path:string){return dirValue(path)}
   public dirValue(path:string){
     return dirValue(path);
+  }
+  public dirReadable(useAppSelector, path:string){
+    return useAppSelector(selectDir(path));
+  }
+
+  public nodesReadable(useAppSelector, path:string):Node[]{
+    if(!dirExists(path)){
+      return undefined;
+    }
+    return useAppSelector(selectNodesInDir(path));
   }
 
   public dirExists(path:string){

@@ -1,11 +1,13 @@
 import { useSelector } from "react-redux";
 import store from "../../app/store";
 import Path, { addError, addLog } from "../../scripts/Path";
-import { fileValue, selectFile } from "../file/fileSlice";
+import { dirValue, fileValue, selectFile } from "../file/fileSlice";
 
 import {
   addProc,
   increaseIndices,
+  killAllProcs,
+  killProc,
   selectProcessById,
   selectProcesses,
   selectProcInIndexOrder,
@@ -32,7 +34,22 @@ export default class ProcMgr{
     store.dispatch(increaseIndices());
   }
 
+  public kill(procId:string){
+    store.dispatch(killProc(procId));
+  }
+
+  public killAll(procId:string){
+    store.dispatch(killAllProcs(procId));
+  }
+
   public exeFile(path: Path, args?: { [key: string]: any }) {
+    const d = dirValue(path.path);
+    if(d){
+      //if is directory, open it
+      this.exeCmd(d.node.exeCmd);
+      return;
+    }
+
     const f = fileValue(path.path);
     if (!f) {
       return;

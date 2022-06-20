@@ -15,11 +15,13 @@ import {
 } from "../features/procmgr/procSlice";
 import { Rect } from "../features/procmgr/ProcTypes";
 import Terminal from "../windows/Terminal";
+import Finder from "../windows/Finder";
 
 const winCmdMap: { [key: string]: (props) => JSX.Element } = {
   testwindow: TestWindow,
   logger: Logger,
   terminal: Terminal,
+  finder: Finder,
 };
 
 export default function Windows(props) {
