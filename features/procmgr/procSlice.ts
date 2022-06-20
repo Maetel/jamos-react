@@ -1,6 +1,7 @@
 import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { WritableDraft } from 'immer/dist/internal';
 import type { AppState, AppThunk } from '../../app/store'
+import store from '../../app/store';
 import ProcMgr from './ProcMgr';
 
 
@@ -146,6 +147,10 @@ export const selectProcInIndexOrder = (state:AppState)=>[...state.proc.procs].so
 export const selectProcProp = (id:string,prop:string)=>(state:AppState)=>{
   const proc = state.proc.procs.find(proc=>proc.id===id)
   return proc?.[prop]
+}
+
+export const processesValue = ()=>{
+  return store.getState().proc.procs;
 }
 
 export default procSlice.reducer;

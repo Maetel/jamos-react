@@ -138,6 +138,40 @@ export default function (props) {
 
     _add(textItem);
   };
+  const addPs = () => {
+    const data = procmgr.psValue().map((p) => {
+      // 0. this?
+      // 1. id
+      // 2. name
+      // 3. type = windowed || deamon
+      // 4. window z index
+      // 5. if based on file, file path
+      const retval = [
+        p.id === proc.id ? ">" : "",
+        p.id,
+        p.name,
+        p.isDaemon ? "daemon" : "window",
+        p.zIndex,
+        "",
+      ];
+
+      if (p.node) {
+        retval[5] = p.node.path;
+      }
+      return retval;
+    });
+    const psData: TableData = {
+      desc: "- Process List",
+      // firstColumnColor: _colors["okay"],
+      heads: ["This", "ID", "Name", "Type", "Z-Index", "File path"],
+      rows: data,
+    };
+    const processItem: PromptItem = {
+      comp: "PromptTableView",
+      data: { tableData: psData },
+    };
+    _add(processItem);
+  };
   const addHelp = () => {
     const titleAndApps: TableData = {
       title: "JamOS Terminal Commands",
@@ -474,10 +508,9 @@ export default function (props) {
 
       //   _add(buildPromptGridGroups(dir));
       //   break;
-      // case "ps":
-      //   addPs();
-
-      //   break;
+      case "ps":
+        addPs();
+        break;
       case "cd":
         if (!merged) {
           addWarn("Path required");

@@ -8,6 +8,7 @@ import {
   increaseIndices,
   killAllProcs,
   killProc,
+  processesValue,
   selectProcessById,
   selectProcesses,
   selectProcInIndexOrder,
@@ -41,6 +42,10 @@ export default class ProcMgr{
   public killAll(procId:string){
     store.dispatch(killAllProcs(procId));
   }
+
+public psValue(){
+  return processesValue();
+}
 
   public exeFile(path: Path, args?: { [key: string]: any }) {
     const d = dirValue(path.path);
