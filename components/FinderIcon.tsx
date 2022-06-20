@@ -5,6 +5,7 @@ import { selectFile, selectNode } from "../features/file/fileSlice";
 import { Node } from "../features/file/FileTypes";
 import Log from "../features/log/Log";
 import ProcMgr from "../features/procmgr/ProcMgr";
+import SetMgr from "../features/settings/SetMgr";
 import Path from "../scripts/Path";
 import { randomId } from "../scripts/utils";
 import styles from "../styles/FinderIcon.module.css";
@@ -53,6 +54,9 @@ export default function FinderIcon(props) {
     borderRadius: width / 2,
   };
   const [hovered, setHovered] = useState(false);
+  const color1 = SetMgr.getInstance().color1(useAppSelector);
+  const color2 = SetMgr.getInstance().color2(useAppSelector);
+  const color3 = SetMgr.getInstance().color3(useAppSelector);
 
   const callHover = (e, hoverIn) => {
     setHovered(hoverIn);
@@ -78,8 +82,15 @@ export default function FinderIcon(props) {
       onMouseOut={(e) => {
         callHover(e, false);
       }}
+      style={{ color: color1 }}
     >
-      <span className={styles.highlight} id={highElemId} />
+      <span
+        className={styles.highlight}
+        id={highElemId}
+        style={{
+          background: `linear-gradient(135deg, ${color1} 25%, ${color2} 60%, ${color3})`,
+        }}
+      />
       <div className={styles.imgContainer} style={imgContainerStyle}>
         <Image
           src={src}
@@ -97,7 +108,11 @@ export default function FinderIcon(props) {
           height={"70%"}
         ></Image>
       </div>
-      <div className={styles.desc} id={descElemId}>
+      <div
+        className={styles.desc}
+        id={descElemId}
+        style={{ backgroundColor: `${color2}cc` }}
+      >
         {dispFilename}
       </div>
     </div>

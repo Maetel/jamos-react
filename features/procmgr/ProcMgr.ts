@@ -109,7 +109,7 @@ public psValue(){
     const proc:Process ={
       id:_id,
       comp:procType,
-      name:`${procType} - id[${_id}]`,
+      name:args['name'], //okay to be undefined
       zIndex:'0',
       ...args
     }

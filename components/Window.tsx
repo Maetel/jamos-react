@@ -156,6 +156,7 @@ export default function Window(props) {
     {
       retval["color"] = _colors["1"];
       retval["backgroundColor"] = _colors["2"];
+      retval["boxShadow"] = _colors["boxShadow"];
     }
     console.log("Buildstyle : ", retval);
     return retval;
@@ -203,6 +204,9 @@ export default function Window(props) {
     dispatch(toggleMaximize(proc.id));
   };
 
+  {
+    console.log("Props.proc : ", props.proc);
+  }
   return (
     <section
       className={styles["window-container"]}
@@ -240,7 +244,9 @@ export default function Window(props) {
             style={maxBtnStyle}
           />
         </ul>
-        <span className={styles["window-title"]}>Window - {proc.procId}</span>
+        <span className={styles["window-title"]}>
+          {proc.name ?? "Application"}
+        </span>
       </div>
       <div className={styles["content-container"]}>
         {(props as any).children}

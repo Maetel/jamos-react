@@ -44,7 +44,8 @@ export default function (props) {
   const procmgr = ProcMgr.getInstance();
   const filemgr = FileMgr.getInstance();
   const setmgr = SetMgr.getInstance();
-  const proc = props.proc;
+  const proc = { ...props.proc };
+  proc["name"] = proc["name"] ?? "Terminal";
 
   /////////// init setup
   let contElem: HTMLElement, inputArea: HTMLElement, inputElem: HTMLElement;
@@ -932,7 +933,7 @@ export default function (props) {
   };
 
   return (
-    <Window {...props}>
+    <Window {...props} proc={proc}>
       <div
         className={`${styles.container}`}
         onMouseUp={handleFocus}
@@ -966,11 +967,6 @@ export default function (props) {
             </Provider>
           );
         })}
-
-        {/* {#each $promptItems as item (item.id)}
-      <!-- <div className="prompt-result">> {prompt}</div> -->
-      <svelte:component this={viewMap[item.comp]} {...item.data} />
-    {/each} */}
       </div>
     </Window>
   );
