@@ -550,10 +550,10 @@ export default function (props) {
         dest = Path.join(pwd.path, cmds.at(1)).path;
         procmgr.add("finder", { path: dest });
         break;
-      // case "browser":
-      //   dest = cmds.at(1) || "";
-      //   procmgr.add("browser", { path: dest });
-      //   break;
+      case "browser":
+        dest = cmds.at(1) || "";
+        procmgr.add("browser", { path: dest });
+        break;
       case "whoami":
         addText(username);
         break;

@@ -13,6 +13,7 @@ import {
   selectProcesses,
   selectProcInIndexOrder,
   setActiveWindow,
+  toggleMaximize,
 } from "./procSlice";
 import Process, { ProcessCommands } from "./ProcTypes";
 
@@ -121,6 +122,10 @@ public psValue(){
 
   public find(procId:string) {
     return this.procs.find(proc=>proc.id===procId);
+  }
+
+  public maximize(procId:string) {
+    store.dispatch(toggleMaximize(procId));
   }
 
   //엄밀히 따지면 프로세스의 z-index는 별도의 어레이에 매핑되어 관리되는 것이 맞아보인다.

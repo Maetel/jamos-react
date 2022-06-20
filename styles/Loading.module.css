@@ -1,0 +1,86 @@
+.progressBar {
+  position: absolute;
+  right: 0;
+  width: 100%;
+}
+.cover {
+  position: absolute;
+  left: 0;
+  width: 200%;
+  height: 100%;
+}
+.color1 {
+  background: linear-gradient(90deg, #b4d9dd 25%, #eec768 60%, #dc8279);
+  background-size: 50% 100%;
+}
+.transp {
+  background: linear-gradient(270deg, #333, #777);
+  mix-blend-mode: screen;
+  opacity: 0.8;
+  background-size: 50% 100%;
+}
+.move.right {
+  animation: 1.5s scroll-right infinite ease-in-out;
+  /* animation-direction: alternate; */
+  /* animation-delay: 0.2s; */
+}
+
+.move.left {
+  animation: 1.5s scroll-left infinite ease-in-out;
+  /* animation-direction: alternate; */
+  /* animation-delay: 0.5; */
+}
+.container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 1;
+  mix-blend-mode: hard-light;
+  overflow: hidden;
+}
+.loadingIconElem {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 10rem;
+  height: 10rem;
+  opacity: 1;
+}
+.fadeout {
+  opacity: 0;
+}
+.rotate {
+  animation: 2s rotate infinite linear;
+}
+@keyframes rotate {
+  from {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+@keyframes scroll-right {
+  from {
+    background-position: left;
+  }
+  10% {
+    background-position: left;
+  }
+  to {
+    /* background-position: 600px; */
+    background-position: right;
+  }
+}
+@keyframes scroll-left {
+  from {
+    background-position: left;
+  }
+  to {
+    /* background-position: 600px; */
+    background-position: right;
+  }
+}
