@@ -33,6 +33,7 @@ export default function (props) {
   const procmgr = ProcMgr.getInstance();
   const filemgr = FileMgr.getInstance();
   const proc = props.proc;
+
   /////////// init setup
   let contElem: HTMLElement, inputArea: HTMLElement, inputElem: HTMLElement;
   let contElemId = randomId(),
@@ -48,10 +49,20 @@ export default function (props) {
   const [cmdValue, setCmdValue] = useState("");
 
   const dispatch = useAppDispatch();
+  const selector = useAppSelector;
   // const findFile = (path: string) => useAppSelector(selectFile(path));
   // const findDir = (path: string) => useAppSelector(selectDir(path));
 
-  const pwd = new Path("~/");
+  //current directory
+  const [pwd, setPwd] = useState(new Path("~/"));
+  let _pwd = pwd;
+  const updatePwd = () => {
+    let p: Path = pwd.isSame(_pwd) ? pwd : _pwd;
+    while (!filemgr.dirExists(p.path)) {
+      p = new Path(p.parent);
+    }
+    setPwd(() => p);
+  };
 
   /////////// command history
   const [cmdHistory, setCmdHistory] = useState({ hist: [], cursor: 0 });
@@ -217,7 +228,9 @@ export default function (props) {
 
   /////////// main handlers
 
-  const handleFocus = (e) => {};
+  const handleFocus = (e) => {
+    updatePwd();
+  };
   const clearCommand = (e) => {
     e.preventDefault();
     setCmdValue("");
@@ -235,7 +248,6 @@ export default function (props) {
     let mergedFilePath = merged.startsWith("~/")
       ? new Path(merged)
       : Path.join(pwd.path, merged);
-    let _pwd;
 
     if (cmd.startsWith("./")) {
       const app = Path.join(pwd.path, cmd.slice(2));
@@ -466,17 +478,17 @@ export default function (props) {
       //   addPs();
 
       //   break;
-      // case "cd":
-      //   if (!merged) {
-      //     addWarn("Path required");
-      //     return;
-      //   }
-      //   if (!filemgr.findDirValue(mergedFilePath)) {
-      //     addError(`Directory '${mergedFilePath.path}' does not exist `);
-      //     return;
-      //   }
-      //   pwd.set(mergedFilePath);
-      //   break;
+      case "cd":
+        if (!merged) {
+          addWarn("Path required");
+          return;
+        }
+        if (!filemgr.dirExists(mergedFilePath.path)) {
+          addError(`Directory '${mergedFilePath.path}' does not exist `);
+          return;
+        }
+        _pwd = mergedFilePath;
+        break;
       // case "cat":
       //   dest = cmds.slice(1).join(" ");
       //   if (!dest) {
@@ -540,6 +552,7 @@ export default function (props) {
       ArrowUp: cmdHistoryUp,
     };
     keyMap[e.key]?.(e);
+    updatePwd();
   };
 
   const handleCommand = (e) => {
