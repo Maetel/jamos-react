@@ -16,12 +16,14 @@ import {
 import { Rect } from "../features/procmgr/ProcTypes";
 import Terminal from "../windows/Terminal";
 import Finder from "../windows/Finder";
+import Notepad from "../windows/Notepad";
 
 const winCmdMap: { [key: string]: (props) => JSX.Element } = {
   testwindow: TestWindow,
   logger: Logger,
   terminal: Terminal,
   finder: Finder,
+  notepad: Notepad,
 };
 
 export default function Windows(props) {

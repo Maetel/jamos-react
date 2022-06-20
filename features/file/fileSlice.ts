@@ -76,6 +76,31 @@ const _rmdir=(state, dir:Dir|WritableDraft<Dir>, path:Path)=>{
   return true;
 }
 
+const _mkdir = (state, path:string)=>{
+  const refined = new Path(path);
+  if(!_verifyPath(path)){
+    // log(`Path must begin with '${initialHomePath}'`);
+    return false;
+  }
+  if(findDir(state, path)){
+    // log(`Directory '${path}' already exists`)
+    return true;
+  }
+  const parentPath = new Path(path).parent;
+  if(!findDir(state, parentPath)){
+    //make parent recursively
+    _mkdir(state, parentPath);
+  }
+
+  const newDir: Dir = {
+    node: NodeControl.build(path, 'dir'),
+    dirs: [],
+    files: [],
+  };
+  const parentDir = findDir(state, parentPath);
+  parentDir.dirs.push(newDir);
+}
+
 
 const log = console.log;
 const fileSlice = createSlice({
@@ -84,33 +109,10 @@ const fileSlice = createSlice({
   reducers:{
     mkdir:(state,action:PayloadAction<string>)=>{
       const _path = action.payload;
-      
-      const _mkdir = (path:string)=>{
-        const refined = new Path(path);
-        if(!_verifyPath(path)){
-          // log(`Path must begin with '${initialHomePath}'`);
-          return false;
-        }
-        if(findDir(state, path)){
-          // log(`Directory '${path}' already exists`)
-          return true;
-        }
-        const parentPath = new Path(path).parent;
-        if(!findDir(state, parentPath)){
-          //make parent recursively
-          _mkdir(parentPath);
-        }
-
-        const newDir: Dir = {
-          node: NodeControl.build(path, 'dir'),
-          dirs: [],
-          files: [],
-        };
-        const parentDir = findDir(state, parentPath);
-        parentDir.dirs.push(newDir);
+      if(dirExists(_path)){
+        return;
       }
-
-      _mkdir(_path);
+      _mkdir(state, _path);
     },   
     addFile:(state,action:PayloadAction<File>)=>{
       const _path = action.payload.node.path;
@@ -119,11 +121,13 @@ const fileSlice = createSlice({
         log(`Path must begin with '${initialHomePath}'`);
         return;
       }
+      // const parent = findDir(state, refined.parent);
+      // if(!parent){
+      //   log(`Parent directory not found : '${refined.path}'`);
+      //   return;
+      // }
+      _mkdir(state, refined.parent);
       const parent = findDir(state, refined.parent);
-      if(!parent){
-        log(`Parent directory not found : '${refined.path}'`);
-        return;
-      }
       if(parent.files.some(file=>Path.areSame(file.node.path ,refined.path))){
         log(`File already exists : '${refined.path}'`);
         return;

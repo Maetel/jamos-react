@@ -370,17 +370,17 @@ export default function (props) {
       //   addText("Fetched data : " + JSON.stringify(res));
       //   break;
 
-      // case "touch":
-      //   if (!merged) {
-      //     addWarn("Path required");
-      //     return;
-      //   }
-      //   if (!filemgr.touch(mergedFilePath.path, "text")) {
-      //     addError(`Failed to make file at ${merged}`);
-      //     return;
-      //   }
-      //   addSuccess(`Successfully made file at ${merged}`);
-      //   break;
+      case "touch":
+        if (!merged) {
+          addWarn("Path required");
+          return;
+        }
+        if (!filemgr.touch(mergedFilePath.path)) {
+          addError(`Failed to make file at ${merged}`);
+          return;
+        }
+        addSuccess(`Successfully made file at ${merged}`);
+        break;
 
       case "rm":
         if (!merged) {

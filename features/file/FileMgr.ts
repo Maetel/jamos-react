@@ -1,7 +1,8 @@
 import store from "../../app/store";
+import Commands from "../../scripts/CommandParser";
 import Path from "../../scripts/Path";
 import { addFile, dirExists, dirValue, fileExists, fileValue, mkdir, rm, rmdir, selectDir, selectNodesInDir } from "./fileSlice";
-import type { File } from "./FileTypes";
+import { File, NodeControl } from "./FileTypes";
 
 export default class FileMgr {
   private static instance:FileMgr;
@@ -66,15 +67,10 @@ export default class FileMgr {
     return true;
   }
 
-  public makeFile(path:string, type:string, iconPath?:string, exeCmd?:string, args?:any, data?:any){
+  public makeFile(path:string, type:string, iconPath?:string, exeCmd?:string, data?:any){
+    
     const f:File = {
-      node:{
-        id:type+path,
-        path:path,
-        type:type,
-        exeCmd:exeCmd || type,
-        iconPath:iconPath,
-      },
+      node:NodeControl.build(path, type, exeCmd, iconPath, data),
       data:data
     }
     return f;
@@ -97,6 +93,13 @@ export default class FileMgr {
       return false;
     }
     store.dispatch(addFile(file))
+    return true;
+  }
+  public touch (path:string, data?) {
+    if(fileExists(path)){
+      return false;
+    }
+    store.dispatch(addFile(this.makeFile(path, 'text')))
     return true;
   }
 }
