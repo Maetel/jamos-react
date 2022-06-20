@@ -15,9 +15,21 @@ const Home: NextPage = () => {
 
   const init = () => {
     procmgr.add("terminal");
-    const f = [
+    const f: File[] = [
       filemgr.makeFile("~/Terminal", "terminal", "/imgs/terminal.svg"),
       filemgr.makeFile("~/Logger", "logger", "/imgs/logger.svg"),
+      filemgr.makeFile(
+        "~/Portfolio/Clips/1. Intro",
+        "browser",
+        "/imgs/jamos.png",
+        "browser https://www.youtube.com/embed/8CfT8yN5tgw"
+      ),
+      filemgr.makeFile(
+        "~/Portfolio/Career description",
+        "browser",
+        "/imgs/career.svg",
+        "browser https://v1.embednotion.com/embed/9091c7d511f941b387d3064690d4d2dd"
+      ),
     ];
     filemgr.addFiles(f);
   };

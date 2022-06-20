@@ -109,7 +109,7 @@ const fileSlice = createSlice({
   reducers:{
     mkdir:(state,action:PayloadAction<string>)=>{
       const _path = action.payload;
-      if(dirExists(_path)){
+      if(!!findDir(state, _path)){
         return;
       }
       _mkdir(state, _path);
@@ -121,13 +121,13 @@ const fileSlice = createSlice({
         log(`Path must begin with '${initialHomePath}'`);
         return;
       }
-      // const parent = findDir(state, refined.parent);
-      // if(!parent){
-      //   log(`Parent directory not found : '${refined.path}'`);
-      //   return;
-      // }
-      _mkdir(state, refined.parent);
+      // !!!!! cannot make directory inside
+      // _mkdir(state, refined.parent);
       const parent = findDir(state, refined.parent);
+      if(!parent){
+        log(`Parent directory not found : '${refined.path}'`);
+        return;
+      }
       if(parent.files.some(file=>Path.areSame(file.node.path ,refined.path))){
         log(`File already exists : '${refined.path}'`);
         return;
@@ -212,11 +212,13 @@ export const selectFile = (path:string)=>((state:AppState)=>{
   return bfsDir(state.file.root, path)?.files.filter(file=>Path.areSame(file.node.path, path)).at(0);
 })
 
-export const dirValue = (path: string) =>bfsDir(store.getState().file.root, path);
+export const dirValue = (path: string) =>bfsDir(store.getState()?.file.root, path);
 export const dirExists = (path: string) =>!!dirValue(path);
 
 
-export const fileValue = (path: string) =>bfsDir(store.getState().file.root, new Path(path).parent).files.filter(file=>Path.areSame(file.node.path, path)).at(0);
+export const fileValue = (path: string) =>{
+  return bfsDir(store.getState().file.root, new Path(path).parent)?.files.filter(file=>Path.areSame(file.node.path, path)).at(0);
+}
 export const fileExists = (path:string)=>!!fileValue(path)
 
 

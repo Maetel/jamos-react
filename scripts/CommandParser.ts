@@ -25,6 +25,8 @@ export default class Commands {
     "quit",
     "ps",
     "maximize",
+    "kill",
+    "killall",
   ];
 
   public possibleCommands = [

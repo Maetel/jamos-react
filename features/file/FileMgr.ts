@@ -99,6 +99,11 @@ export default class FileMgr {
     if(fileExists(path)){
       return false;
     }
+    const parentPath = new Path(path).parent;
+    if (!this.mkdir(parentPath)) {
+      console.error(`Failed mkdir towards ${parentPath}`);
+      return false;
+    }
     store.dispatch(addFile(this.makeFile(path, 'text')))
     return true;
   }

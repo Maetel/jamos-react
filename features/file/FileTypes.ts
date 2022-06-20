@@ -15,9 +15,9 @@ export class NodeControl {
       id :type + path,
       path:path,
       type:type,
-      exeCmd:exeCmd|| this._setDefaultCmd(new Path(path), type),
-      iconPath : iconPath || this._setDefaultIcon(type),
-      data: data || {},
+      exeCmd:exeCmd ?? this._setDefaultCmd(new Path(path), type),
+      iconPath : iconPath ?? this._setDefaultIcon(type),
+      data: data ?? {},
     }
   }
 

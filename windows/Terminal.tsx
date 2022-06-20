@@ -178,68 +178,81 @@ export default function (props) {
     };
     _add(processItem);
   };
+  const appHelpData = [
+    ["about", "about", "About JamOS🍞"],
+    ["bakery", "bakery", "Let's begin from here"],
+    ["terminal", "terminal", "CLI interface that can control JamOS"],
+    [
+      "finder",
+      "finder [$path]",
+      "displays and interacts with directories and files",
+    ],
+    ["notepad", "notepad [$path]", "easy and simple text editor"],
+    ["markdown", "markdown [$path]", "markdown editor and viewer"],
+    ["browser", "browser [$url]", "JamBrowser"],
+    ["broom", "broom", "close all process"],
+    ["settings", "settings", "open user settings"],
+    ["styler", "styler", "JamOS Styler"],
+    ["atelier", "atelier", "Interactive canvas with generative art"],
+  ];
+  const terminalHelpData = [
+    ["ls", "ls [$path]", "list all directories and files"],
+    ["cd", "cd <$path>", "goes to the path"],
+    ["mkdir", "mkdir <$path>", "makes directories recursively to the path"],
+    ["cat", "cat <$path>", "reads a text file"],
+    ["rm", "rm <$path>", "removes a file"],
+    ["rmdir", "rmdir <$path>", "removes a directory recursively"],
+    ["clear", "clear", "clears prompt"],
+    ["get", "get <$url>", "sends get request to url"],
+    ["whoami", "whoami", "shows your username"],
+    ["maximize", "maximize", "toggle window maximize"],
+    ["quit", "quit, exit", "quits this terminal"],
+    ["ps", "ps", "process list"],
+    ["kill", "kill <$processId>", "closes process"],
+    ["killall", "killall", "closes all processes"],
+    [
+      "touch",
+      "touch <$path>",
+      "makes a file in text mode and creates directories to the file",
+    ],
+  ];
+  const systemHelpData = [
+    ["savebread", "savebread", "save current status"],
+    ["loadbread", "loadbread", "load saved"],
+    ["resetbread", "resetbread", "reset all data and settings and reboot"],
+    ["get", "get <$url>", "<DEV> send get request and display response"],
+    ["postman", "postman", "<DEV> send request and receive response"],
+    [
+      "logger",
+      "logger",
+      "<DEV>A logger watches over the whole OS and displays changes",
+    ],
+    ["mv", "mv <$path:from> <$path:to>", "<To be updated>moves a file"],
+    ["cp", "cp <$path:from> <$path:to>", "<To be updated>copies a file"],
+    [
+      "hub",
+      "hub",
+      "<To be updated> where you can create and share your bread with your friends.",
+    ],
+  ];
+  const helpdata = [...appHelpData, ...terminalHelpData, ...systemHelpData];
   const addHelp = () => {
     const titleAndApps: TableData = {
       title: "JamOS Terminal Commands",
       desc: `- Applications, [optional] <required>`,
       heads: ["App Name", "Description"],
-      rows: [
-        ["about", "About JamOS🍞"],
-        ["bakery", "Let's begin from here"],
-        ["terminal", "CLI interface that can control JamOS"],
-        ["finder [$path]", "displays and interacts with directories and files"],
-        ["notepad [$path]", "easy and simple text editor"],
-        ["markdown [$path]", "markdown editor and viewer"],
-        ["browser [$url]", "JamBrowser"],
-        ["broom", "close all process"],
-        ["settings", "open user settings"],
-        ["styler", "JamOS Styler"],
-        ["atelier", "Interactive canvas with generative art"],
-      ],
+      rows: appHelpData.map((row) => row.splice(1)),
     };
     const terminalCmds: TableData = {
       desc: "- Terminal Commands",
       heads: ["Command Name", "Description"],
-      rows: [
-        ["ls [$path]", "list all directories and files"],
-        ["cd <$path>", "goes to the path"],
-        ["mkdir <$path>", "makes directories recursively to the path"],
-        [
-          "touch <$path>",
-          "makes a file in text mode and creates directories to the file",
-        ],
-        ["cat <$path>", "reads a text file"],
-        ["rm <$path>", "removes a file"],
-        ["rmdir <$path>", "removes a directory recursively"],
-        ["clear", "clears prompt"],
-        ["get <$url>", "sends get request to url"],
-        ["whoami", "shows your username"],
-        ["maximize", "toggle window maximize"],
-        ["quit, exit", "quits this terminal"],
-        ["ps", "process list"],
-      ],
+      rows: terminalHelpData.map((row) => row.splice(1)),
     };
 
     const systemCmds: TableData = {
       desc: `- System commands, or dev/beta apps`,
       heads: ["App Name", "Description"],
-      rows: [
-        ["savebread", "save current status"],
-        ["loadbread", "load saved"],
-        ["resetbread", "reset all data and settings and reboot"],
-        ["get <$url>", "<DEV> send get request and display response"],
-        ["postman", "<DEV> send request and receive response"],
-        [
-          "logger",
-          "<DEV>A logger watches over the whole OS and displays changes",
-        ],
-        [
-          "hub",
-          "<To be updated> where you can create and share your bread with your friends.",
-        ],
-        ["mv <$path:from> <$path:to>", "<To be updated>moves a file"],
-        ["cp <$path:from> <$path:to>", "<To be updated>copies a file"],
-      ],
+      rows: systemHelpData.map((row) => row.splice(1)),
     };
 
     titleAndApps.rows.sort();
@@ -285,6 +298,26 @@ export default function (props) {
     // }
     let dest: string;
     let merged = cmds.slice(1).join(" ").trim();
+    {
+      //help
+      const helps = ["-help", "--help", "-h", "--h"];
+      const helpDataRowFound = helpdata.find((datum) => datum.at(0) === cmd);
+      if (helps.includes(merged.toLowerCase()) && !!helpDataRowFound) {
+        const helpTable: TableData = {
+          title: `${cmd} - help page`,
+          desc: `<$var> : var required  [$var] var is optional"`,
+          // firstColumnColor: _colors["okay"],
+          heads: ["Command", "Usage", "Description"],
+          rows: [helpDataRowFound],
+        };
+        const helpItem: PromptItem = {
+          comp: "PromptTableView",
+          data: { tableData: helpTable },
+        };
+        _add(helpItem);
+        return;
+      }
+    }
     let mergedFilePath = merged.startsWith("~/")
       ? new Path(merged)
       : Path.join(pwd.path, merged);
@@ -369,7 +402,17 @@ export default function (props) {
 
       //   addText("Fetched data : " + JSON.stringify(res));
       //   break;
-
+      case "kill":
+        if (!procmgr.psValue().some((proc) => proc.id === merged)) {
+          addWarn("No process id found : " + merged);
+          break;
+        }
+        procmgr.kill(merged);
+        addSuccess("Process killed : " + merged);
+        break;
+      case "killall":
+        procmgr.killAll(proc.id);
+        break;
       case "touch":
         if (!merged) {
           addWarn("Path required");
