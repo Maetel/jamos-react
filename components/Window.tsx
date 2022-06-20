@@ -146,9 +146,24 @@ export default function Window(props) {
       if (!(retval["left"] | retval["right"])) {
         retval["left"] = calcInitLeft(parseInt(proc.id));
       }
-      retval["width"] = retval["width"] ?? "50%";
-      if (!(retval["width"] | retval["aspectRatio"])) {
-        retval["height"] = "70%";
+
+      {
+        console.log("Proc.rect : ", proc.rect, " name:", proc.name);
+        if (proc.name === "Styler") {
+          // debugger;
+        }
+      }
+      retval["width"] = retval["width"] ?? proc.rect?.["width"] ?? "50%";
+      if (!(retval["height"] | retval["aspectRatio"])) {
+        if (proc["rect"]?.["aspectRatio"]) {
+          retval["aspectRatio"] = proc["rect"]["aspectRatio"];
+        }
+        if (proc["rect"]?.["height"]) {
+          retval["height"] = proc["rect"]["height"];
+        }
+        if (!(retval["height"] | retval["aspectRatio"])) {
+          retval["height"] = "70%";
+        }
       }
     }
 

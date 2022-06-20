@@ -2,6 +2,7 @@ import { useSelector } from "react-redux";
 import store from "../../app/store";
 import Path, { addError, addLog } from "../../scripts/Path";
 import { dirValue, fileValue, selectFile } from "../file/fileSlice";
+import Log from "../log/Log";
 import SetMgr from "../settings/SetMgr";
 
 import {
