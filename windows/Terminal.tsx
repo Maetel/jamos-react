@@ -108,7 +108,7 @@ export default function (props) {
   const _add = (item: PromptItem) => {
     item.id = "" + itemId++; //randomId();
     setPromptItems((promptItems) => [item, ...promptItems]);
-    console.log("_add, item :", item);
+    // console.log("_add, item :", item);
   };
   const addWarn = (prom: string) => {
     addText(prom, "warn");

@@ -17,7 +17,7 @@ export default class FileMgr {
 
   public mkdir(path:string){
     if (dirExists(path)) {
-      console.warn(`Directory '${path}' already exists`);
+      // console.warn(`Directory '${path}' already exists`);
       return true;
     }
     store.dispatch(mkdir(path));

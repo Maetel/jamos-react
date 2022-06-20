@@ -60,11 +60,11 @@ const fileSlice = createSlice({
       const _mkdir = (path:string)=>{
         const refined = new Path(path);
         if(!_verifyPath(path)){
-          log(`Path must begin with '${initialHomePath}'`);
+          // log(`Path must begin with '${initialHomePath}'`);
           return false;
         }
         if(findDir(state, path)){
-          log(`Directory '${path}' already exists`)
+          // log(`Directory '${path}' already exists`)
           return true;
         }
         const parentPath = new Path(path).parent;
