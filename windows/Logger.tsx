@@ -8,12 +8,13 @@ import Process from "../features/procmgr/ProcTypes";
 import styles from "../styles/Logger.module.css";
 
 export default function Logger(props) {
-  const proc: Process = props.proc;
+  const proc: Process = { ...props.proc };
+  proc.name = proc.name || "Logger";
   const logs = [...useAppSelector(selectLogAll)].reverse();
 
   const procs = useAppSelector(selectProcesses);
   return (
-    <Window {...props}>
+    <Window {...props} proc={proc}>
       <div className={styles.container}>
         <div className={styles.flex1}>
           * Logs

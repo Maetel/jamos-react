@@ -45,7 +45,7 @@ export default function (props) {
   const filemgr = FileMgr.getInstance();
   const setmgr = SetMgr.getInstance();
   const proc = { ...props.proc };
-  proc["name"] = proc["name"] ?? "Terminal";
+  proc.name = proc.name ?? `Terminal`;
 
   /////////// init setup
   let contElem: HTMLElement, inputArea: HTMLElement, inputElem: HTMLElement;
@@ -176,8 +176,9 @@ export default function (props) {
     const psData: TableData = {
       desc: "- Process List",
       // firstColumnColor: _colors["okay"],
-      heads: ["This", "ID", "Name", "Type", "Z-Index", "File path"],
+      heads: ["This", "ID", "Name", "Type", "Index", "File path"],
       rows: data,
+      weights: [2, 1, 4, 4, 2, 5],
     };
     const processItem: PromptItem = {
       comp: "PromptTableView",

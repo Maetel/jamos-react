@@ -47,7 +47,7 @@ export default function SystemInfo(props) {
       const serialized = ["string", "number", "boolean"].includes(
         typeof proc[key]
       )
-        ? proc[key]
+        ? "" + proc[key]
         : JSON.stringify(proc[key]);
       rows.push([key, serialized]);
     }
@@ -56,6 +56,7 @@ export default function SystemInfo(props) {
       desc: `${proc.comp} of id ${proc.id}`,
       heads: ["Property", "Value"],
       rows: rows,
+      weights: [1, 4],
     };
     return (
       <div
@@ -66,7 +67,7 @@ export default function SystemInfo(props) {
         }}
       >
         <div className={styles.clickable} onClick={toggleCollapse}>
-          {proc.comp}
+          {proc.name !== "Application" ? proc.name : proc.type}
         </div>
         <div
           className={styles.content}

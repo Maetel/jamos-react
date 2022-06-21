@@ -99,19 +99,23 @@ export default function Window(props) {
     winElem = document.querySelector(`#${winId}`) as HTMLElement;
     navElem = document.querySelector(`#${navId}`) as HTMLElement;
   };
+
+  const dispatch = useAppDispatch();
+  const proc: Process = props.proc;
+  const rect: Rect = useAppSelector(selectProcProp(proc.id, "rect"));
+  // console.log(`Win rect of ${proc.comp}, rect :`, rect);
+  const isMax = useAppSelector(selectProcProp(proc.id, "isMaximized"));
+
   useEffect(() => {
     // console.log("Use effect called :", effectCalled++);
     setElems();
     if (winElem) {
       dispatchRect();
     }
+    if (proc.name) {
+      dispatch(setProcProps({ id: proc.id, props: { name: proc.name } }));
+    }
   }, []);
-
-  const dispatch = useAppDispatch();
-  const proc: Process = props.proc;
-  const rect: Rect = useAppSelector(selectProcProp(proc.id, "rect"));
-  console.log(`Win rect of ${proc.comp}, rect :`, rect);
-  const isMax = useAppSelector(selectProcProp(proc.id, "isMaximized"));
 
   ////////////////// rect / style / theme
   const [transition, setTransition] = useState("0.3s");

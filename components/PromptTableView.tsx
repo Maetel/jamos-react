@@ -8,6 +8,7 @@ export interface TableData {
   firstColumnColor?: string;
   heads?: string[];
   rows?: Array<any>[];
+  weights?: Array<number>;
 }
 
 export default function PromptTableView(props) {
@@ -15,9 +16,23 @@ export default function PromptTableView(props) {
     Log.error("no table data!");
     return;
   }
-  const data = props.tableData;
-  // console.log("Table data : ", data);
-  const thisViewId = randomId();
+
+  const data: TableData = props.tableData;
+  const setWeights = () => {
+    if (!data.weights) {
+      data.weights = new Array(data.rows.length).fill(1);
+    }
+    while (data.weights.length < data.rows.length) {
+      data.weights.push(1);
+    }
+    data.weights.map((w, i) => (data.weights[i] > 1 ? data.weights[i] : 1));
+  };
+  setWeights();
+  const weightTotal = data.weights.reduce((prev, next: number) => {
+    return prev + next;
+  }, 0);
+  const buildWidth = (w) => `${(w * 100) / weightTotal}%`;
+
   const TableTitle = () => {
     if (!data.title) {
       return;
@@ -41,7 +56,12 @@ export default function PromptTableView(props) {
         <tr>
           {data.heads.map((head, i) => {
             return (
-              <th scope="col" key={i} className={styles.tableCol}>
+              <th
+                scope="col"
+                key={i}
+                className={styles.tableCol}
+                style={{ width: buildWidth(data.weights[i]) }}
+              >
                 {head}
               </th>
             );
@@ -64,7 +84,11 @@ export default function PromptTableView(props) {
               <tr className={styles.tableRow} key={i}>
                 {row.map((col, j) => {
                   return (
-                    <td className={styles.tableCol} key={j}>
+                    <td
+                      className={styles.tableCol}
+                      key={j}
+                      style={{ width: buildWidth(data.weights[j]) }}
+                    >
                       {col}
                     </td>
                   );

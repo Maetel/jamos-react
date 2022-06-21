@@ -26,19 +26,22 @@
 }
 .tableCol {
   font-weight: 300;
-  /* font-size: 0.9rem; */
-  padding: 3px 20px;
+  /* font-size: 0.7rem; */
+  /* padding: 3px 20px; */
+  padding: 3px 0px;
   line-break: strict;
   overflow-wrap: break-word;
   overflow-x: auto;
 
   /* width:60%; */
+  text-align: center;
 }
 .tableCol:first-child {
   /* font-weight: 300; */
   /* font-size: 1.1rem; */
   border-right: 1px solid #dbdbdb;
-  width:20%;
+  /* width:20%; */
+  /* max-width: fit-content; */
 }
 .tableHead {
   border:1px solid #dbdbdb;

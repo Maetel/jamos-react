@@ -1,8 +1,11 @@
 import { useState } from "react";
 import Window from "../components/Window";
+import Process from "../features/procmgr/ProcTypes";
 import styles from "../styles/Notepad.module.css";
 
 export default function Notepad(props) {
+  const proc: Process = { ...props.proc };
+  proc.name = proc.name || "Notepad";
   const setFile = (e) => {};
   const loadFile = (e) => {};
   const saveFile = (e) => {};
@@ -11,7 +14,7 @@ export default function Notepad(props) {
   const [textAreaValue, setTextAreaValue] = useState("");
 
   return (
-    <Window {...props}>
+    <Window {...props} proc={proc}>
       <div className={styles.container}>
         <div className={styles.btns}>
           <button title="Reload" className={styles.btn} onClick={setFile}>

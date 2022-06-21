@@ -6,7 +6,8 @@ import ProcMgr from "../features/procmgr/ProcMgr";
 
 export default function Browser(props) {
   // console.log("Browser prsop : ", props);
-  const proc = props.proc;
+  const proc = { ...props.proc };
+  proc.name = proc.name ?? "JamBrowser";
   const currentPath = proc.path;
   let contentSrc = currentPath ?? "";
   const onMountSetter = proc.onMountSetter;
@@ -26,7 +27,7 @@ export default function Browser(props) {
   const barHeight = "40px";
 
   return (
-    <Window {...props}>
+    <Window {...props} proc={proc}>
       {isLoading ? <Loading barHeight={barHeight} /> : undefined}
       <div className={styles.container}>
         <div className={styles.browser}>

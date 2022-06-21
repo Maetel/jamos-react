@@ -9,7 +9,8 @@ import ProcMgr from "../features/procmgr/ProcMgr";
 import styles from "../styles/Finder.module.css";
 
 export default function Finder(props) {
-  const proc = props.proc;
+  const proc = { ...props.proc };
+  proc.name = proc.name ?? "Finder";
   const currentPath: string = props.proc.path;
 
   const procmgr = ProcMgr.getInstance();
@@ -21,7 +22,7 @@ export default function Finder(props) {
   ////////////// browse back and forth
   const nodes = filemgr.nodesReadable(selector, currentPath);
   return nodes ? (
-    <Window {...props}>
+    <Window {...props} proc={proc}>
       <div className={styles.container}>
         <div className={styles.browser}>
           <button className={`${styles.browserContent} ${styles.button}`}>
