@@ -42,6 +42,11 @@ export default function FinderIcon(props) {
   const procmgr = ProcMgr.getInstance();
   const nodepath: string = props.node.path;
   const node: Node = useAppSelector(selectNode(nodepath));
+  const onClick: (Event) => void =
+    props.onClick ??
+    function (node: Node) {
+      procmgr.exeFile(new Path(node.path));
+    };
   // if (!node) {
   //   Log.warn("No such file : " + nodepath);
   //   return;
@@ -74,7 +79,7 @@ export default function FinderIcon(props) {
       className={styles.container}
       id={contElemId}
       onClick={(e) => {
-        procmgr.exeFile(new Path(node.path));
+        onClick(node);
       }}
       onMouseOver={(e) => {
         callHover(e, true);
