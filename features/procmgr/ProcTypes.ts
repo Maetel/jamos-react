@@ -29,6 +29,7 @@ export const ProcessCommands = [
   "about",
   "settings",
   "styler",
+  "systeminfo",
 
   //daemon/app
   "broom", "savebread", "loadbread", "resetbread"

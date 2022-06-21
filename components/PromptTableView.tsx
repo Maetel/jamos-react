@@ -1,5 +1,6 @@
 import Log from "../features/log/Log";
 import { randomId } from "../scripts/utils";
+import styles from "../styles/PromptTableView.module.css";
 
 export interface TableData {
   title?: string;
@@ -21,34 +22,13 @@ export default function PromptTableView(props) {
     if (!data.title) {
       return;
     }
-    return (
-      <div
-        className="table-title"
-        style={{
-          fontWeight: "600",
-          fontSize: "1.4rem",
-          padding: "10px 0px 7px 15px",
-        }}
-      >
-        {data.title}
-      </div>
-    );
+    return <div className={styles.tableTitle}>{data.title}</div>;
   };
   const TableDesc = () => {
     if (!data.desc) {
       return;
     }
-    return (
-      <div
-        className="table-desc"
-        style={{
-          fontWeight: "400",
-          padding: "0px 0px 10px 15px",
-        }}
-      >
-        {data.desc}
-      </div>
-    );
+    return <div className={styles.tableDesc}>{data.desc}</div>;
   };
 
   const TableHeads = () => {
@@ -57,11 +37,11 @@ export default function PromptTableView(props) {
     }
 
     return (
-      <thead>
+      <thead className={styles.tableHead}>
         <tr>
           {data.heads.map((head, i) => {
             return (
-              <th scope="col" key={i}>
+              <th scope="col" key={i} className={styles.tableCol}>
                 {head}
               </th>
             );
@@ -76,22 +56,15 @@ export default function PromptTableView(props) {
     }
 
     return (
-      <table className="table-content">
+      <table className={styles.tableContent}>
         <TableHeads {...props} />
-        <tbody>
+        <tbody className={styles.tableBody}>
           {data.rows.map((row, i) => {
             return (
-              <tr className="table-row" key={i}>
+              <tr className={styles.tableRow} key={i}>
                 {row.map((col, j) => {
                   return (
-                    <td
-                      className="table-col"
-                      key={j}
-                      style={{
-                        fontWeight: "300",
-                        padding: "3px 20px",
-                      }}
-                    >
+                    <td className={styles.tableCol} key={j}>
                       {col}
                     </td>
                   );
@@ -106,7 +79,7 @@ export default function PromptTableView(props) {
 
   return (
     <div
-      className="container"
+      className={styles.container}
       style={{
         position: "relative",
         width: "100%",

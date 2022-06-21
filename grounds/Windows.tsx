@@ -19,6 +19,7 @@ import Finder from "../windows/Finder";
 import Notepad from "../windows/Notepad";
 import Browser from "../windows/Browser";
 import Styler from "../windows/Styler";
+import SystemInfo from "../windows/SystemInfo";
 
 const winCmdMap: { [key: string]: (props) => JSX.Element } = {
   testwindow: TestWindow,
@@ -28,6 +29,7 @@ const winCmdMap: { [key: string]: (props) => JSX.Element } = {
   notepad: Notepad,
   browser: Browser,
   styler: Styler,
+  systeminfo: SystemInfo,
 };
 
 export default function Windows(props) {

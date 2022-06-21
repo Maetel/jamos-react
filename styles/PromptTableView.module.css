@@ -1,0 +1,45 @@
+.container {
+  width: 100%;
+  position:relative;
+}
+.tableTitle {
+  font-weight: 600;
+  font-size: 1.4rem;
+  padding: 10px 0px 7px 15px;
+}
+.tableDesc {
+  font-weight: 400;
+  padding: 0px 0px 10px 15px;
+}
+
+.tableContent{
+  table-layout: fixed;
+}
+.tableHead,
+.tableBody,
+.tableContent,
+.tableRow {
+  width:100%;
+  overflow-wrap: break-word;
+  line-break: normal;
+  overflow-x: scroll;
+}
+.tableCol {
+  font-weight: 300;
+  /* font-size: 0.9rem; */
+  padding: 3px 20px;
+  line-break: strict;
+  overflow-wrap: break-word;
+  overflow-x: auto;
+
+  /* width:60%; */
+}
+.tableCol:first-child {
+  /* font-weight: 300; */
+  /* font-size: 1.1rem; */
+  border-right: 1px solid #dbdbdb;
+  width:20%;
+}
+.tableHead {
+  border:1px solid #dbdbdb;
+}

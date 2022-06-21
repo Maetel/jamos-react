@@ -18,6 +18,7 @@ const Home: NextPage = () => {
     const f: File[] = [
       filemgr.makeFile("~/Terminal", "terminal", "/imgs/terminal.svg"),
       filemgr.makeFile("~/Logger", "logger", "/imgs/logger.svg"),
+      filemgr.makeFile("~/System Info", "systeminfo", "/imgs/chart.svg"),
       filemgr.makeFile(
         "~/Portfolio/Clips/1. Intro",
         "browser",
@@ -30,6 +31,7 @@ const Home: NextPage = () => {
         "/imgs/career.svg",
         "browser https://v1.embednotion.com/embed/9091c7d511f941b387d3064690d4d2dd"
       ),
+      filemgr.makeFile("~/Styler", "styler", "/imgs/styler.svg"),
     ];
     filemgr.addFiles(f);
   };

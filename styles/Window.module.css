@@ -20,16 +20,22 @@
   top: 0;
   left: 0;
   /* background-color: #3c3a38; */
-  cursor: move; /* fallback if grab cursor is unsupported */
-    cursor: grab;
-    cursor: -moz-grab;
-    cursor: -webkit-grab;
+  
 }
-.window-container-header:active {
+/* .draggable:active {
   cursor: grabbing;
     cursor: -moz-grabbing;
     cursor: -webkit-grabbing;
 }
+
+.draggable {
+  cursor: move; 
+  cursor: grab;
+  cursor: -moz-grab;
+  cursor: -webkit-grab;
+} */
+
+
 .window-title {
   font-weight: 500;
   font-size: 1.1rem;
@@ -49,9 +55,7 @@
   /* background-color: #dbdbdb; */
 }
 
-.grabbable .window-container {
-  transform: scale(0.8) translateY(-20%);
-}
+
 
 .content-container.dragging::after {
   content: "";
@@ -74,6 +78,9 @@
   cursor: grabbing;
   cursor: -moz-grabbing;
   cursor: -webkit-grabbing;
+}
+.grabbable .window-container {
+  transform: scale(0.8) translateY(-20%);
 }
 
 .button-container {

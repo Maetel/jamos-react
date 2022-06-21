@@ -219,8 +219,8 @@ export default function (props) {
       "markdown editor and viewer",
     ],
     ["browser", "browser [$url]", "JamBrowser", "JamBrowser"],
-    ["broom", "broom", "close all process", "close all process"],
-    ["settings", "settings", "open user settings", "open user settings"],
+    ["broom", "broom", "Process cleaner", "close all open processes"],
+    ["settings", "settings", "OS settings", "open user settings"],
     [
       "styler",
       "styler [$style]",
@@ -232,27 +232,27 @@ export default function (props) {
     [
       "atelier",
       "atelier",
-      "Interactive canvas with generative art",
-      "Interactive canvas with generative art",
+      "Interactive canvas",
+      "Generative art demo. Select mode and drag on canvas to view",
     ],
   ];
   const terminalHelpData = [
     [
       "ls",
       "ls [$path]",
-      "list all directories and files",
-      "list all directories and files",
+      "List dirs and files",
+      `list all directories and files in the path. If executed without path argument, performs list towards 'pwd', which is '${pwd.path}'`,
     ],
     [
       "cd",
       "cd <$path>",
-      "goes to the path",
+      "Goes to the path",
       "Browse in terminal using cd. ex) cd ../../Directory",
     ],
     [
       "mkdir",
       "mkdir <$path>",
-      "makes directories recursively to the path",
+      "Makes directories",
       "makes directories recursively to the path",
     ],
     ["cat", "cat <$path>", "reads a text file", "reads a text file"],
@@ -278,9 +278,7 @@ export default function (props) {
       "toggle window maximize",
     ],
     ["quit", "quit, exit", "quits this terminal", "quits this terminal"],
-    ["ps", "ps", "process list", "process list"],
-    ["kill", "kill <$processId>", "closes process", "closes process"],
-    ["killall", "killall", "closes all processes", "closes all processes"],
+
     [
       "touch",
       "touch <$path>",
@@ -289,6 +287,15 @@ export default function (props) {
     ],
   ];
   const systemHelpData = [
+    [
+      "systeminfo",
+      "systeminfo",
+      "Process monitor",
+      "View detailed information about currently running processes",
+    ],
+    ["ps", "ps", "process list", "process list"],
+    ["kill", "kill <$processId>", "closes process", "closes process"],
+    ["killall", "killall", "closes all processes", "closes all processes"],
     ["savebread", "savebread", "save current status", "save current status"],
     ["loadbread", "loadbread", "load saved", "load saved"],
     [
@@ -339,18 +346,18 @@ export default function (props) {
     const titleAndApps: TableData = {
       title: "JamOS Terminal Commands",
       desc: `- Applications, [optional] <required>`,
-      heads: ["App Name", "Description"],
+      heads: ["App Name", "Brief", "Description"],
       rows: appHelpData.map((row) => row.splice(1)),
     };
     const terminalCmds: TableData = {
       desc: "- Terminal Commands",
-      heads: ["Command Name", "Description"],
+      heads: ["Terminal cmd", "Brief", "Description"],
       rows: terminalHelpData.map((row) => row.splice(1)),
     };
 
     const systemCmds: TableData = {
       desc: `- System commands, or dev/beta apps`,
-      heads: ["App Name", "Description"],
+      heads: ["System cmd", "Brief", "Description"],
       rows: systemHelpData.map((row) => row.splice(1)),
     };
 
@@ -432,15 +439,17 @@ export default function (props) {
       }
     }
     switch (cmd) {
-      case "atelier":
-      case "postman":
+      //   case "atelier":
+      // case "postman":
+
+      // case "markdown":
+      // case "bakery":
+      // case "broom":
+      // case "about":
+      // case "settings":
       case "terminal":
       case "logger":
-      case "markdown":
-      case "bakery":
-      case "broom":
-      case "about":
-      case "settings":
+      case "systeminfo":
         procmgr.add(cmd);
         break;
       case "notepad":
@@ -489,14 +498,14 @@ export default function (props) {
         setmgr.setTheme(merged);
         addSuccess(`Theme '${merged} applied'`);
         break;
-      case "viewer":
-        if (merged.length === 0) {
-          addWarn("Path required for image viewer.");
-          break;
-        }
+      // case "viewer":
+      //   if (merged.length === 0) {
+      //     addWarn("Path required for image viewer.");
+      //     break;
+      //   }
 
-        procmgr.add("viewer", { path: mergedFilePath.path });
-        break;
+      //   procmgr.add("viewer", { path: mergedFilePath.path });
+      //   break;
       case "cp":
       case "mv":
         addWarn("To be updated soon");

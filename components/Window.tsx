@@ -89,6 +89,7 @@ function closeDragElement(el: HTMLElement) {
 }
 
 export default function Window(props) {
+  let _navElem = useRef(null);
   let winElem: HTMLElement | undefined;
   let navElem: HTMLElement | undefined;
   const winId: string = randomId();
@@ -109,7 +110,7 @@ export default function Window(props) {
   const dispatch = useAppDispatch();
   const proc: Process = props.proc;
   const rect: Rect = useAppSelector(selectProcProp(proc.id, "rect"));
-
+  console.log(`Win rect of ${proc.comp}, rect :`, rect);
   const isMax = useAppSelector(selectProcProp(proc.id, "isMaximized"));
 
   ////////////////// rect / style / theme
@@ -128,6 +129,9 @@ export default function Window(props) {
     // console.log(`Buildstyle from id:${id}, rect : ${JSON.stringify(rect)}`);
 
     //rect
+    if (rect?.["width"] === "100%" && proc.comp === "systeminfo") {
+      // debugger;
+    }
     {
       if (!!rect) {
         for (let key in rect) {
@@ -140,28 +144,22 @@ export default function Window(props) {
       const calcInitTop = (count: number) => {
         return `${5 + 3 * Math.floor(count / 20) + (count % 20) * 2}%`;
       };
-      if (!(retval["top"] | retval["bottom"])) {
+      if (!(retval["top"] || retval["bottom"])) {
         retval["top"] = calcInitTop(parseInt(proc.id));
       }
-      if (!(retval["left"] | retval["right"])) {
+      if (!(retval["left"] || retval["right"])) {
         retval["left"] = calcInitLeft(parseInt(proc.id));
       }
 
-      {
-        console.log("Proc.rect : ", proc.rect, " name:", proc.name);
-        if (proc.name === "Styler") {
-          // debugger;
-        }
-      }
       retval["width"] = retval["width"] ?? proc.rect?.["width"] ?? "50%";
-      if (!(retval["height"] | retval["aspectRatio"])) {
+      if (!(retval["height"] || retval["aspectRatio"])) {
         if (proc["rect"]?.["aspectRatio"]) {
           retval["aspectRatio"] = proc["rect"]["aspectRatio"];
         }
         if (proc["rect"]?.["height"]) {
           retval["height"] = proc["rect"]["height"];
         }
-        if (!(retval["height"] | retval["aspectRatio"])) {
+        if (!(retval["height"] || retval["aspectRatio"])) {
           retval["height"] = "70%";
         }
       }
@@ -173,6 +171,12 @@ export default function Window(props) {
       retval["backgroundColor"] = _colors["2"];
       retval["boxShadow"] = _colors["boxShadow"];
     }
+
+    //bar
+    {
+      retval["borderRadius"] = isMax ? 0 : 8;
+    }
+
     // console.log("Buildstyle : ", retval);
     return retval;
   };
@@ -215,13 +219,24 @@ export default function Window(props) {
   const minBtnStyle = { backgroundColor: _colors["warn"] };
   const maxBtnStyle = { backgroundColor: _colors["okay"] };
 
-  const toggleWindow = (e) => {
+  const togglegrabbable = () => {
+    //watches before transition, so toggle opposite way
+    if (isMax) {
+      _navElem?.current.classList.add(styles.grabbable);
+    } else {
+      _navElem?.current.classList.remove(styles.grabbable);
+    }
+  };
+
+  const toggleWindowMaximize = (e) => {
     dispatch(toggleMaximize(proc.id));
+    // setTimeout(togglegrabbable, 500);
+    togglegrabbable();
   };
 
   return (
     <section
-      className={styles["window-container"]}
+      className={`${styles["window-container"]}`}
       id={winId}
       onMouseDown={(e) => {
         if ((e.target as HTMLElement).classList.contains("btn-close")) {
@@ -233,10 +248,13 @@ export default function Window(props) {
       style={contElemStyle}
     >
       <div
-        className={styles["window-container-header"]}
+        className={`${styles["window-container-header"]} ${styles.grabbable}`}
         id={navId}
+        ref={_navElem}
         onMouseDown={(e) => {
-          dragMouseDown(e);
+          if (!isMax) {
+            dragMouseDown(e);
+          }
         }}
         onMouseUp={(e) => {
           dispatchRect();
@@ -252,7 +270,7 @@ export default function Window(props) {
           <li className={styles["btn-minimize"]} style={minBtnStyle} />
           <li
             className={styles["btn-maximize"]}
-            onClick={toggleWindow}
+            onClick={toggleWindowMaximize}
             style={maxBtnStyle}
           />
         </ul>
