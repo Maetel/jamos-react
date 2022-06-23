@@ -3,8 +3,10 @@ import { useAppDispatch, useAppSelector } from "../app/hooks";
 import FinderIcon from "../components/FinderIcon";
 import Window from "../components/Window";
 import FileMgr from "../features/file/FileMgr";
+import { Node } from "../features/file/FileTypes";
 import Log from "../features/log/Log";
 import ProcMgr from "../features/procmgr/ProcMgr";
+import Path from "../scripts/Path";
 
 import styles from "../styles/Finder.module.css";
 
@@ -16,9 +18,17 @@ export default function Finder(props) {
 
   const [currentPath, setCurrentPath] = useState(props.proc.path);
   const [pathList, setPathList] = useState([props.proc.path]);
-  const onIconClick = (node) => {
-    setCurrentPath((p) => node.path);
-    setPathList((l) => [...l, node.path]);
+  const onIconClick = (_node: Node) => {
+    const nodeIsDir = () => _node.type === "dir";
+    setCurrentPath((p) => {
+      return nodeIsDir() ? _node.path : p;
+    });
+    setPathList((l) => {
+      return nodeIsDir() ? [...l, _node.path] : l;
+    });
+    if (!nodeIsDir()) {
+      procmgr.exeFile(new Path(_node.path));
+    }
   };
   const browseBack = (e) => {
     setCurrentPath((p) => pathList.at(pathList.length - 2) ?? p);
@@ -26,7 +36,9 @@ export default function Finder(props) {
   };
 
   useEffect(() => {
-    (backBtn?.current as HTMLButtonElement).disabled = pathList.length <= 1;
+    if (backBtn?.current) {
+      (backBtn.current as HTMLButtonElement).disabled = pathList.length <= 1;
+    }
   });
 
   const procmgr = ProcMgr.getInstance();

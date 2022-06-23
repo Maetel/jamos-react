@@ -3,6 +3,7 @@ export default interface Process {
   comp:string,
   name:string,
   zIndex:string,
+  //onFocus?:()=>void,
   [key:string]:any
 }
 

@@ -112,12 +112,17 @@ public psValue(){
       comp:procType,
       name:args['name'], //okay to be undefined
       zIndex:'0',
+      resize:'both',
       ...args
     }
     
     store.dispatch(addProc(proc));
 
     return this;
+  }
+
+  public isFront(procId:string):boolean{
+    return useSelector(selectProcesses)?.find(proc=>proc.zIndex==='0')?.id === procId;
   }
 
   public get procs(){

@@ -26,18 +26,6 @@ export default function Logger(props) {
             ))}
           </ul>
         </div>
-        <div className={`${styles.flex1}`}>
-          *Procs :
-          <ul className="procs">
-            {procs.map((proc, i) => {
-              return (
-                <li className="procText" key={i}>
-                  {i}. {JSON.stringify(proc)}
-                </li>
-              );
-            })}
-          </ul>
-        </div>
       </div>
     </Window>
   );

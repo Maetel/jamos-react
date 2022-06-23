@@ -18,6 +18,7 @@ export default function Styler(props) {
     width: 400,
     height: 210 + themes.length * 33,
   };
+  proc["resize"] = "none";
 
   const ThemeButton = (btnProps) => {
     const theme = btnProps.theme;

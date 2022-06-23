@@ -46,16 +46,25 @@ export default function (props) {
   const setmgr = SetMgr.getInstance();
   const proc = { ...props.proc };
   proc.name = proc.name ?? `Terminal`;
+  proc.onFocus = () => {
+    if (!inputElem) {
+      setElems();
+    }
+    inputElem.focus();
+  };
 
   /////////// init setup
+  const setElems = () => {
+    contElem = document.querySelector(`#${contElemId}`);
+    inputArea = document.querySelector(`#${inputAreaId}`);
+    inputElem = document.querySelector(`#${inputElemId}`);
+  };
   let contElem: HTMLElement, inputArea: HTMLElement, inputElem: HTMLElement;
   let contElemId = randomId(),
     inputAreaId = randomId(),
     inputElemId = randomId();
   useEffect(() => {
-    contElem = document.querySelector(`#${contElemId}`);
-    inputArea = document.querySelector(`#${inputAreaId}`);
-    inputElem = document.querySelector(`#${inputElemId}`);
+    setElems();
   }, []);
 
   const [username, setUsername] = useState("jam@127.0.0.1");

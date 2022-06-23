@@ -23,7 +23,7 @@ let pos1 = 0,
   pos2 = 0,
   pos3 = 0,
   pos4 = 0;
-let defaultTransition = "0.3s";
+let maximizeTransition = "0.3s";
 function dragMouseDown(e: any) {
   const el = e.currentTarget.parentElement;
   if (!el) {
@@ -83,7 +83,6 @@ function closeDragElement(el: HTMLElement) {
   //   Updater.rect("top", winElem.style.top).rect("left", winElem.style.left);
   // }
   //restore transition
-  el.style.transition = defaultTransition;
   // win.style.transition = transition;
   // contentElem.classList.remove("dragging");
 }
@@ -100,28 +99,44 @@ export default function Window(props) {
     navElem = document.querySelector(`#${navId}`) as HTMLElement;
   };
 
+  const procmgr = ProcMgr.getInstance();
   const dispatch = useAppDispatch();
   const proc: Process = props.proc;
   const rect: Rect = useAppSelector(selectProcProp(proc.id, "rect"));
   // console.log(`Win rect of ${proc.comp}, rect :`, rect);
   const isMax = useAppSelector(selectProcProp(proc.id, "isMaximized"));
+  const isFront = procmgr.isFront(proc.id);
 
   useEffect(() => {
     // console.log("Use effect called :", effectCalled++);
     setElems();
     if (winElem) {
       dispatchRect();
+      if (winElem && proc["resize"] === "both") {
+        console.log("Resize in");
+        resizeObserver.observe(winElem);
+      } else {
+        resizeObserver.disconnect();
+      }
     }
     if (proc.name) {
       dispatch(setProcProps({ id: proc.id, props: { name: proc.name } }));
     }
   }, []);
 
+  ////////////////// detect resize
+  const resizeObserver = new ResizeObserver((entries) => {
+    for (let entry of entries) {
+      // console.log("Borderbox: ", entry.borderBoxSize.at(0));
+      // console.log("ContentBoxSize: ", entry.contentBoxSize.at(0));
+    }
+  });
+
   ////////////////// rect / style / theme
-  const [transition, setTransition] = useState("0.3s");
   const themeReadable = SetMgr.getInstance().themeReadable(useAppSelector);
   // console.log("Cur theme name : ", themeReadable.name);
   const _colors = themeReadable.colors;
+  const [navHovered, setNavHovered] = useState(false);
   const buildNavStyle = () => {
     return {
       color: _colors["2"],
@@ -181,9 +196,17 @@ export default function Window(props) {
       retval["borderRadius"] = isMax ? 0 : 8;
     }
 
+    //resize
+    {
+      if (!isMax && isFront) {
+        retval["resize"] = proc["resize"] ?? "none";
+      }
+    }
+
     // console.log("Buildstyle : ", retval);
     return retval;
   };
+
   const curRect = () => {
     if (!winElem) {
       setElems();
@@ -216,6 +239,9 @@ export default function Window(props) {
     dispatch(killProc(proc.id));
   };
   const onCloseBtn = dispatchCloseWindow;
+  const onMinimizeBtn = (e) => {
+    console.log("minimizeBtn clicked from ", proc.name);
+  };
 
   const contElemStyle = buildStyle(rect, proc.id);
   const navElemStyle = buildNavStyle();
@@ -233,23 +259,62 @@ export default function Window(props) {
   };
 
   const toggleWindowMaximize = (e) => {
+    if (!winElem) {
+      setElems();
+    }
+    if (winElem) {
+      console.log("Maximize transition : ", maximizeTransition);
+      winElem.style.setProperty("transition", maximizeTransition);
+      const safetimeout =
+        parseInt(maximizeTransition.toLowerCase().replace("s", "")) * 1000 +
+        100;
+      setTimeout(() => {
+        if (winElem) {
+          //in case winelem is destroyed before setproperty
+          winElem.style.setProperty("transition", "0s");
+        }
+      }, safetimeout);
+    }
     dispatch(toggleMaximize(proc.id));
     // setTimeout(togglegrabbable, 500);
     togglegrabbable();
+  };
+
+  const onContainerMouseDown = (e) => {
+    let cl = (e.target as HTMLElement).classList;
+    {
+      //handle switches
+      if (cl.contains("btn-close")) {
+        onCloseBtn();
+        return;
+      }
+      if (cl.contains("btn-minimize")) {
+        onMinimizeBtn(e);
+        return;
+      }
+      if (cl.contains("btn-maximize")) {
+        toggleWindowMaximize(e);
+        return;
+      }
+    }
+
+    if (!winElem) {
+      setElems();
+    }
+
+    dispatch(setActiveWindow(proc.id));
+    console.log("On mouse down");
   };
 
   return (
     <section
       className={`${styles["window-container"]}`}
       id={winId}
-      onMouseDown={(e) => {
-        if ((e.target as HTMLElement).classList.contains("btn-close")) {
-          onCloseBtn();
-          return;
-        }
-        dispatch(setActiveWindow(proc.id));
-      }}
+      onMouseDown={onContainerMouseDown}
       style={contElemStyle}
+      onMouseUp={(e) => {
+        console.log("On mouse up");
+      }}
     >
       <div
         className={`${styles["window-container-header"]} ${styles.grabbable}`}
@@ -260,21 +325,33 @@ export default function Window(props) {
             dragMouseDown(e);
           }
         }}
-        onMouseUp={(e) => {
-          dispatchRect();
-        }}
         style={navElemStyle}
       >
-        <ul className={styles["button-container"]}>
+        <ul
+          className={styles["button-container"]}
+          style={{ backgroundColor: navHovered ? _colors["2"] : "transparent" }}
+          onMouseEnter={(e) => {
+            // navElemStyle["backgroundColor"] = _colors["3"];
+            setNavHovered(true);
+          }}
+          onMouseLeave={(e) => {
+            setNavHovered(false);
+            // navElemStyle["backgroundColor"] = "transparent";
+          }}
+        >
           <li
             className={`${styles["btn-close"]} btn-close`}
-            onClick={onCloseBtn}
+            // onClick={onCloseBtn}
             style={closeBtnStyle}
           />
-          <li className={styles["btn-minimize"]} style={minBtnStyle} />
           <li
-            className={styles["btn-maximize"]}
-            onClick={toggleWindowMaximize}
+            className={`${styles["btn-minimize"]} btn-minimize`}
+            style={minBtnStyle}
+            // onClick={onMinimizeBtn}
+          />
+          <li
+            className={`${styles["btn-maximize"]} btn-maximize`}
+            // onClick={toggleWindowMaximize}
             style={maxBtnStyle}
           />
         </ul>
@@ -282,7 +359,12 @@ export default function Window(props) {
           {proc.name ?? "Application"}
         </span>
       </div>
-      <div className={styles["content-container"]}>
+      <div
+        className={styles["content-container"]}
+        onClick={(e) => {
+          proc.onFocus?.();
+        }}
+      >
         {(props as any).children}
       </div>
     </section>
