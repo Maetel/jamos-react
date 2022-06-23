@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 import Window from "../components/Window";
 import FileMgr from "../features/file/FileMgr";
@@ -41,6 +42,8 @@ export default function TestWindow(props) {
       </div>
     );
   };
+
+  useEffect(() => {}, []);
 
   return (
     <Window {...props} proc={proc}>

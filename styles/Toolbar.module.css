@@ -1,0 +1,16 @@
+.container {
+  width:100%;
+  position:absolute;
+  height:1.3rem;
+  top:0px;
+  left:50%;
+  transform:translateX(-50%) translateY(-1.3rem);
+  transition:0.2s;
+  z-index: 1002;
+  display:flex;
+  justify-content: space-between;
+}
+
+.container.active {
+  transform:translateX(-50%);
+}
