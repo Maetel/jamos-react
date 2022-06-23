@@ -70,11 +70,6 @@ export default function (props) {
   const [username, setUsername] = useState("jam@127.0.0.1");
   const [cmdValue, setCmdValue] = useState("");
 
-  const dispatch = useAppDispatch();
-  const selector = useAppSelector;
-  // const findFile = (path: string) => useAppSelector(selectFile(path));
-  // const findDir = (path: string) => useAppSelector(selectDir(path));
-
   //current directory
   const [pwd, setPwd] = useState(new Path("~/"));
   let _pwd = pwd;
@@ -777,10 +772,12 @@ export default function (props) {
         break;
       case "exit":
       case "quit":
-        dispatch(killProc(proc.id));
+        // dispatch(killProc(proc.id));
+        procmgr.kill(proc.id);
         break;
       case "maximize":
-        dispatch(toggleMaximize(proc.id));
+        // dispatch(toggleMaximize(proc.id));
+        procmgr.toggleMaximize(proc.id);
         break;
       default:
         addError("No command : " + cmds.join(" "));

@@ -44,7 +44,6 @@ export default function Finder(props) {
   const procmgr = ProcMgr.getInstance();
   const filemgr = FileMgr.getInstance();
 
-  const dispatch = useAppDispatch();
   const selector = useAppSelector;
 
   ////////////// browse back and forth

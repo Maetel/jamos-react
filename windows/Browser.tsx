@@ -21,7 +21,7 @@ export default function Browser(props) {
   const refreshPage = (e) => {};
   const contentLoaded = (e) => {
     setIsLoading(false);
-    ProcMgr.getInstance().maximize(proc.id);
+    ProcMgr.getInstance().toggleMaximize(proc.id);
   };
   const [isLoading, setIsLoading] = useState(true);
   const barHeight = "40px";

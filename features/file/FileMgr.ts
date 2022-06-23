@@ -1,5 +1,4 @@
 import store from "../../app/store";
-import Commands from "../../scripts/CommandParser";
 import Path from "../../scripts/Path";
 import { addFile, dirExists, dirValue, fileExists, fileValue, mkdir, rm, rmdir, selectDir, selectNodesInDir } from "./fileSlice";
 import { File, NodeControl } from "./FileTypes";

@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import ReactDOM, { render } from "react-dom";
 import { useDispatch } from "react-redux";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
+import FileMgr from "../features/file/FileMgr";
 import Log from "../features/log/Log";
 import ProcMgr from "../features/procmgr/ProcMgr";
 import {
@@ -19,6 +20,8 @@ import { addError } from "../scripts/Path";
 import { clamp, randomId } from "../scripts/utils";
 import styles from "../styles/Window.module.css";
 
+const minHeight = 240;
+const minWidth = 300;
 let pos1 = 0,
   pos2 = 0,
   pos3 = 0,
@@ -59,8 +62,7 @@ function elementDrag(e: any, el: HTMLElement) {
   pos4 = e.clientY;
 
   // set the element's new position and bound:
-  const minHeight = 150;
-  const minWidth = 180;
+
   let offsetTop = clamp(el.offsetTop - pos2, 0, window.innerHeight - minHeight);
   let offsetLeft = clamp(
     el.offsetLeft - pos1,
@@ -120,7 +122,7 @@ export default function Window(props) {
       }
     }
     if (proc.name) {
-      dispatch(setProcProps({ id: proc.id, props: { name: proc.name } }));
+      procmgr.set(proc.id, { name: proc.name });
     }
   }, []);
 
@@ -146,6 +148,12 @@ export default function Window(props) {
   const buildStyle = (rect: Rect, id: string) => {
     const retval = {};
     // console.log(`Buildstyle from id:${id}, rect : ${JSON.stringify(rect)}`);
+
+    // min w/h
+    {
+      retval["minWidth"] = proc["minWidth"] ?? minWidth;
+      retval["minHeight"] = proc["minHeight"] ?? minHeight;
+    }
 
     //rect
     if (rect?.["width"] === "100%" && proc.comp === "systeminfo") {
@@ -222,21 +230,14 @@ export default function Window(props) {
   };
   const dispatchRect = () => {
     const _rect = curRect();
-    const payload = {
-      id: proc.id,
-      props: {
-        rect: _rect,
-      },
-    };
-
-    dispatch(setProcProps(payload));
-
+    procmgr.set(proc.id, { rect: _rect });
     return _rect;
   };
 
   const dispatchCloseWindow = () => {
     Log.log(`Kill proc:` + proc.id);
-    dispatch(killProc(proc.id));
+    procmgr.kill(proc.id);
+    // dispatch(killProc(proc.id));
   };
   const onCloseBtn = dispatchCloseWindow;
   const onMinimizeBtn = (e) => {
@@ -275,7 +276,9 @@ export default function Window(props) {
         }
       }, safetimeout);
     }
-    dispatch(toggleMaximize(proc.id));
+    procmgr.toggleMaximize(proc.id);
+    procmgr;
+    // dispatch(toggleMaximize(proc.id));
     // setTimeout(togglegrabbable, 500);
     togglegrabbable();
   };
@@ -302,7 +305,8 @@ export default function Window(props) {
       setElems();
     }
 
-    dispatch(setActiveWindow(proc.id));
+    // dispatch(setActiveWindow(proc.id));
+    procmgr.setFront(proc.id);
     console.log("On mouse down");
   };
 

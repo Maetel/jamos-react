@@ -3,36 +3,19 @@ import { randomId } from "../scripts/utils";
 import styles from "../styles/Loading.module.css";
 
 export default function Loading(props) {
-  let barTop: string = "0px";
-  let barHeight: string = "30px;";
-  let background: string = "#dbdbdb";
-  let transition: string = "1s";
-
-  let loadingElem: HTMLElement, loadingIconElem: HTMLElement;
-  let barElem: HTMLElement;
-  const loadingElemId = randomId(),
-    loadingIconElemId = randomId(),
-    barElemId = randomId();
-  const setElems = () => {
-    loadingElem = loadingElem ?? document.querySelector(`#${loadingElemId}`);
-    loadingIconElem =
-      loadingIconElem ?? document.querySelector(`#${loadingIconElemId}`);
-    barElem = barElem ?? document.querySelector(`#${barElemId}`);
-  };
-  useEffect(() => {
-    setElems();
-    loadingElem.style.transition = transition;
-    loadingIconElem.style.transition = transition;
-    loadingElem.style.background = background;
-    barElem.style.setProperty("height", barHeight);
-    barElem.style.setProperty("top", barTop);
-  }, []);
+  let barTop: string = props.barTop ?? "0px";
+  let barHeight: string = props.barHeight ?? "30px;";
+  let background: string = props.background ?? "#dbdbdb";
+  let transition: string = props.transition ?? "1s";
 
   return (
     <div
       className={styles.container}
       // bind:this={loadingElem}
-      id={loadingElemId}
+      style={{
+        transition: transition,
+        background: background,
+      }}
     >
       <div className="loadingIconElem-wrapper">
         <img
@@ -40,13 +23,18 @@ export default function Loading(props) {
           alt="Loading"
           className={`${styles.loadingIconElem} ${styles.rotate}`}
           // bind:this={loadingIconElem}
-          id={loadingIconElemId}
+          style={{
+            transition: transition,
+          }}
         />
       </div>
       <div
         className={styles.progressBar}
-        id={barElemId}
         // bind:this={barElem}
+        style={{
+          height: barHeight,
+          top: barTop,
+        }}
       >
         <div
           className={`${styles.cover} ${styles.color1} ${styles.move} ${styles.right} `}

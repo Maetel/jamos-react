@@ -15,10 +15,37 @@ import {
   selectProcesses,
   selectProcInIndexOrder,
   setActiveWindow,
+  setProcProps,
   toggleMaximize,
 } from "./procSlice";
 import Process, { ProcessCommands } from "./ProcTypes";
 
+export class ProcController {
+  public procmgr = ProcMgr.getInstance();
+  constructor(public procId:string, private appselector){
+  }
+  kill(){this.procmgr.kill(this.procId)};
+  killAll(){this.procmgr.killAll(this.procId)};
+  psValue(){return this.procmgr.psValue()};
+  public isFront(procId:string):boolean{
+    return this.appselector(selectProcesses)?.find(proc=>proc.zIndex==='0')?.id === procId;
+  }
+
+  public get procs(){
+    return this.appselector(selectProcesses);
+  }
+  public get procsInOrder(){
+    return this.appselector(selectProcInIndexOrder);
+  }
+
+  getReadable() {
+    return this.procs.find(proc=>proc.id===this.procId);
+  }
+
+  public maximize() {
+    store.dispatch(toggleMaximize(this.procId));
+  }
+}
 
 export default class ProcMgr{
   private static instance:ProcMgr;
@@ -42,7 +69,7 @@ export default class ProcMgr{
     store.dispatch(killProc(procId));
   }
 
-  public killAll(procId:string){
+  public killAll(procId?:string){
     store.dispatch(killAllProcs(procId));
   }
 
@@ -136,8 +163,16 @@ public psValue(){
     return this.procs.find(proc=>proc.id===procId);
   }
 
-  public maximize(procId:string) {
+  public toggleMaximize(procId:string) {
     store.dispatch(toggleMaximize(procId));
+  }
+
+  public setFront(procId:string){
+    store.dispatch(setActiveWindow(procId));
+  }
+
+  public set (procId:string, props:{}){
+    store.dispatch(setProcProps({id:procId, props:props}));
   }
 
   //엄밀히 따지면 프로세스의 z-index는 별도의 어레이에 매핑되어 관리되는 것이 맞아보인다.

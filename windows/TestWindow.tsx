@@ -1,5 +1,6 @@
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 import Window from "../components/Window";
+import FileMgr from "../features/file/FileMgr";
 import {
   mkdir,
   selectDir,
@@ -10,21 +11,20 @@ import {
 import { Dir } from "../features/file/FileTypes";
 import Log from "../features/log/Log";
 import { selectLogAll, selectLogSystem } from "../features/log/logSlice";
+import ProcMgr from "../features/procmgr/ProcMgr";
 import Process from "../features/procmgr/ProcTypes";
 
 export default function TestWindow(props) {
-  const proc: Process = props.proc;
-  const dispatch = useAppDispatch();
+  const procmgr = ProcMgr.getInstance();
+  const filemgr = FileMgr.getInstance();
+  const proc: Process = { ...props.proc };
+  proc.name = proc.name ?? "Test Window";
   const logs = useAppSelector(selectLogAll);
   const system = useAppSelector(selectLogSystem);
   const home = useAppSelector(selectHome);
   const dirs = useAppSelector(selectDirs);
   const dir = useAppSelector(selectDir("~/hi/ho"));
   // const f = useAppSelector(selectFile("f"));
-  const addFile = (e) => {
-    dispatch(mkdir("~/hi/ho"));
-    Log.obj(dirs, "Dirs");
-  };
 
   const DirView = (dir: Dir, key = 0) => {
     return (
@@ -43,18 +43,15 @@ export default function TestWindow(props) {
   };
 
   return (
-    <Window {...props}>
+    <Window {...props} proc={proc}>
       <div className="test-window">
-        This is a test window of id : {proc.id} <br></br>
-        Index : {proc.zIndex}; log :{" "}
-        <button className="addfile" onClick={addFile}>
-          add file
+        <button
+          onClick={() => {
+            procmgr.killAll();
+          }}
+        >
+          killall
         </button>
-        Dirs: <br></br>
-        {DirView(home)}
-        <br></br>
-        select dir : <br></br>
-        {JSON.stringify(dir)}
       </div>
     </Window>
   );
