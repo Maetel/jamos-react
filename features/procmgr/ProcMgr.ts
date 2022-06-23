@@ -175,5 +175,9 @@ public psValue(){
     store.dispatch(setProcProps({id:procId, props:props}));
   }
 
+  public get (procId:string, prop:string){
+    return this.find(procId)[prop];
+  }
+
   //엄밀히 따지면 프로세스의 z-index는 별도의 어레이에 매핑되어 관리되는 것이 맞아보인다.
 }

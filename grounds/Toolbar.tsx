@@ -160,12 +160,12 @@ export default function Toolbar(props) {
   const procmgr = ProcMgr.getInstance();
   const collapsibles: CollapsibleMenu[] = [
     {
-      title: "   🍞   ",
+      title: "🍞",
       items: [
         {
-          name: "About",
+          name: "About JamOS",
           callback: () => {
-            procmgr.add("terminal");
+            procmgr.add("about");
           },
           separator: true,
         },
@@ -173,6 +173,12 @@ export default function Toolbar(props) {
           name: "Settings",
           callback: () => {
             procmgr.add("settings");
+          },
+        },
+        {
+          name: "System Monitor",
+          callback: () => {
+            procmgr.add("systeminfo");
           },
         },
         {
@@ -198,11 +204,18 @@ export default function Toolbar(props) {
     },
   ];
 
+  collapsibles.push(collapsibles[0]);
+
   const uncollapse = (e) => {
     setHovered(false);
     setClicked(null);
+    window.removeEventListener("keydown", handleEscape);
   };
-
+  const handleEscape = (e) => {
+    if (e.key === "Escape") {
+      uncollapse(e);
+    }
+  };
   return (
     <>
       <div
@@ -224,6 +237,7 @@ export default function Toolbar(props) {
                 key={i}
                 menuActivate={() => {
                   setClicked(i);
+                  window.addEventListener("keydown", handleEscape);
                 }}
                 clicked={clicked}
                 uncollapse={uncollapse}

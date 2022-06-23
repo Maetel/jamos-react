@@ -102,11 +102,11 @@ export default function Window(props) {
   };
 
   const procmgr = ProcMgr.getInstance();
-  const dispatch = useAppDispatch();
   const proc: Process = props.proc;
-  const rect: Rect = useAppSelector(selectProcProp(proc.id, "rect"));
+  const get = (prop) => procmgr.get(proc.id, prop);
+  const rect: Rect = get("rect");
   // console.log(`Win rect of ${proc.comp}, rect :`, rect);
-  const isMax = useAppSelector(selectProcProp(proc.id, "isMaximized"));
+  const isMax = get("isMaximized");
   const isFront = procmgr.isFront(proc.id);
 
   useEffect(() => {
@@ -146,7 +146,7 @@ export default function Window(props) {
     };
   };
   const buildStyle = (rect: Rect, id: string) => {
-    const retval = {};
+    const retval = { ...proc.rect };
     // console.log(`Buildstyle from id:${id}, rect : ${JSON.stringify(rect)}`);
 
     // min w/h
@@ -156,9 +156,6 @@ export default function Window(props) {
     }
 
     //rect
-    if (rect?.["width"] === "100%" && proc.comp === "systeminfo") {
-      // debugger;
-    }
     {
       if (!!rect) {
         for (let key in rect) {

@@ -53,7 +53,7 @@
 .items.active {
   display:flex;
   flex-direction: column;
-  min-width:150px;
+  min-width:180px;
   top: 1.6rem;
   gap:3px;
   border-radius: 6px;
