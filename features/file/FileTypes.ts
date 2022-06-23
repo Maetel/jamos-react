@@ -44,7 +44,7 @@ export class NodeControl {
       case "postman":
       case "atelier":
       case "notepad":
-      case "bakery":
+      case "appstore":
       case "savebread":
       case "styler":
       case "loadbread":

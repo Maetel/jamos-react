@@ -21,7 +21,7 @@ export default function Desktop(props) {
 
   const init = () => {
     procmgr.add("terminal");
-    procmgr.add("testwindow");
+    // procmgr.add("testwindow");
     filemgr.mkdir("~/1/2/3");
     const f: File[] = [
       filemgr.makeFile("~/Terminal", "terminal", "/imgs/terminal.svg"),

@@ -113,9 +113,12 @@ export default function Window(props) {
     // console.log("Use effect called :", effectCalled++);
     setElems();
     if (winElem) {
-      dispatchRect();
+      if (proc.rect) {
+        procmgr.set(proc.id, { rect: proc.rect });
+      } else {
+        dispatchRect();
+      }
       if (winElem && proc["resize"] === "both") {
-        console.log("Resize in");
         resizeObserver.observe(winElem);
       } else {
         resizeObserver.disconnect();
@@ -146,7 +149,7 @@ export default function Window(props) {
     };
   };
   const buildStyle = (rect: Rect, id: string) => {
-    const retval = { ...proc.rect };
+    const retval = {};
     // console.log(`Buildstyle from id:${id}, rect : ${JSON.stringify(rect)}`);
 
     // min w/h
@@ -256,12 +259,13 @@ export default function Window(props) {
     }
   };
 
+  // set window transition then toggle maximize
   const toggleWindowMaximize = (e) => {
     if (!winElem) {
       setElems();
     }
     if (winElem) {
-      console.log("Maximize transition : ", maximizeTransition);
+      // console.log("Maximize transition : ", maximizeTransition);
       winElem.style.setProperty("transition", maximizeTransition);
       const safetimeout =
         parseInt(maximizeTransition.toLowerCase().replace("s", "")) * 1000 +
@@ -274,9 +278,6 @@ export default function Window(props) {
       }, safetimeout);
     }
     procmgr.toggleMaximize(proc.id);
-    procmgr;
-    // dispatch(toggleMaximize(proc.id));
-    // setTimeout(togglegrabbable, 500);
     togglegrabbable();
   };
 
@@ -293,7 +294,11 @@ export default function Window(props) {
         return;
       }
       if (cl.contains("btn-maximize")) {
-        toggleWindowMaximize(e);
+        procmgr.setFront(proc.id);
+        setTimeout((e) => {
+          toggleWindowMaximize(e);
+          proc.onFocus?.();
+        }, 1);
         return;
       }
     }
@@ -304,7 +309,7 @@ export default function Window(props) {
 
     // dispatch(setActiveWindow(proc.id));
     procmgr.setFront(proc.id);
-    console.log("On mouse down");
+    // console.log("On mouse down");
   };
 
   return (
@@ -314,7 +319,7 @@ export default function Window(props) {
       onMouseDown={onContainerMouseDown}
       style={contElemStyle}
       onMouseUp={(e) => {
-        console.log("On mouse up");
+        // console.log("On mouse up");
       }}
     >
       <div

@@ -148,8 +148,11 @@ public psValue(){
     return this;
   }
 
+  public front(){
+    return useSelector(selectProcesses)?.find(proc=>proc.zIndex==='0');
+  }
   public isFront(procId:string):boolean{
-    return useSelector(selectProcesses)?.find(proc=>proc.zIndex==='0')?.id === procId;
+    return this.front()?.id === procId;
   }
 
   public get procs(){
@@ -159,7 +162,11 @@ public psValue(){
     return useSelector(selectProcInIndexOrder);
   }
 
-  public find(procId:string) {
+  public find(procId:string){
+    return store.getState().proc.procs.find(proc=>proc.id===procId);
+  }
+  
+  public findReadable(selector,procId:string) {
     return this.procs.find(proc=>proc.id===procId);
   }
 
@@ -176,7 +183,12 @@ public psValue(){
   }
 
   public get (procId:string, prop:string){
-    return this.find(procId)[prop];
+    // return this.find(procId)[prop];
+    return this.find?.[prop];
+  }
+
+  public getReadable (selector, procId:string, prop:string){
+    return this.findReadable(selector, procId)?.[prop];
   }
 
   //엄밀히 따지면 프로세스의 z-index는 별도의 어레이에 매핑되어 관리되는 것이 맞아보인다.

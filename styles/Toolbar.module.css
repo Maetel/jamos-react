@@ -43,11 +43,14 @@
   
 }
 
-.collTitle {
+.collMenu {
   display:block;
   cursor:pointer;
   min-width:50px;
   text-align: center;
+  padding: 0px 6px;
+  margin:1px;
+  border-radius: 3px;
 }
 
 .items.active {

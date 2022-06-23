@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Window from "../components/Window";
 import styles from "../styles/Terminal.module.css";
 import { clamp, randomId } from "../scripts/utils";
@@ -23,10 +23,9 @@ import { Dir } from "../features/file/FileTypes";
 import Log from "../features/log/Log";
 import Commands from "../scripts/CommandParser";
 import SetMgr from "../features/settings/SetMgr";
-import officialThemes, {
-  defaultTheme,
-  themeExists,
-} from "../features/settings/Themes";
+import officialThemes, { themeExists } from "../features/settings/Themes";
+import { ToolbarControl } from "../grounds/Toolbar";
+import { CollapsibleMenu } from "../scripts/ToolbarTypes";
 
 const viewMap = {
   PromptTextView: PromptTextView,
@@ -40,31 +39,44 @@ interface PromptItem {
   data: {};
 }
 
-export default function (props) {
+export default function Terminal(props) {
   const procmgr = ProcMgr.getInstance();
   const filemgr = FileMgr.getInstance();
   const setmgr = SetMgr.getInstance();
+  const selector = useAppSelector;
   const proc = { ...props.proc };
   proc.name = proc.name ?? `Terminal`;
-  proc.onFocus = () => {
-    if (!inputElem) {
-      setElems();
-    }
-    inputElem.focus();
+  const focusOnInput = () => {
+    inputElem.current.focus();
+  };
+  proc.onFocus = focusOnInput;
+
+  /////////////////////////
+  const registerToolbarCallback = () => {
+    const tb = ToolbarControl.getInstance();
+    const register = (menu, item, cb) => {
+      const data: CollapsibleMenu = {
+        caller: proc.id,
+        menu: menu,
+        items: [
+          {
+            item: item,
+          },
+        ],
+      };
+      tb.registerMenu(data, [cb]);
+    };
+    register("Terminal", "About terminal", () => {
+      addHelp();
+      procmgr.toggleMaximize(proc.id);
+    });
   };
 
   /////////// init setup
-  const setElems = () => {
-    contElem = document.querySelector(`#${contElemId}`);
-    inputArea = document.querySelector(`#${inputAreaId}`);
-    inputElem = document.querySelector(`#${inputElemId}`);
-  };
-  let contElem: HTMLElement, inputArea: HTMLElement, inputElem: HTMLElement;
-  let contElemId = randomId(),
-    inputAreaId = randomId(),
-    inputElemId = randomId();
+  const inputElem = useRef(null);
   useEffect(() => {
-    setElems();
+    focusOnInput();
+    registerToolbarCallback();
   }, []);
 
   const [username, setUsername] = useState("jam@127.0.0.1");
@@ -81,7 +93,7 @@ export default function (props) {
     setPwd(() => p);
   };
 
-  /////////// command history
+  //////////////////////////////////////////// command history
   const [cmdHistory, setCmdHistory] = useState({ hist: [], cursor: 0 });
   const getCmdValue = (cursor) => cmdHistory.hist.at(cursor) || "";
   const getCmdCursor = () => cmdHistory.cursor;
@@ -111,7 +123,7 @@ export default function (props) {
     }));
   };
 
-  /////////// Prompt view
+  /////////////////////////////////////////////////////// Prompt view
   const [promptItems, setPromptItems] = useState([]);
   let itemId = 1;
   const lineElem = (): PromptItem => {
@@ -194,10 +206,10 @@ export default function (props) {
   const appHelpData = [
     ["about", "about", "About JamOS🍞", "Brief explanation about JamOS."],
     [
-      "bakery",
-      "bakery",
+      "appstore",
+      "appstore",
       "Appstore for JamOS🍞",
-      `Bakery lets you add and remove apps on your desktop. It's like an appstore for JamOS.`,
+      `AppStore lets you add and remove apps on your desktop. It's like an appstore for JamOS.`,
     ],
     [
       "terminal",
@@ -353,17 +365,20 @@ export default function (props) {
       desc: `- Applications, [optional] <required>`,
       heads: ["App Name", "Brief", "Description"],
       rows: appHelpData.map((row) => row.splice(1)),
+      weights: [1, 2, 3],
     };
     const terminalCmds: TableData = {
       desc: "- Terminal Commands",
       heads: ["Terminal cmd", "Brief", "Description"],
       rows: terminalHelpData.map((row) => row.splice(1)),
+      weights: [1, 2, 3],
     };
 
     const systemCmds: TableData = {
       desc: `- System commands, or dev/beta apps`,
       heads: ["System cmd", "Brief", "Description"],
       rows: systemHelpData.map((row) => row.splice(1)),
+      weights: [1, 2, 3],
     };
 
     titleAndApps.rows.sort();
@@ -390,7 +405,7 @@ export default function (props) {
     _add(appItem);
   };
 
-  /////////// main handlers
+  ////////////////////////////////////////////////// main handlers
 
   const handleFocus = (e) => {
     updatePwd();
@@ -422,6 +437,7 @@ export default function (props) {
           rows: [
             [helpDataRowFound[0], helpDataRowFound[1], helpDataRowFound[3]],
           ],
+          weights: [1, 2, 3],
         };
         const helpItem: PromptItem = {
           comp: "PromptTableView",
@@ -446,14 +462,14 @@ export default function (props) {
     switch (cmd) {
       //   case "atelier":
       // case "postman":
-
       // case "markdown":
-      // case "bakery":
       // case "broom":
-      // case "about":
-      // case "settings":
+      case "about":
+      case "settings":
       case "terminal":
+      case "appstore":
       case "logger":
+      case "settings":
       case "systeminfo":
         procmgr.add(cmd);
         break;
@@ -950,12 +966,8 @@ export default function (props) {
 
   return (
     <Window {...props} proc={proc}>
-      <div
-        className={`${styles.container}`}
-        onMouseUp={handleFocus}
-        id={contElemId}
-      >
-        <div className={`${styles.inputArea}`} id={inputAreaId}>
+      <div className={`${styles.container}`} onMouseUp={handleFocus}>
+        <div className={`${styles.inputArea}`}>
           <span className={`${styles.inputLabel}`}>
             {username} {pwd.last}/
           </span>
@@ -964,7 +976,7 @@ export default function (props) {
               className={`${styles.inputBox}`}
               spellCheck={false}
               rows={1}
-              id={inputElemId}
+              ref={inputElem}
               value={cmdValue}
               onChange={(e) => {
                 setCmdValue(e.target.value);

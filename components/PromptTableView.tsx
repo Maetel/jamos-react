@@ -19,10 +19,14 @@ export default function PromptTableView(props) {
 
   const data: TableData = props.tableData;
   const setWeights = () => {
-    if (!data.weights) {
-      data.weights = new Array(data.rows.length).fill(1);
+    if (!data.rows || data.rows.length === 0) {
+      return;
     }
-    while (data.weights.length < data.rows.length) {
+    const rowWidth = data.rows.at(0).length;
+    if (!data.weights) {
+      data.weights = new Array(rowWidth).fill(1);
+    }
+    while (data.weights.length < rowWidth) {
       data.weights.push(1);
     }
     data.weights.map((w, i) => (data.weights[i] > 1 ? data.weights[i] : 1));
@@ -32,6 +36,8 @@ export default function PromptTableView(props) {
     return prev + next;
   }, 0);
   const buildWidth = (w) => `${(w * 100) / weightTotal}%`;
+
+  // console.log("Total : ", weightTotal);
 
   const TableTitle = () => {
     if (!data.title) {

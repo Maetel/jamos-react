@@ -1,18 +1,148 @@
 import { useEffect, useRef, useState } from "react";
 import { useAppSelector } from "../app/hooks";
+import Log from "../features/log/Log";
 import ProcMgr from "../features/procmgr/ProcMgr";
 import SetMgr from "../features/settings/SetMgr";
+import { CollapsibleItem, CollapsibleMenu } from "../scripts/ToolbarTypes";
+
 import styles from "../styles/Toolbar.module.css";
 
-export interface CollapsibleMenu {
-  title: string;
-  items: CollapsibleItem[];
-}
-export interface CollapsibleItem {
-  name: string;
-  disabled?: boolean;
-  callback?: () => void;
-  separator?: boolean;
+const systemMenu: CollapsibleMenu = {
+  caller: "system",
+  menu: "🍞",
+  items: [
+    {
+      item: "About JamOS",
+      callback: "system.proc.add.about",
+      separator: true,
+    },
+    { item: "Settings", callback: "system.proc.add.settings" },
+    { item: "System Monitor", callback: "system.proc.add.systeminfo" },
+    {
+      item: "AppStore",
+      callback: "system.proc.add.appstore",
+      separator: true,
+    },
+    {
+      item: "Terminal",
+      callback: "system.proc.add.terminal",
+      separator: true,
+    },
+    ,
+    { item: "Close all windows", callback: "system.proc.killall.system" },
+  ],
+};
+
+export class ToolbarControl {
+  private static instance: ToolbarControl;
+  private constructor() {}
+
+  private _systemCallbackParser(query: string) {
+    const q = query.toLowerCase().trim();
+    const qs = q.split(".");
+    const caller = qs.at(0); //must be system
+
+    const cmd = qs.at(1);
+    const func = qs.at(2);
+    const params = qs.at(3);
+
+    const procmgr = ProcMgr.getInstance();
+
+    if (cmd === "proc") {
+      switch (func) {
+        case "add":
+          procmgr.add(params);
+          return;
+        case "killall":
+          procmgr.killAll(params);
+          return;
+        case "kill":
+          procmgr.kill(params);
+          return;
+        default:
+          break;
+      }
+    }
+    Log.error(`ToolbarControl system command ${query} does not exist`);
+  }
+
+  public static getInstance() {
+    if (!this.instance) {
+      this.instance = new ToolbarControl();
+    }
+    return this.instance;
+  }
+  // callbacks[procId][menu][item]
+  // public static callbacks: {
+  //   [key: string]: { [key: string]: { [key: string]: () => void } };
+  // } = {};
+  public static callbacks: { [key: string]: () => void } = {};
+  private _merge(caller, menu, item) {
+    return `${caller}/${menu}/${item}`;
+  }
+  public registerMenu(collMenu: CollapsibleMenu, callbacks: (() => void)[]) {
+    if (collMenu.items.length !== callbacks.length) {
+      throw new Error(
+        `Toolbar register error. Must be 'menu.items.length === callbacks.length', which was '${collMenu.items.length} !== ${callbacks.length}'`
+      );
+    }
+    const { caller, menu, items } = collMenu;
+
+    items.forEach((item, i) => {
+      ToolbarControl.callbacks[this._merge(caller, menu, item.item)] =
+        callbacks.at(i);
+    });
+    for (let i = 0; i < collMenu.items.length; ++i) {
+      collMenu.items.at(i).callback =
+        collMenu.items.at(i).callback ??
+        this._merge(caller, menu, collMenu.items.at(i).item);
+    }
+
+    const procmgr = ProcMgr.getInstance();
+    let menus: CollapsibleMenu[] =
+      procmgr.get(
+        // selector,
+        caller,
+        "toolbar"
+      ) ?? [];
+    const menuFound = menus.find((_menu) => _menu.menu === menu);
+    if (menuFound) {
+      collMenu.items.forEach((item) => {
+        //filter if already exists
+        menuFound.items = [
+          ...menuFound.items.filter((_items) => _items.item !== item.item),
+          item,
+        ];
+      });
+
+      menus = [...menus.filter((_menu) => _menu.menu !== menu), menuFound];
+    } else {
+      menus = [...menus, collMenu];
+    }
+    procmgr.set(caller, { toolbar: menus });
+    console.log("Registered menus : ", menus);
+  }
+  public unregister(procId: string) {
+    if (ToolbarControl.callbacks[procId]) {
+      for (let key in ToolbarControl.callbacks[procId]) {
+        delete ToolbarControl.callbacks[procId][key];
+      }
+      delete ToolbarControl.callbacks[procId];
+    }
+  }
+  public execute(callback: string) {
+    console.log("callback:", callback);
+    if (callback.startsWith("system")) {
+      this._systemCallbackParser(callback);
+      return;
+    }
+    ToolbarControl.callbacks[callback]?.();
+    if (!ToolbarControl.callbacks[callback]) {
+      Log.error(
+        `Toolbar callback does not exist for : ${JSON.stringify(callback)}`
+      );
+    }
+  }
 }
 
 function ToolbarClock(props) {
@@ -58,7 +188,9 @@ function MenuItem(props) {
     <span
       className={styles.menuitem}
       onClick={(e) => {
-        item.callback?.();
+        // ProcMgr.getInstance().front()?.[item.callback]?.();
+        // ToolbarControl.getInstance().execute("system", item.menu, item.item);
+        ToolbarControl.getInstance().execute(item.callback);
         props.uncollapse?.();
       }}
       onMouseEnter={() => {
@@ -69,7 +201,7 @@ function MenuItem(props) {
       }}
       style={style}
     >
-      {item.name}
+      {item.item}
     </span>
   );
 }
@@ -87,15 +219,16 @@ function CollapsibleMenu(props) {
     // setPosX(getComputedStyle(collMenuElem.current).left);
   }, []);
   const onTitleClick = (e) => {
-    console.log("Ontitleclick x :", `${e.target.getBoundingClientRect().x}px`);
     setPosX(`${e.target.getBoundingClientRect().x}px`);
-    setCollActive(true);
     props.menuActivate?.();
+    setCollActive(true);
   };
 
-  const items: CollapsibleItem[] = menu.items ?? [
-    { name: "No item", disabled: true },
-  ];
+  const items: CollapsibleItem[] =
+    menu.items ??
+    [
+      // { menu: "No item", item: "No item", disabled: true },
+    ];
 
   const buildItemsStyle = () => {
     const retval = {
@@ -122,12 +255,12 @@ function CollapsibleMenu(props) {
   return (
     <>
       <span
-        className={`${styles.collTitle}`}
+        className={`${styles.collMenu}`}
         onClick={onTitleClick}
         ref={collMenuElem}
         style={titleStyle}
       >
-        {menu.title}
+        {menu.menu}
       </span>
       <div className={`${styles.items} ${itemClassName}`} style={itemsStyle}>
         {items.map((item, i) => (
@@ -149,6 +282,11 @@ export default function Toolbar(props) {
   const className = show ? styles.active : "";
   const colors = SetMgr.getInstance().themeReadable(useAppSelector).colors;
 
+  const front = ProcMgr.getInstance().front();
+  const frontMenus: CollapsibleMenu[] = front?.["toolbar"];
+
+  // console.log("FrontMenus:", frontMenus);
+
   const buildContainerStyle = () => {
     return {
       color: colors["2"],
@@ -158,53 +296,22 @@ export default function Toolbar(props) {
   const containerStyle = buildContainerStyle();
 
   const procmgr = ProcMgr.getInstance();
-  const collapsibles: CollapsibleMenu[] = [
-    {
-      title: "🍞",
-      items: [
-        {
-          name: "About JamOS",
-          callback: () => {
-            procmgr.add("about");
-          },
-          separator: true,
-        },
-        {
-          name: "Settings",
-          callback: () => {
-            procmgr.add("settings");
-          },
-        },
-        {
-          name: "System Monitor",
-          callback: () => {
-            procmgr.add("systeminfo");
-          },
-        },
-        {
-          name: "AppStore",
-          callback: () => {
-            procmgr.add("bakery");
-          },
-          separator: true,
-        },
-        {
-          name: "Terminal",
-          callback: () => {
-            procmgr.add("terminal");
-          },
-        },
-        {
-          name: "Close all windows",
-          callback: () => {
-            procmgr.killAll();
-          },
-        },
-      ],
-    },
-  ];
-
-  collapsibles.push(collapsibles[0]);
+  let initialColl = [systemMenu];
+  const buildColls = () => {
+    // console.log("Build colls called :", frontMenus);
+    if (frontMenus) {
+      return [systemMenu, ...frontMenus];
+    }
+    return [systemMenu];
+  };
+  useEffect(() => {
+    updateFront();
+    // setCollapsibles(buildColls());
+  }, [frontMenus]);
+  const updateFront = () => {
+    setCollapsibles(buildColls());
+  };
+  const [collapsibles, setCollapsibles] = useState([systemMenu]);
 
   const uncollapse = (e) => {
     setHovered(false);
@@ -222,6 +329,7 @@ export default function Toolbar(props) {
         className={`${styles.container} ${className}`}
         style={containerStyle}
         onMouseEnter={(e) => {
+          updateFront();
           setHovered(true);
         }}
         onMouseLeave={(e) => {

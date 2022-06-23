@@ -26,7 +26,7 @@ export const ProcessCommands = [
   "atelier",
   "hub",
   "postman",
-  "bakery",
+  "appstore",
   "about",
   "settings",
   "styler",
