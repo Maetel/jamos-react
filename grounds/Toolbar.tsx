@@ -28,15 +28,21 @@ const systemMenu: ToolbarItem[] = [
   {
     caller: "system",
     menu: "🍞",
+    item: "Fix toolbar",
+    callback: "system.proc.toolbar.open",
+  },
+  {
+    caller: "system",
+    menu: "🍞",
     item: "System Monitor",
     callback: "system.proc.add.systeminfo",
+    separator: true,
   },
   {
     caller: "system",
     menu: "🍞",
     item: "AppStore",
     callback: "system.proc.add.appstore",
-    separator: true,
   },
   {
     caller: "system",
@@ -45,6 +51,7 @@ const systemMenu: ToolbarItem[] = [
     callback: "system.proc.add.terminal",
     separator: true,
   },
+
   {
     caller: "system",
     menu: "🍞",
@@ -78,6 +85,15 @@ export class ToolbarControl {
           return;
         case "kill":
           procmgr.kill(params);
+          return;
+
+        case "toolbar":
+          if (params === "open") {
+            procmgr.openToolbar();
+          }
+          if (params === "close") {
+            procmgr.closeToolbar();
+          }
           return;
         default:
           break;
@@ -319,7 +335,18 @@ export default function Toolbar(props) {
   };
   const containerStyle = buildContainerStyle();
 
+  const isToolbarOpen = procmgr.isToolbarOpen();
+  useEffect(() => {}, [isToolbarOpen]);
+
   const parseItems = (items: TbItem[]): TbProc => {
+    const idx = systemMenu.indexOf(
+      systemMenu.find((menu) => menu.item.includes("toolbar"))
+    );
+    systemMenu[idx].item = isToolbarOpen ? "Hide toolbar" : "Fix toolbar";
+    systemMenu[idx].callback = isToolbarOpen
+      ? "system.proc.toolbar.close"
+      : "system.proc.toolbar.open";
+
     const retval: TbMenu[] = [{ menu: "🍞", items: systemMenu }];
     if (!items || items.length === 0) {
       if (!front || !front.name) {
@@ -349,7 +376,7 @@ export default function Toolbar(props) {
     // console.log("frontMenus update :", frontMenus);
     const _tbproc = parseItems(frontMenus);
     setMenus(_tbproc);
-  }, [frontMenus]);
+  }, [frontMenus, isToolbarOpen]);
 
   const uncollapse = (e) => {
     setHovered(false);

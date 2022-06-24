@@ -146,17 +146,22 @@ export const procSlice = createSlice({
       }
 
       //maximize
-      proc.prevRect = {...proc.rect};
-      const max:Rect = {
-        top:'0%',
-        left:'0%',
-        width:'100%',
-        height:'100%'
-      };
-      for(let key in max){
-        proc['rect'][key] = max[key]
+      {
+        proc.prevRect = {...proc.rect};
+        const max:Rect = {
+          top:'0%',
+          left:'0%',
+          width:'100%',
+          height:'100%'
+        };
+        for(let key in max){
+          proc['rect'][key] = max[key]
+        }
+        if(isMaximized()){
+          state.openToolbar = false; //close toolbar on maximize
+        }
       }
-      console.log('togglemaximize rect:',{...proc.rect});
+      
       proc.isMaximized = isMaximized();
     },
 

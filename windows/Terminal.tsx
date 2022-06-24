@@ -52,6 +52,7 @@ export default function Terminal(props) {
   proc.onFocus = focusOnInput;
 
   /////////////////////////
+  const isToolbarOpen = procmgr.isToolbarOpen();
   const registerToolbarCallback = () => {
     const tb = ToolbarControl.getInstance();
     const register = (menu, item, cb, seperator?: boolean) => {
@@ -333,7 +334,7 @@ export default function Terminal(props) {
       "toolbar",
       "toolbar [open|close]",
       "Open/Close toolbar",
-      "open and close toolbar using terminal command.",
+      "toggle toolbar. If executed with arguments, opens and closes the toolbar.",
     ],
     ["kill", "kill <$processId>", "closes process", "closes process"],
     ["killall", "killall", "closes all processes", "closes all processes"],
@@ -500,7 +501,16 @@ export default function Terminal(props) {
 
       case "toolbar":
         const _l = merged.toLowerCase();
-        if (merged.length === 0 || _l === "open" || _l === "o") {
+        if (merged.length === 0) {
+          if (isToolbarOpen) {
+            //toggle toolbar
+            procmgr.closeToolbar();
+          } else {
+            procmgr.openToolbar();
+          }
+          break;
+        }
+        if (_l === "open" || _l === "o") {
           procmgr.openToolbar();
         } else if (_l === "close" || _l === "c") {
           procmgr.closeToolbar();
