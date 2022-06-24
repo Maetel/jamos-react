@@ -7,7 +7,6 @@ import ProcMgr from "../features/procmgr/ProcMgr";
 
 import Process, { Rect } from "../features/procmgr/ProcTypes";
 import SetMgr from "../features/settings/SetMgr";
-import { addError } from "../scripts/Path";
 import { clamp, randomId } from "../scripts/utils";
 import styles from "../styles/Window.module.css";
 
@@ -20,6 +19,7 @@ let pos1 = 0,
 let maximizeTransition = "0.3s";
 
 export default function Window(props) {
+  let _winElem = useRef(null);
   let _navElem = useRef(null);
   let winElem: HTMLElement | undefined;
   let navElem: HTMLElement | undefined;
@@ -33,7 +33,8 @@ export default function Window(props) {
 
   const procmgr = ProcMgr.getInstance();
   const proc: Process = props.proc;
-  const get = (prop) => procmgr.get(proc.id, prop);
+  const get = (prop) => procmgr.getReadable(useAppSelector, proc.id, prop);
+  // const get = (prop) => procmgr.get(proc.id, prop);
 
   ////////////////// rect / style / theme
   const themeReadable = SetMgr.getInstance().themeReadable(useAppSelector);
@@ -101,13 +102,13 @@ export default function Window(props) {
       }
     }
 
-    console.log("Buildstyle : ", retval);
+    // console.log("Buildstyle : ", retval);
     return retval;
   };
   const [contElemStyle, setContElemStyle] = useState(null);
   useEffect(() => {
-    console.log("New rect called");
-    console.log("Initial rect : ", proc.rect);
+    // console.log("New rect called");
+    // console.log("Initial rect : ", proc.rect);
     const _setContElemStyle = () => {
       const style = buildStyle(proc.rect);
       const nuRect = {};
@@ -125,26 +126,32 @@ export default function Window(props) {
           nuRect[key] = style[key];
         }
       }
-      console.log("New rect : ", nuRect);
+      // console.log("New rect : ", nuRect);
       procmgr.set(proc.id, { rect: nuRect });
       return style;
     };
     const _contElemStyle = _setContElemStyle();
     setContElemStyle(_contElemStyle);
 
-    console.log("Currect style :", curRect());
+    // console.log("Currect style :", curRect());
     setElems();
     if (proc.name) {
       procmgr.set(proc.id, { name: proc.name });
     }
   }, []);
   const rectReadable: Rect = get("rect");
+  // console.log("rectReadable:", rectReadable);
 
   //////////////////////////////////// drag events
   function dragMouseDown(e: any) {
-    const el = e.currentTarget.parentElement;
+    // const el = e.currentTarget.parentElement;
+    const el = _winElem.current;
     if (!el) {
-      addError("el eempty");
+      Log.error("el eempty");
+      return;
+    }
+    if ((e.target as HTMLElement).classList.contains(styles.btn)) {
+      Log.log("cloas dragmousedown cause it's a btn");
       return;
     }
     e = e || window.event;
@@ -197,6 +204,7 @@ export default function Window(props) {
     /* stop moving when mouse button is released:*/
     document.onmouseup = null;
     document.onmousemove = null;
+    console.log("Close drag ele");
     dispatchRect();
   }
 
@@ -205,14 +213,11 @@ export default function Window(props) {
   const isFront = procmgr.isFront(proc.id);
 
   useEffect(() => {
-    console.log("Change on rectReadable...");
     if (!rectReadable) {
-      console.log("rectReadable null. return...");
       return;
     }
-    console.log("Rect readable : ", rectReadable);
     setContElemStyle(() => buildStyle(rectReadable));
-  }, [rectReadable]);
+  }, [rectReadable, _colors, isMax, isFront]);
 
   ////////////////// detect resize
   const resizeObserver = new ResizeObserver((entries) => {
@@ -256,7 +261,7 @@ export default function Window(props) {
   };
   const onCloseBtn = dispatchCloseWindow;
   const onMinimizeBtn = (e) => {
-    console.log("minimizeBtn clicked from ", proc.name);
+    // console.log("minimizeBtn clicked from ", proc.name);
   };
 
   const navElemStyle = buildNavStyle();
@@ -338,6 +343,7 @@ export default function Window(props) {
       onMouseUp={(e) => {
         // console.log("On mouse up");
       }}
+      ref={_winElem}
     >
       <div
         className={`${styles["window-container-header"]} ${styles.grabbable}`}
@@ -363,18 +369,18 @@ export default function Window(props) {
           }}
         >
           <li
-            className={`${styles["btn-close"]} btn-close`}
+            className={`${styles["btn-close"]} ${styles["btn"]}`}
             // onClick={onCloseBtn}
             style={closeBtnStyle}
           />
           <li
-            className={`${styles["btn-minimize"]} btn-minimize`}
+            className={`${styles["btn-minimize"]} ${styles["btn"]}`}
             style={minBtnStyle}
             // onClick={onMinimizeBtn}
           />
           <li
-            className={`${styles["btn-maximize"]} btn-maximize`}
-            // onClick={toggleWindowMaximize}
+            className={`${styles["btn-maximize"]} ${styles["btn"]}`}
+            onClick={toggleWindowMaximize}
             style={maxBtnStyle}
           />
         </ul>

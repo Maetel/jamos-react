@@ -112,25 +112,23 @@
   transform: translateY(-50%);
   right: 0;
 }
-.btn-close {
-  /* background-color: #ff605c; */
+
+.btn {
   width: 10px;
   height: 10px;
   border-radius: 5px;
+}
+
+.btn-close {
+  /* background-color: #ff605c; */
   cursor: pointer;
 }
 .btn-minimize {
   /* background-color: #ffbd44; */
-  width: 10px;
-  height: 10px;
-  border-radius: 5px;
   cursor: pointer;
 }
 .btn-maximize {
   /* background-color: #00ca4e; */
-  width: 10px;
-  height: 10px;
-  border-radius: 5px;
   cursor: pointer;
 }
 .css-keeper {

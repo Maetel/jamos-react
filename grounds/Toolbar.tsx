@@ -352,7 +352,7 @@ export default function Toolbar(props) {
   const tbproc = parseItems(frontMenus);
   const [menus, setMenus] = useState(tbproc);
   useEffect(() => {
-    console.log("frontMenus update :", frontMenus);
+    // console.log("frontMenus update :", frontMenus);
     const _tbproc = parseItems(frontMenus);
     setMenus(_tbproc);
   }, [frontMenus]);

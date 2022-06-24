@@ -7,7 +7,7 @@ import styles from "../styles/Dock.module.css";
 export default function Dock(props) {
   const [clicked, setClicked] = useState(false);
   const [active, setActive] = useState(props.show);
-  const show: boolean = true || props.show || active || clicked;
+  const show: boolean = active || clicked;
   const className = show ? styles.active : "";
   const colors = SetMgr.getInstance().themeReadable(useAppSelector).colors;
 
