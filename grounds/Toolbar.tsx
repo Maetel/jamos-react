@@ -160,18 +160,20 @@ function MenuItem(props) {
       color: colors["2"],
       backgroundColor: colors["1"],
     };
+    if (item.separator) {
+      retval["borderBottom"] = `1px solid ${colors["2"]}`;
+    }
     if (disabled) {
       // retval.color = colors["3"];
-      retval["textDecoration"] = "underline";
+      retval["textDecoration"] = "line-through";
+      retval.color = colors["2"] + "99";
       return retval;
     }
     if (hovered) {
       retval.color = colors["1"];
       retval.backgroundColor = colors["2"] + "aa";
     }
-    if (item.separator) {
-      retval["borderBottom"] = `1px solid ${colors["2"]}`;
-    }
+
     return retval;
   };
   const style = buildStyle();
@@ -237,6 +239,26 @@ function CollapsibleMenu(props) {
   const itemsStyle = buildItemsStyle();
   const titleStyle = buildTitleStyle();
 
+  let order = 0;
+  const _items: TbItem[] = menu.items.map((item) => {
+    const retval = { ...item };
+    retval.order = retval.order ?? order++;
+    if (retval.caller === "1") {
+      console.log("Items : ", retval);
+    }
+    return retval;
+  });
+
+  while (_items.find((item) => item.order === -1)) {
+    _items.find((item) => item.order === -1).order = order++;
+  }
+  _items.sort((l, r) => l.order - r.order);
+
+  if (_items.length > 0) {
+    //ignore separator at the end
+    _items[_items.length - 1].separator = false;
+  }
+
   return (
     <>
       <span
@@ -248,7 +270,7 @@ function CollapsibleMenu(props) {
         {menu.menu}
       </span>
       <div className={`${styles.items} ${itemClassName}`} style={itemsStyle}>
-        {menu.items.map((item, i) => (
+        {_items.map((item, i) => (
           <MenuItem
             key={i}
             item={item}
@@ -293,43 +315,11 @@ export default function Toolbar(props) {
   };
   const containerStyle = buildContainerStyle();
 
-  const procmgr = ProcMgr.getInstance();
-
-  const _parseItems = (items: TbItem[]): TbProc => {
-    const retval: TbMenu[] = [{ menu: "🍞", items: systemMenu }];
-    return retval;
-  };
   const parseItems = (items: TbItem[]): TbProc => {
     const retval: TbMenu[] = [{ menu: "🍞", items: systemMenu }];
     if (!items || items.length === 0) {
       if (!front || !front.name) {
         return retval;
-      }
-      {
-        //registering here causes warning :
-        /*
-        'Cannot update a component (`Toolbar`) while rendering a different component (`Toolbar`). To locate the bad setState() call inside `Toolbar`'
-        */
-        // const register = (menu, item, cb, seperator?: boolean) => {
-        //   const data: ToolbarItem = {
-        //     caller: front.id,
-        //     menu: menu,
-        //     item: item,
-        //   };
-        //   if (seperator) {
-        //     data.separator = seperator;
-        //   }
-        //   ToolbarControl.getInstance().register(data, cb);
-        // };
-        // register(
-        //   front.name,
-        //   `Quit ${front.name}`,
-        //   () => {
-        //     procmgr.kill(front.id);
-        //     // addHelp();
-        //   },
-        //   true
-        // );
       }
     }
     const menus: { [key: string]: TbItem[] } = {};

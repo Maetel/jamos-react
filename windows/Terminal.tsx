@@ -82,9 +82,9 @@ export default function Terminal(props) {
       },
       true
     );
-    register("Terminal", "Quit Terminal", () => {
-      procmgr.kill(proc.id);
-    });
+    // register("Terminal", "Quit Terminal", () => {
+    //   procmgr.kill(proc.id);
+    // });
     register("File", "New window ", () => {
       procmgr.add("terminal");
     });

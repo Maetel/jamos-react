@@ -7,6 +7,8 @@ import ProcMgr from "../features/procmgr/ProcMgr";
 
 import Process, { Rect } from "../features/procmgr/ProcTypes";
 import SetMgr from "../features/settings/SetMgr";
+import { ToolbarControl } from "../grounds/Toolbar";
+import { ToolbarItem } from "../scripts/ToolbarTypes";
 import { clamp, randomId } from "../scripts/utils";
 import styles from "../styles/Window.module.css";
 
@@ -25,7 +27,6 @@ export default function Window(props) {
   let navElem: HTMLElement | undefined;
   const winId: string = randomId();
   const navId: string = randomId();
-  let effectCalled = 1;
   const setElems = () => {
     winElem = document.querySelector(`#${winId}`) as HTMLElement;
     navElem = document.querySelector(`#${navId}`) as HTMLElement;
@@ -141,6 +142,35 @@ export default function Window(props) {
   }, []);
   const rectReadable: Rect = get("rect");
   // console.log("rectReadable:", rectReadable);
+
+  //////////////////////////////////// register Toolbar.quit()
+  /*
+        'Cannot update a component (`Toolbar`) while rendering a different component (`Toolbar`). To locate the bad setState() call inside `Toolbar`'
+        */
+  const register = (menu, item, cb, seperator?: boolean) => {
+    const data: ToolbarItem = {
+      caller: proc.id,
+      menu: menu,
+      item: item,
+      order: -1, //last
+    };
+    if (seperator) {
+      data.separator = seperator;
+    }
+    ToolbarControl.getInstance().register(data, cb);
+  };
+  useEffect(() => {
+    console.log("call");
+    register(
+      proc.name,
+      `Quit ${proc.name}`,
+      () => {
+        procmgr.kill(proc.id);
+        // addHelp();
+      },
+      true
+    );
+  }, []);
 
   //////////////////////////////////// drag events
   function dragMouseDown(e: any) {

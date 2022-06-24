@@ -12,7 +12,13 @@ export default function Styler(props) {
   /////////////////////////
   const registerToolbarCallback = () => {
     const tb = ToolbarControl.getInstance();
-    const register = (menu, item, cb, seperator?: boolean) => {
+    const register = (
+      menu,
+      item,
+      cb,
+      seperator?: boolean,
+      disabled?: boolean
+    ) => {
       const data: ToolbarItem = {
         caller: proc.id,
         menu: menu,
@@ -21,12 +27,21 @@ export default function Styler(props) {
       if (seperator) {
         data.separator = seperator;
       }
+      if (disabled) {
+        data.disabled = disabled;
+      }
       tb.register(data, cb);
     };
 
-    register("Styler", "Quit Styler", () => {
-      ProcMgr.getInstance().kill(proc.id);
-    });
+    register(
+      "Styler",
+      "About",
+      () => {
+        // ProcMgr.getInstance().kill(proc.id);
+      },
+      true,
+      true
+    );
 
     register(
       "Edit",

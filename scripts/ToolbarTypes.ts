@@ -23,6 +23,7 @@ export interface ToolbarItem {
   menu: string;
   item: string;
   callback?:string; //for system
+  order?:number;
   disabled?: boolean;
   separator?: boolean;
 }
