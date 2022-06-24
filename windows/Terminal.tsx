@@ -25,7 +25,7 @@ import Commands from "../scripts/CommandParser";
 import SetMgr from "../features/settings/SetMgr";
 import officialThemes, { themeExists } from "../features/settings/Themes";
 import { ToolbarControl } from "../grounds/Toolbar";
-import { CollapsibleMenu } from "../scripts/ToolbarTypes";
+import { CollapsibleMenu, ToolbarItem } from "../scripts/ToolbarTypes";
 
 const viewMap = {
   PromptTextView: PromptTextView,
@@ -54,21 +54,39 @@ export default function Terminal(props) {
   /////////////////////////
   const registerToolbarCallback = () => {
     const tb = ToolbarControl.getInstance();
-    const register = (menu, item, cb) => {
-      const data: CollapsibleMenu = {
+    const register = (menu, item, cb, seperator?: boolean) => {
+      const data: ToolbarItem = {
         caller: proc.id,
         menu: menu,
-        items: [
-          {
-            item: item,
-          },
-        ],
+        item: item,
       };
-      tb.registerMenu(data, [cb]);
+      if (seperator) {
+        data.separator = seperator;
+      }
+      tb.register(data, cb);
     };
-    register("Terminal", "About terminal", () => {
-      addHelp();
-      procmgr.toggleMaximize(proc.id);
+    register("Terminal", "About terminal", async () => {
+      // addHelp();
+      await handleTerminalCmd(["terminal", "-h"]);
+    });
+    register("Terminal", "Help", async () => {
+      // addHelp();
+      await handleTerminalCmd(["help"]);
+    });
+    register(
+      "Terminal",
+      "View process list",
+      async () => {
+        // addHelp();
+        await handleTerminalCmd(["ps"]);
+      },
+      true
+    );
+    register("Terminal", "Quit Terminal", () => {
+      procmgr.kill(proc.id);
+    });
+    register("File", "New window ", () => {
+      procmgr.add("terminal");
     });
   };
 

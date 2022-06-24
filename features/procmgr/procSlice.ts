@@ -2,6 +2,7 @@ import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { WritableDraft } from 'immer/dist/internal';
 import type { AppState, AppThunk } from '../../app/store'
 import store from '../../app/store';
+import { serializeToolbarItem, ToolbarItem, ToolbarItemId } from '../../scripts/ToolbarTypes';
 import ProcMgr from './ProcMgr';
 
 
@@ -63,6 +64,22 @@ export const procSlice = createSlice({
         proc.zIndex = ''+(parseInt(proc.zIndex)+1);
         return proc
       })
+    },
+
+    setToolbarItem:(state, action:PayloadAction<{id:string,item:ToolbarItem}>)=>{
+      const proc = state.procs.find(proc=>proc.id===action.payload.id)
+      
+      if(!proc){
+        return;
+      }
+      const item = action.payload.item;
+      const idx = proc.toolbar.map(_item=> ToolbarItemId(_item)).indexOf(ToolbarItemId(item))
+      
+      if(idx!==-1){
+        proc['toolbar'][idx]=item;
+      } else {
+        proc['toolbar']=[...proc['toolbar'], item];
+      }
     },
 
     setProcProps:(state, action:PayloadAction<{id:string,props:{}}>)=>{
@@ -156,4 +173,4 @@ export const processesValue = ()=>{
 }
 
 export default procSlice.reducer;
-export const { addProc, killProc, killAllProcs, increaseIndices, setActiveWindow,setProcProps, toggleMaximize} = procSlice.actions
+export const { addProc, killProc, killAllProcs, increaseIndices, setActiveWindow,setProcProps, toggleMaximize,setToolbarItem} = procSlice.actions

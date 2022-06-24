@@ -1,6 +1,8 @@
 import { useSelector } from "react-redux";
 import store from "../../app/store";
+import { ToolbarControl } from "../../grounds/Toolbar";
 import Path, { addError, addLog } from "../../scripts/Path";
+import { parseToolbarItem, ToolbarItem } from "../../scripts/ToolbarTypes";
 import { dirValue, fileValue, selectFile } from "../file/fileSlice";
 import Log from "../log/Log";
 import SetMgr from "../settings/SetMgr";
@@ -16,6 +18,7 @@ import {
   selectProcInIndexOrder,
   setActiveWindow,
   setProcProps,
+  setToolbarItem,
   toggleMaximize,
 } from "./procSlice";
 import Process, { ProcessCommands } from "./ProcTypes";
@@ -66,6 +69,7 @@ export default class ProcMgr{
   }
 
   public kill(procId:string){
+    ToolbarControl.getInstance().unregister(procId);
     store.dispatch(killProc(procId));
   }
 
@@ -140,6 +144,7 @@ public psValue(){
       name:args['name'], //okay to be undefined
       zIndex:'0',
       resize:'both',
+      toolbar:[],
       ...args
     }
     
@@ -189,6 +194,14 @@ public psValue(){
 
   public getReadable (selector, procId:string, prop:string){
     return this.findReadable(selector, procId)?.[prop];
+  }
+
+  public getToolbarItems ( procId:string):ToolbarItem[] {
+    return store.getState().proc.procs.find(proc=>proc.id===procId)?.['toolbar'];
+  }
+
+  public setToolbarItem (procId:string, item:ToolbarItem){
+    store.dispatch(setToolbarItem({id:procId, item:item}));
   }
 
   //엄밀히 따지면 프로세스의 z-index는 별도의 어레이에 매핑되어 관리되는 것이 맞아보인다.

@@ -1,9 +1,12 @@
+import { ToolbarItem } from "../../scripts/ToolbarTypes";
+
 export default interface Process {
   id:string,
   comp:string,
   name:string,
   zIndex:string,
   //onFocus?:()=>void,
+  toolbar:ToolbarItem[],
   [key:string]:any
 }
 

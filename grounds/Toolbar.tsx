@@ -1,37 +1,58 @@
+import { iteratorSymbol } from "immer/dist/internal";
 import { useEffect, useRef, useState } from "react";
 import { useAppSelector } from "../app/hooks";
 import Log from "../features/log/Log";
 import ProcMgr from "../features/procmgr/ProcMgr";
 import SetMgr from "../features/settings/SetMgr";
-import { CollapsibleItem, CollapsibleMenu } from "../scripts/ToolbarTypes";
+import { ToolbarItem, ToolbarItemId } from "../scripts/ToolbarTypes";
 
 import styles from "../styles/Toolbar.module.css";
 
-const systemMenu: CollapsibleMenu = {
-  caller: "system",
-  menu: "🍞",
-  items: [
-    {
-      item: "About JamOS",
-      callback: "system.proc.add.about",
-      separator: true,
-    },
-    { item: "Settings", callback: "system.proc.add.settings" },
-    { item: "System Monitor", callback: "system.proc.add.systeminfo" },
-    {
-      item: "AppStore",
-      callback: "system.proc.add.appstore",
-      separator: true,
-    },
-    {
-      item: "Terminal",
-      callback: "system.proc.add.terminal",
-      separator: true,
-    },
-    ,
-    { item: "Close all windows", callback: "system.proc.killall.system" },
-  ],
-};
+type TbItem = ToolbarItem;
+type TbMenu = { menu: string; items: TbItem[] };
+type TbProc = TbMenu[];
+
+const systemMenu: ToolbarItem[] = [
+  {
+    caller: "system",
+    menu: "🍞",
+    item: "About JamOS",
+    callback: "system.proc.add.about",
+    separator: true,
+  },
+  {
+    caller: "system",
+    menu: "🍞",
+    item: "Settings",
+    callback: "system.proc.add.settings",
+  },
+  {
+    caller: "system",
+    menu: "🍞",
+    item: "System Monitor",
+    callback: "system.proc.add.systeminfo",
+  },
+  {
+    caller: "system",
+    menu: "🍞",
+    item: "AppStore",
+    callback: "system.proc.add.appstore",
+    separator: true,
+  },
+  {
+    caller: "system",
+    menu: "🍞",
+    item: "Terminal",
+    callback: "system.proc.add.terminal",
+    separator: true,
+  },
+  {
+    caller: "system",
+    menu: "🍞",
+    item: "Close all windows",
+    callback: "system.proc.killall.system",
+  },
+];
 
 export class ToolbarControl {
   private static instance: ToolbarControl;
@@ -47,7 +68,7 @@ export class ToolbarControl {
     const params = qs.at(3);
 
     const procmgr = ProcMgr.getInstance();
-
+    // debugger;
     if (cmd === "proc") {
       switch (func) {
         case "add":
@@ -77,70 +98,40 @@ export class ToolbarControl {
   //   [key: string]: { [key: string]: { [key: string]: () => void } };
   // } = {};
   public static callbacks: { [key: string]: () => void } = {};
-  private _merge(caller, menu, item) {
-    return `${caller}/${menu}/${item}`;
+
+  public register(item: ToolbarItem, callback: () => void) {
+    const id = ToolbarItemId(item);
+    ToolbarControl.callbacks[id] = callback;
+    ProcMgr.getInstance().setToolbarItem(item.caller, item);
   }
-  public registerMenu(collMenu: CollapsibleMenu, callbacks: (() => void)[]) {
-    if (collMenu.items.length !== callbacks.length) {
-      throw new Error(
-        `Toolbar register error. Must be 'menu.items.length === callbacks.length', which was '${collMenu.items.length} !== ${callbacks.length}'`
-      );
-    }
-    const { caller, menu, items } = collMenu;
 
-    items.forEach((item, i) => {
-      ToolbarControl.callbacks[this._merge(caller, menu, item.item)] =
-        callbacks.at(i);
-    });
-    for (let i = 0; i < collMenu.items.length; ++i) {
-      collMenu.items.at(i).callback =
-        collMenu.items.at(i).callback ??
-        this._merge(caller, menu, collMenu.items.at(i).item);
-    }
-
-    const procmgr = ProcMgr.getInstance();
-    let menus: CollapsibleMenu[] =
-      procmgr.get(
-        // selector,
-        caller,
-        "toolbar"
-      ) ?? [];
-    const menuFound = menus.find((_menu) => _menu.menu === menu);
-    if (menuFound) {
-      collMenu.items.forEach((item) => {
-        //filter if already exists
-        menuFound.items = [
-          ...menuFound.items.filter((_items) => _items.item !== item.item),
-          item,
-        ];
-      });
-
-      menus = [...menus.filter((_menu) => _menu.menu !== menu), menuFound];
-    } else {
-      menus = [...menus, collMenu];
-    }
-    procmgr.set(caller, { toolbar: menus });
-    console.log("Registered menus : ", menus);
-  }
   public unregister(procId: string) {
-    if (ToolbarControl.callbacks[procId]) {
-      for (let key in ToolbarControl.callbacks[procId]) {
-        delete ToolbarControl.callbacks[procId][key];
+    let deleteCount = 0;
+    for (let key in ToolbarControl.callbacks) {
+      if (key.startsWith(procId)) {
+        delete ToolbarControl.callbacks.key;
+        deleteCount++;
       }
-      delete ToolbarControl.callbacks[procId];
+    }
+    Log.log(`Toolbar unregister id[${procId}] of ${deleteCount} toolbar items`);
+  }
+  public unregisterItem(item: ToolbarItem) {
+    for (let key in ToolbarControl.callbacks) {
+      if (key === ToolbarItemId(item)) {
+        delete ToolbarControl.callbacks.key;
+      }
     }
   }
-  public execute(callback: string) {
+  public execute(item: ToolbarItem) {
+    const callback = ToolbarItemId(item);
     console.log("callback:", callback);
     if (callback.startsWith("system")) {
-      this._systemCallbackParser(callback);
+      this._systemCallbackParser(item.callback);
       return;
     }
     ToolbarControl.callbacks[callback]?.();
     if (!ToolbarControl.callbacks[callback]) {
-      Log.error(
-        `Toolbar callback does not exist for : ${JSON.stringify(callback)}`
-      );
+      Log.error(`Toolbar callback does not exist for : ${callback}`);
     }
   }
 }
@@ -160,7 +151,7 @@ function ToolbarClock(props) {
 }
 
 function MenuItem(props) {
-  const item: CollapsibleItem = props.item;
+  const item: ToolbarItem = props.item;
   const disabled = item.disabled;
   const colors = SetMgr.getInstance().themeReadable(useAppSelector).colors;
   const [hovered, setHovered] = useState(false);
@@ -190,7 +181,7 @@ function MenuItem(props) {
       onClick={(e) => {
         // ProcMgr.getInstance().front()?.[item.callback]?.();
         // ToolbarControl.getInstance().execute("system", item.menu, item.item);
-        ToolbarControl.getInstance().execute(item.callback);
+        ToolbarControl.getInstance().execute(item);
         props.uncollapse?.();
       }}
       onMouseEnter={() => {
@@ -207,7 +198,7 @@ function MenuItem(props) {
 }
 
 function CollapsibleMenu(props) {
-  const menu: CollapsibleMenu = props.menu;
+  const menu: TbMenu = props.menu;
   const colors = SetMgr.getInstance().themeReadable(useAppSelector).colors;
   const collMenuElem = useRef(null);
   const [collActive, setCollActive] = useState(false);
@@ -223,12 +214,6 @@ function CollapsibleMenu(props) {
     props.menuActivate?.();
     setCollActive(true);
   };
-
-  const items: CollapsibleItem[] =
-    menu.items ??
-    [
-      // { menu: "No item", item: "No item", disabled: true },
-    ];
 
   const buildItemsStyle = () => {
     const retval = {
@@ -263,7 +248,7 @@ function CollapsibleMenu(props) {
         {menu.menu}
       </span>
       <div className={`${styles.items} ${itemClassName}`} style={itemsStyle}>
-        {items.map((item, i) => (
+        {menu.items.map((item, i) => (
           <MenuItem
             key={i}
             item={item}
@@ -283,7 +268,7 @@ export default function Toolbar(props) {
   const colors = SetMgr.getInstance().themeReadable(useAppSelector).colors;
 
   const front = ProcMgr.getInstance().front();
-  const frontMenus: CollapsibleMenu[] = front?.["toolbar"];
+  const frontMenus: ToolbarItem[] = front?.["toolbar"];
 
   // console.log("FrontMenus:", frontMenus);
 
@@ -296,22 +281,55 @@ export default function Toolbar(props) {
   const containerStyle = buildContainerStyle();
 
   const procmgr = ProcMgr.getInstance();
-  let initialColl = [systemMenu];
-  const buildColls = () => {
-    // console.log("Build colls called :", frontMenus);
-    if (frontMenus) {
-      return [systemMenu, ...frontMenus];
+
+  const parseItems = (items: TbItem[]): TbProc => {
+    const retval: TbMenu[] = [{ menu: "🍞", items: systemMenu }];
+    if (!items || items.length === 0) {
+      if (!front || !front.name) {
+        return retval;
+      }
+      const register = (menu, item, cb, seperator?: boolean) => {
+        const data: ToolbarItem = {
+          caller: front.id,
+          menu: menu,
+          item: item,
+        };
+        if (seperator) {
+          data.separator = seperator;
+        }
+        ToolbarControl.getInstance().register(data, cb);
+      };
+      register(
+        front.name,
+        `Quit ${front.name}`,
+        () => {
+          // addHelp();
+          procmgr.kill(front.id);
+        },
+        true
+      );
     }
-    return [systemMenu];
+    const menus: { [key: string]: TbItem[] } = {};
+    items
+      // .filter((item) => item.caller === procId)
+      .forEach((item) => {
+        if (!menus[item.menu]) {
+          menus[item.menu] = [item];
+        } else {
+          menus[item.menu].push(item);
+        }
+      });
+
+    for (let menu in menus) {
+      retval.push({ menu: menu, items: menus[menu] });
+    }
+
+    return retval;
   };
+  const [menus, setMenus] = useState(parseItems(frontMenus));
   useEffect(() => {
-    updateFront();
-    // setCollapsibles(buildColls());
+    setMenus(parseItems(frontMenus));
   }, [frontMenus]);
-  const updateFront = () => {
-    setCollapsibles(buildColls());
-  };
-  const [collapsibles, setCollapsibles] = useState([systemMenu]);
 
   const uncollapse = (e) => {
     setHovered(false);
@@ -323,13 +341,13 @@ export default function Toolbar(props) {
       uncollapse(e);
     }
   };
+
   return (
     <>
       <div
         className={`${styles.container} ${className}`}
         style={containerStyle}
         onMouseEnter={(e) => {
-          updateFront();
           setHovered(true);
         }}
         onMouseLeave={(e) => {
@@ -337,10 +355,10 @@ export default function Toolbar(props) {
         }}
       >
         <span className={styles.left}>
-          {collapsibles.map((coll, i) => {
+          {menus.map((menu, i) => {
             return (
               <CollapsibleMenu
-                menu={coll}
+                menu={menu}
                 id={i}
                 key={i}
                 menuActivate={() => {

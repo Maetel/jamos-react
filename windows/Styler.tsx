@@ -1,11 +1,51 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAppSelector } from "../app/hooks";
 import Window from "../components/Window";
+import ProcMgr from "../features/procmgr/ProcMgr";
 import SetMgr from "../features/settings/SetMgr";
-import officialThemes from "../features/settings/Themes";
+import officialThemes, { defaultTheme } from "../features/settings/Themes";
+import { ToolbarControl } from "../grounds/Toolbar";
+import { ToolbarItem } from "../scripts/ToolbarTypes";
 import styles from "../styles/Styler.module.css";
 
 export default function Styler(props) {
+  /////////////////////////
+  const registerToolbarCallback = () => {
+    const tb = ToolbarControl.getInstance();
+    const register = (menu, item, cb, seperator?: boolean) => {
+      const data: ToolbarItem = {
+        caller: proc.id,
+        menu: menu,
+        item: item,
+      };
+      if (seperator) {
+        data.separator = seperator;
+      }
+      tb.register(data, cb);
+    };
+
+    register("Styler", "Quit Styler", () => {
+      ProcMgr.getInstance().kill(proc.id);
+    });
+
+    register(
+      "Edit",
+      `Set to default style : ${defaultTheme.name}`,
+      () => {
+        setmgr.setTheme(defaultTheme.name);
+      },
+      true
+    );
+    officialThemes.forEach((theme) => {
+      register("Edit", `Set to ${theme.name}`, () => {
+        setmgr.setTheme(theme.name);
+      });
+    });
+  };
+  useEffect(() => {
+    registerToolbarCallback();
+  }, []);
+
   const setmgr = SetMgr.getInstance();
   const [prevTheme, setPrevTheme] = useState(setmgr.themeValue().name);
   const clicked = setmgr.themeReadable(useAppSelector).name;
@@ -100,8 +140,8 @@ export default function Styler(props) {
         {/* <p className={styles.content}>Hover on themes to preview</p> */}
         <p className={styles.content}>{intro}</p>
         <div className={styles.btns}>
-          {themes.map((theme) => (
-            <ThemeButton theme={theme}></ThemeButton>
+          {themes.map((theme, i) => (
+            <ThemeButton theme={theme} key={i}></ThemeButton>
           ))}
         </div>
       </div>
