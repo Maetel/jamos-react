@@ -36,7 +36,8 @@ export const ProcessCommands = [
   "systeminfo",
 
   //daemon/app
-  "broom", "savebread", "loadbread", "resetbread"
+  "broom", "savebread", "loadbread", "resetbread",
+  'toolbar',
 ];
 
 export interface Rect {

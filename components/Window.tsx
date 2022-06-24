@@ -160,7 +160,7 @@ export default function Window(props) {
     ToolbarControl.getInstance().register(data, cb);
   };
   useEffect(() => {
-    console.log("call");
+    // console.log("call");
     register(
       proc.name,
       `Quit ${proc.name}`,
@@ -181,7 +181,6 @@ export default function Window(props) {
       return;
     }
     if ((e.target as HTMLElement).classList.contains(styles.btn)) {
-      Log.log("cloas dragmousedown cause it's a btn");
       return;
     }
     e = e || window.event;
@@ -335,15 +334,15 @@ export default function Window(props) {
     let cl = (e.target as HTMLElement).classList;
     {
       //handle switches
-      if (cl.contains("btn-close")) {
+      if (cl.contains(styles["btn-close"])) {
         onCloseBtn();
         return;
       }
-      if (cl.contains("btn-minimize")) {
+      if (cl.contains(styles["btn-minimize"])) {
         onMinimizeBtn(e);
         return;
       }
-      if (cl.contains("btn-maximize")) {
+      if (cl.contains(styles["btn-maximize"])) {
         procmgr.setFront(proc.id);
         // dispatchRect();
         setTimeout((e) => {

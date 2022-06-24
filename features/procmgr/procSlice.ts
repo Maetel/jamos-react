@@ -11,10 +11,12 @@ import Process, { ProcessCommands, Rect } from "./ProcTypes";
 
 export interface ProcState {
   procs:Process[]
+  openToolbar : boolean;
 }
 
 const initialState: ProcState = {
   procs:[],
+  openToolbar:false,
 }
 
 export const procSlice = createSlice({
@@ -103,7 +105,12 @@ export const procSlice = createSlice({
         }
       }
     },
-
+    openToolbar:(state, action:PayloadAction<void>)=>{
+      state.openToolbar = true;
+    },
+    closeToolbar:(state, action:PayloadAction<void>)=>{
+      state.openToolbar = false;
+    },
     setActiveWindow:(state, action:PayloadAction<string>)=>{
       const proc = state.procs.find(proc=>proc.id===action.payload)
       if(!proc){
@@ -158,6 +165,8 @@ export const procSlice = createSlice({
   
 })
 
+export const selectIsToolbarOpen = (state:AppState)=>state.proc.openToolbar;
+
 export const selectProcessById = createSelector([state=>state.procs, (state, procId:string)=>procId], (procs,procId)=>{
   return procs.find(proc=>proc.id===procId);
 })
@@ -176,4 +185,4 @@ export const processesValue = ()=>{
 }
 
 export default procSlice.reducer;
-export const { addProc, killProc, killAllProcs, increaseIndices, setActiveWindow,setProcProps, toggleMaximize,setToolbarItem} = procSlice.actions
+export const { addProc, killProc, killAllProcs, increaseIndices, setActiveWindow,setProcProps, toggleMaximize,setToolbarItem, openToolbar, closeToolbar} = procSlice.actions

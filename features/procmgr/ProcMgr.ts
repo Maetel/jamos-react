@@ -9,10 +9,13 @@ import SetMgr from "../settings/SetMgr";
 
 import {
   addProc,
+  closeToolbar,
   increaseIndices,
   killAllProcs,
   killProc,
+  openToolbar,
   processesValue,
+  selectIsToolbarOpen,
   selectProcessById,
   selectProcesses,
   selectProcInIndexOrder,
@@ -203,6 +206,18 @@ public psValue(){
   public setToolbarItem (procId:string, item:ToolbarItem){
     store.dispatch(setToolbarItem({id:procId, item:item}));
   }
+
+  public isToolbarOpen(){
+    return useSelector(selectIsToolbarOpen)
+  }
+
+  public openToolbar(){
+    store.dispatch(openToolbar());
+  }
+  public closeToolbar(){
+    store.dispatch(closeToolbar());
+  }
+
 
   //엄밀히 따지면 프로세스의 z-index는 별도의 어레이에 매핑되어 관리되는 것이 맞아보인다.
 }

@@ -1,4 +1,3 @@
-import { iteratorSymbol } from "immer/dist/internal";
 import { useEffect, useRef, useState } from "react";
 import { useAppSelector } from "../app/hooks";
 import Log from "../features/log/Log";
@@ -207,14 +206,20 @@ function CollapsibleMenu(props) {
   const isActive = collActive && props.clicked === props.id;
   const itemClassName = isActive ? styles.active : "";
 
-  const [posX, setPosX] = useState(undefined);
+  const front = ProcMgr.getInstance().front();
   useEffect(() => {
-    // setPosX(getComputedStyle(collMenuElem.current).left);
-  }, []);
+    setCollActive(false);
+  }, [front]);
+
+  const [posX, setPosX] = useState(undefined);
   const onTitleClick = (e) => {
     setPosX(`${e.target.getBoundingClientRect().x}px`);
-    props.menuActivate?.();
-    setCollActive(true);
+    if (0) {
+      props.menuActivate?.();
+      setCollActive(true);
+    } else {
+      setCollActive(props.menuToggleActivate() !== null ? true : false);
+    }
   };
 
   const buildItemsStyle = () => {
@@ -243,9 +248,6 @@ function CollapsibleMenu(props) {
   const _items: TbItem[] = menu.items.map((item) => {
     const retval = { ...item };
     retval.order = retval.order ?? order++;
-    if (retval.caller === "1") {
-      console.log("Items : ", retval);
-    }
     return retval;
   });
 
@@ -283,19 +285,20 @@ function CollapsibleMenu(props) {
 }
 
 export default function Toolbar(props) {
+  const procmgr = ProcMgr.getInstance();
   const [isEdge, setIsEdge] = useState(false);
   const [hovered, setHovered] = useState(false);
   const [clicked, setClicked] = useState(null);
+  const openByMgr = procmgr.isToolbarOpen();
   const show: boolean = isEdge || hovered || clicked !== null;
-  const className = show ? styles.active : "";
+  const className = show || openByMgr ? styles.active : "";
+  const bgClassName = show && !openByMgr ? styles.active : "";
   const colors = SetMgr.getInstance().themeReadable(useAppSelector).colors;
 
   const front = ProcMgr.getInstance().front();
   const frontMenus: ToolbarItem[] = front?.["toolbar"];
 
-  // console.log("FrontMenus:", frontMenus);
-
-  useEffect(() => {
+  const _mouseEdgeDetect = () => {
     const toolbarTriggerHeight = 3;
     const dockTriggerHeight = 20;
     const detectEdge = (e) => {
@@ -305,7 +308,8 @@ export default function Toolbar(props) {
     return () => {
       window.removeEventListener("mousemove", detectEdge);
     };
-  }, []);
+  };
+  useEffect(_mouseEdgeDetect, []);
 
   const buildContainerStyle = () => {
     return {
@@ -351,6 +355,7 @@ export default function Toolbar(props) {
     setHovered(false);
     setClicked(null);
     window.removeEventListener("keydown", handleEscape);
+    // procmgr.closeToolbar();
   };
   const handleEscape = (e) => {
     if (e.key === "Escape") {
@@ -360,16 +365,6 @@ export default function Toolbar(props) {
 
   return (
     <>
-      <div
-        className={styles.edge}
-        onMouseEnter={(e) => {
-          // console.log("mouse enter");
-          // setIsEdge(true);
-        }}
-        onMouseLeave={(e) => {
-          // setIsEdge(false);
-        }}
-      ></div>
       <div
         className={`${styles.container} ${className}`}
         style={containerStyle}
@@ -391,6 +386,16 @@ export default function Toolbar(props) {
                   setClicked(i);
                   window.addEventListener("keydown", handleEscape);
                 }}
+                menuToggleActivate={() => {
+                  let val;
+                  setClicked((num) => {
+                    const retval = i === num ? null : i;
+                    val = i;
+                    return retval;
+                  });
+                  window.removeEventListener("keydown", handleEscape);
+                  return val;
+                }}
                 clicked={clicked}
                 uncollapse={uncollapse}
               />
@@ -401,7 +406,7 @@ export default function Toolbar(props) {
           <ToolbarClock></ToolbarClock>
         </span>
       </div>
-      <div className={`${styles.bg} ${className}`} onClick={uncollapse}></div>
+      <div className={`${styles.bg} ${bgClassName}`} onClick={uncollapse}></div>
     </>
   );
 }

@@ -329,6 +329,12 @@ export default function Terminal(props) {
       "View detailed information about currently running processes",
     ],
     ["ps", "ps", "process list", "process list"],
+    [
+      "toolbar",
+      "toolbar [open|close]",
+      "Open/Close toolbar",
+      "open and close toolbar using terminal command.",
+    ],
     ["kill", "kill <$processId>", "closes process", "closes process"],
     ["killall", "killall", "closes all processes", "closes all processes"],
     ["savebread", "savebread", "save current status", "save current status"],
@@ -490,6 +496,15 @@ export default function Terminal(props) {
       case "settings":
       case "systeminfo":
         procmgr.add(cmd);
+        break;
+
+      case "toolbar":
+        const _l = merged.toLowerCase();
+        if (merged.length === 0 || _l === "open" || _l === "o") {
+          procmgr.openToolbar();
+        } else if (_l === "close" || _l === "c") {
+          procmgr.closeToolbar();
+        }
         break;
       case "notepad":
         if (merged.length === 0) {
