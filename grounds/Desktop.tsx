@@ -43,6 +43,10 @@ export default function Desktop(props) {
       filemgr.makeFile("~/Styler", "styler", "/imgs/styler.svg"),
     ];
     filemgr.addFiles(f);
+    procmgr.openToolbar();
+    setTimeout(() => {
+      procmgr.closeToolbar();
+    }, 1500);
   };
 
   useEffect(() => {

@@ -233,7 +233,6 @@ export default function Window(props) {
     /* stop moving when mouse button is released:*/
     document.onmouseup = null;
     document.onmousemove = null;
-    console.log("Close drag ele");
     dispatchRect();
   }
 

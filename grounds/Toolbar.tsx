@@ -139,7 +139,7 @@ export class ToolbarControl {
   }
   public execute(item: ToolbarItem) {
     const callback = ToolbarItemId(item);
-    console.log("callback:", callback);
+    // console.log("callback:", callback);
     if (callback.startsWith("system")) {
       this._systemCallbackParser(item.callback);
       return;
