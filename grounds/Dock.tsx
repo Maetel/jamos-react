@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { useAppSelector } from "../app/hooks";
+import ProcMgr from "../features/procmgr/ProcMgr";
 import SetMgr from "../features/settings/SetMgr";
 import styles from "../styles/Dock.module.css";
 
 export default function Dock(props) {
+  const [clicked, setClicked] = useState(false);
   const [active, setActive] = useState(props.show);
-  const show: boolean = props.show || active;
+  const show: boolean = true || props.show || active || clicked;
   const className = show ? styles.active : "";
   const colors = SetMgr.getInstance().themeReadable(useAppSelector).colors;
 
@@ -16,6 +18,7 @@ export default function Dock(props) {
     };
   };
   const containerStyle = buildContainerStyle();
+  const front = ProcMgr.getInstance().front();
 
   return (
     <div
@@ -27,11 +30,15 @@ export default function Dock(props) {
       onMouseLeave={(e) => {
         setActive(false);
       }}
+      onClick={(e) => {
+        setClicked(true);
+      }}
     >
-      <span className="left">JamOS Toolbar</span>
+      <span className="item">{JSON.stringify(front?.["rect"])}</span>
+      {/* <span className="left">JamOS Toolbar</span>
       <span className="right">
         <span className="rightitem">right item</span>
-      </span>
+      </span> */}
     </div>
   );
 }

@@ -30,7 +30,7 @@ export const procSlice = createSlice({
       const actionId = action.payload.id;
       const sameFound = state.procs.find(proc=>proc.id===actionId);
       if(sameFound){
-        throw new Error("Samd id process found error");
+        throw new Error("Same id process found error");
       }
       
       state.procs.push(action.payload);
@@ -129,6 +129,8 @@ export const procSlice = createSlice({
       }
       // console.log(window.innerWidth, ',',window.innerHeight);
       const isMaximized = ()=>(proc.rect.width === '100%' && proc.rect.height === '100%') || (proc.rect.width === `${window.innerWidth}px` && proc.rect.height === `${window.innerHeight}px`);
+
+
       if(isMaximized()){
         //restore rect
         proc.rect = {...proc.prevRect};
@@ -147,6 +149,7 @@ export const procSlice = createSlice({
       for(let key in max){
         proc['rect'][key] = max[key]
       }
+      console.log('togglemaximize rect:',{...proc.rect});
       proc.isMaximized = isMaximized();
     },
 

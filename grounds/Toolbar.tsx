@@ -261,9 +261,10 @@ function CollapsibleMenu(props) {
 }
 
 export default function Toolbar(props) {
-  const [hovered, setHovered] = useState(props.show);
+  const [isEdge, setIsEdge] = useState(false);
+  const [hovered, setHovered] = useState(false);
   const [clicked, setClicked] = useState(null);
-  const show: boolean = props.show || hovered || clicked !== null;
+  const show: boolean = isEdge || hovered || clicked !== null;
   const className = show ? styles.active : "";
   const colors = SetMgr.getInstance().themeReadable(useAppSelector).colors;
 
@@ -271,6 +272,18 @@ export default function Toolbar(props) {
   const frontMenus: ToolbarItem[] = front?.["toolbar"];
 
   // console.log("FrontMenus:", frontMenus);
+
+  useEffect(() => {
+    const toolbarTriggerHeight = 3;
+    const dockTriggerHeight = 20;
+    const detectEdge = (e) => {
+      setIsEdge(Math.abs(e.clientY) < toolbarTriggerHeight);
+    };
+    window.addEventListener("mousemove", detectEdge);
+    return () => {
+      window.removeEventListener("mousemove", detectEdge);
+    };
+  }, []);
 
   const buildContainerStyle = () => {
     return {
@@ -282,32 +295,42 @@ export default function Toolbar(props) {
 
   const procmgr = ProcMgr.getInstance();
 
+  const _parseItems = (items: TbItem[]): TbProc => {
+    const retval: TbMenu[] = [{ menu: "🍞", items: systemMenu }];
+    return retval;
+  };
   const parseItems = (items: TbItem[]): TbProc => {
     const retval: TbMenu[] = [{ menu: "🍞", items: systemMenu }];
     if (!items || items.length === 0) {
       if (!front || !front.name) {
         return retval;
       }
-      const register = (menu, item, cb, seperator?: boolean) => {
-        const data: ToolbarItem = {
-          caller: front.id,
-          menu: menu,
-          item: item,
-        };
-        if (seperator) {
-          data.separator = seperator;
-        }
-        ToolbarControl.getInstance().register(data, cb);
-      };
-      register(
-        front.name,
-        `Quit ${front.name}`,
-        () => {
-          // addHelp();
-          procmgr.kill(front.id);
-        },
-        true
-      );
+      {
+        //registering here causes warning :
+        /*
+        'Cannot update a component (`Toolbar`) while rendering a different component (`Toolbar`). To locate the bad setState() call inside `Toolbar`'
+        */
+        // const register = (menu, item, cb, seperator?: boolean) => {
+        //   const data: ToolbarItem = {
+        //     caller: front.id,
+        //     menu: menu,
+        //     item: item,
+        //   };
+        //   if (seperator) {
+        //     data.separator = seperator;
+        //   }
+        //   ToolbarControl.getInstance().register(data, cb);
+        // };
+        // register(
+        //   front.name,
+        //   `Quit ${front.name}`,
+        //   () => {
+        //     procmgr.kill(front.id);
+        //     // addHelp();
+        //   },
+        //   true
+        // );
+      }
     }
     const menus: { [key: string]: TbItem[] } = {};
     items
@@ -326,9 +349,12 @@ export default function Toolbar(props) {
 
     return retval;
   };
-  const [menus, setMenus] = useState(parseItems(frontMenus));
+  const tbproc = parseItems(frontMenus);
+  const [menus, setMenus] = useState(tbproc);
   useEffect(() => {
-    setMenus(parseItems(frontMenus));
+    console.log("frontMenus update :", frontMenus);
+    const _tbproc = parseItems(frontMenus);
+    setMenus(_tbproc);
   }, [frontMenus]);
 
   const uncollapse = (e) => {
@@ -344,6 +370,16 @@ export default function Toolbar(props) {
 
   return (
     <>
+      <div
+        className={styles.edge}
+        onMouseEnter={(e) => {
+          // console.log("mouse enter");
+          // setIsEdge(true);
+        }}
+        onMouseLeave={(e) => {
+          // setIsEdge(false);
+        }}
+      ></div>
       <div
         className={`${styles.container} ${className}`}
         style={containerStyle}

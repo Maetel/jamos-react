@@ -1,21 +1,12 @@
 import React from "react";
 import { useEffect, useRef, useState } from "react";
-import ReactDOM, { render } from "react-dom";
-import { useDispatch } from "react-redux";
-import { useAppDispatch, useAppSelector } from "../app/hooks";
+import { useAppSelector } from "../app/hooks";
 import FileMgr from "../features/file/FileMgr";
 import Log from "../features/log/Log";
 import ProcMgr from "../features/procmgr/ProcMgr";
-import {
-  killProc,
-  selectProcProp,
-  setActiveWindow,
-  setProcProps,
-  toggleMaximize,
-} from "../features/procmgr/procSlice";
+
 import Process, { Rect } from "../features/procmgr/ProcTypes";
 import SetMgr from "../features/settings/SetMgr";
-import officialThemes from "../features/settings/Themes";
 import { addError } from "../scripts/Path";
 import { clamp, randomId } from "../scripts/utils";
 import styles from "../styles/Window.module.css";
@@ -27,67 +18,6 @@ let pos1 = 0,
   pos3 = 0,
   pos4 = 0;
 let maximizeTransition = "0.3s";
-function dragMouseDown(e: any) {
-  const el = e.currentTarget.parentElement;
-  if (!el) {
-    addError("el eempty");
-    return;
-  }
-  e = e || window.event;
-  e.preventDefault();
-  // get the mouse cursor position at startup:
-  pos3 = e.clientX;
-  pos4 = e.clientY;
-  el.style.transition = "0s";
-  // contentElem.classList.add("dragging");
-  document.onmouseup = () => {
-    closeDragElement(el);
-  };
-  // call a function whenever the cursor moves:
-  document.onmousemove = (_e) => {
-    elementDrag(_e, el);
-  };
-}
-
-function elementDrag(e: any, el: HTMLElement) {
-  e = e || window.event;
-  e.preventDefault();
-
-  //remove window transition
-
-  // calculate the new cursor position:
-  pos1 = pos3 - e.clientX;
-  pos2 = pos4 - e.clientY;
-  pos3 = e.clientX;
-  pos4 = e.clientY;
-
-  // set the element's new position and bound:
-
-  let offsetTop = clamp(el.offsetTop - pos2, 0, window.innerHeight - minHeight);
-  let offsetLeft = clamp(
-    el.offsetLeft - pos1,
-    minWidth - parseInt(getComputedStyle(el).width.replace("px", "")),
-    window.innerWidth - minWidth
-  );
-  el.style.top = `${offsetTop}px`;
-  el.style.left = `${offsetLeft}px`;
-  // Updater.rect("top", `${offsetTop}px`);
-  // Updater.rect("left", `${offsetLeft}px`);
-}
-
-function closeDragElement(el: HTMLElement) {
-  /* stop moving when mouse button is released:*/
-  document.onmouseup = null;
-  document.onmousemove = null;
-
-  // {
-  //   //for store update
-  //   Updater.rect("top", winElem.style.top).rect("left", winElem.style.left);
-  // }
-  //restore transition
-  // win.style.transition = transition;
-  // contentElem.classList.remove("dragging");
-}
 
 export default function Window(props) {
   let _navElem = useRef(null);
@@ -104,51 +34,11 @@ export default function Window(props) {
   const procmgr = ProcMgr.getInstance();
   const proc: Process = props.proc;
   const get = (prop) => procmgr.get(proc.id, prop);
-  const rect: Rect = get("rect");
-  // console.log(`Win rect of ${proc.comp}, rect :`, rect);
-  const isMax = get("isMaximized");
-  const isFront = procmgr.isFront(proc.id);
-
-  useEffect(() => {
-    // console.log("Use effect called :", effectCalled++);
-    setElems();
-    if (winElem) {
-      if (proc.rect) {
-        procmgr.set(proc.id, { rect: proc.rect });
-      } else {
-        dispatchRect();
-      }
-      if (winElem && proc["resize"] === "both") {
-        resizeObserver.observe(winElem);
-      } else {
-        resizeObserver.disconnect();
-      }
-    }
-    if (proc.name) {
-      procmgr.set(proc.id, { name: proc.name });
-    }
-  }, []);
-
-  ////////////////// detect resize
-  const resizeObserver = new ResizeObserver((entries) => {
-    for (let entry of entries) {
-      // console.log("Borderbox: ", entry.borderBoxSize.at(0));
-      // console.log("ContentBoxSize: ", entry.contentBoxSize.at(0));
-    }
-  });
 
   ////////////////// rect / style / theme
   const themeReadable = SetMgr.getInstance().themeReadable(useAppSelector);
-  // console.log("Cur theme name : ", themeReadable.name);
   const _colors = themeReadable.colors;
-  const [navHovered, setNavHovered] = useState(false);
-  const buildNavStyle = () => {
-    return {
-      color: _colors["2"],
-      backgroundColor: _colors["1"],
-    };
-  };
-  const buildStyle = (rect: Rect, id: string) => {
+  const buildStyle = (rect: Rect) => {
     const retval = {};
     // console.log(`Buildstyle from id:${id}, rect : ${JSON.stringify(rect)}`);
 
@@ -160,7 +50,7 @@ export default function Window(props) {
 
     //rect
     {
-      if (!!rect) {
+      if (rect) {
         for (let key in rect) {
           retval[key] = rect[key];
         }
@@ -211,8 +101,133 @@ export default function Window(props) {
       }
     }
 
-    // console.log("Buildstyle : ", retval);
+    console.log("Buildstyle : ", retval);
     return retval;
+  };
+  const [contElemStyle, setContElemStyle] = useState(null);
+  useEffect(() => {
+    console.log("New rect called");
+    console.log("Initial rect : ", proc.rect);
+    const _setContElemStyle = () => {
+      const style = buildStyle(proc.rect);
+      const nuRect = {};
+      for (let key in style) {
+        const _l = [
+          "top",
+          "left",
+          "bottom",
+          "right",
+          "width",
+          "height",
+          "aspectRatio",
+        ];
+        if (_l.includes(key)) {
+          nuRect[key] = style[key];
+        }
+      }
+      console.log("New rect : ", nuRect);
+      procmgr.set(proc.id, { rect: nuRect });
+      return style;
+    };
+    const _contElemStyle = _setContElemStyle();
+    setContElemStyle(_contElemStyle);
+
+    console.log("Currect style :", curRect());
+    setElems();
+    if (proc.name) {
+      procmgr.set(proc.id, { name: proc.name });
+    }
+  }, []);
+  const rectReadable: Rect = get("rect");
+
+  //////////////////////////////////// drag events
+  function dragMouseDown(e: any) {
+    const el = e.currentTarget.parentElement;
+    if (!el) {
+      addError("el eempty");
+      return;
+    }
+    e = e || window.event;
+    e.preventDefault();
+    // get the mouse cursor position at startup:
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+    el.style.transition = "0s";
+    // contentElem.classList.add("dragging");
+    document.onmouseup = () => {
+      closeDragElement(el);
+    };
+    // call a function whenever the cursor moves:
+    document.onmousemove = (_e) => {
+      elementDrag(_e, el);
+    };
+  }
+
+  function elementDrag(e: any, el: HTMLElement) {
+    e = e || window.event;
+    e.preventDefault();
+
+    //remove window transition
+
+    // calculate the new cursor position:
+    pos1 = pos3 - e.clientX;
+    pos2 = pos4 - e.clientY;
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+
+    // set the element's new position and bound:
+
+    let offsetTop = clamp(
+      el.offsetTop - pos2,
+      0,
+      window.innerHeight - minHeight
+    );
+    let offsetLeft = clamp(
+      el.offsetLeft - pos1,
+      minWidth - parseInt(getComputedStyle(el).width.replace("px", "")),
+      window.innerWidth - minWidth
+    );
+    el.style.top = `${offsetTop}px`;
+    el.style.left = `${offsetLeft}px`;
+    // Updater.rect("top", `${offsetTop}px`);
+    // Updater.rect("left", `${offsetLeft}px`);
+  }
+
+  function closeDragElement(el: HTMLElement) {
+    /* stop moving when mouse button is released:*/
+    document.onmouseup = null;
+    document.onmousemove = null;
+    dispatchRect();
+  }
+
+  // console.log(`Win rect of ${proc.comp}, rect :`, rect);
+  const isMax = get("isMaximized");
+  const isFront = procmgr.isFront(proc.id);
+
+  useEffect(() => {
+    console.log("Change on rectReadable...");
+    if (!rectReadable) {
+      console.log("rectReadable null. return...");
+      return;
+    }
+    console.log("Rect readable : ", rectReadable);
+    setContElemStyle(() => buildStyle(rectReadable));
+  }, [rectReadable]);
+
+  ////////////////// detect resize
+  const resizeObserver = new ResizeObserver((entries) => {
+    for (let entry of entries) {
+      // console.log("Borderbox: ", entry.borderBoxSize.at(0));
+      // console.log("ContentBoxSize: ", entry.contentBoxSize.at(0));
+    }
+  });
+
+  const [navHovered, setNavHovered] = useState(false);
+  const buildNavStyle = () => {
+    return {
+      color: _colors["2"],
+      backgroundColor: _colors["1"],
+    };
   };
 
   const curRect = () => {
@@ -244,7 +259,6 @@ export default function Window(props) {
     console.log("minimizeBtn clicked from ", proc.name);
   };
 
-  const contElemStyle = buildStyle(rect, proc.id);
   const navElemStyle = buildNavStyle();
   const closeBtnStyle = { backgroundColor: _colors["error"] };
   const minBtnStyle = { backgroundColor: _colors["warn"] };
@@ -277,6 +291,7 @@ export default function Window(props) {
         }
       }, safetimeout);
     }
+    console.log("toggleWindowMaximize");
     procmgr.toggleMaximize(proc.id);
     togglegrabbable();
   };
@@ -295,6 +310,7 @@ export default function Window(props) {
       }
       if (cl.contains("btn-maximize")) {
         procmgr.setFront(proc.id);
+        // dispatchRect();
         setTimeout((e) => {
           toggleWindowMaximize(e);
           proc.onFocus?.();
@@ -308,6 +324,7 @@ export default function Window(props) {
     }
 
     // dispatch(setActiveWindow(proc.id));
+    // dispatchRect();
     procmgr.setFront(proc.id);
     // console.log("On mouse down");
   };
