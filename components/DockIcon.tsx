@@ -15,6 +15,7 @@ export interface DockIconProp {
   onClick?: (Event) => void;
   onClickDefault: (Event) => void;
   isOpen?: boolean;
+  separator?: boolean;
 }
 
 export default function DockIcon(props) {
@@ -66,7 +67,7 @@ export default function DockIcon(props) {
       <div className={styles.imgContainer} style={imgContainerStyle}>
         <Image
           src={src}
-          alt={`Dock icon of ${name}`}
+          alt={`Dock icon of ${type}`}
           style={{
             display: "inline-block",
             borderRadius: "5px",

@@ -15,6 +15,12 @@ function DockItem(props) {
   );
 }
 
+const DockIconSeparator: DockIconProp = {
+  type: "",
+  onClickDefault: (e) => {},
+  separator: true,
+};
+
 export default function Dock(props) {
   const debugMode = !true;
   const procmgr = ProcMgr.getInstance();
@@ -25,6 +31,28 @@ export default function Dock(props) {
   const colors = SetMgr.getInstance().themeReadable(useAppSelector).colors;
   const groups = procmgr.groupedProcs();
   const [items, setItems] = useState([]);
+
+  const initialItems: DockIconProp[] = [
+    {
+      type: "finder",
+      onClickDefault: (e) => {
+        procmgr.exeCmd("finder ~");
+      },
+    },
+    {
+      type: "terminal",
+      onClickDefault: (e) => {
+        procmgr.add("terminal");
+      },
+    },
+    {
+      type: "styler",
+      onClickDefault: (e) => {
+        procmgr.add("styler");
+      },
+    },
+    { ...DockIconSeparator },
+  ];
 
   useEffect(() => {
     const _mouseEdgeDetect = () => {
@@ -40,47 +68,77 @@ export default function Dock(props) {
     _mouseEdgeDetect();
 
     /////////////////////////// set initial items
-    setItems([
-      {
-        type: "finder",
-        onClickDefault: (e) => {
-          procmgr.exeCmd("finder ~");
-        },
-      },
-      {
-        type: "terminal",
-        onClickDefault: (e) => {
-          procmgr.add("terminal");
-        },
-      },
-      {
-        type: "styler",
-        onClickDefault: (e) => {
-          procmgr.add("styler");
-        },
-      },
-    ]);
+    setItems(initialItems);
   }, []);
 
   useEffect(() => {
-    /////// build groups
+    let keys = 0;
     for (let key in groups) {
-      console.log("groups.key : ", key);
+      // console.log(` - ${key} : ${groups[key].length}`);
+      keys++;
     }
+    const setInitialItems = keys === 0;
+
+    // setItems(initialItems);
+    /////// build groups
+    // for (let key in groups) {
+    //   console.log("groups.key : ", key);
+    // }
+    // setItems((items: DockIconProp[]) => {
+    //   //
+    // return;
+    // console.log("1");
     setItems((items: DockIconProp[]) => {
-      return items.map((item) => {
+      if (setInitialItems) {
+        return [...initialItems];
+      }
+      items = items.map((item) => {
         if (groups[item.type]) {
           item.isOpen = true;
           item.onClick = (e) => {
             procmgr.setFront(groups[item.type].at(0).id);
           };
-        } else {
+        } else if (initialItems.some((item) => !!groups[item.type])) {
           item.isOpen = false;
           item.onClick = undefined;
+        } else {
         }
         return item;
       });
+
+      // for un-initials
+      for (let procType in groups) {
+        const _procs = groups[procType];
+        if (initialItems.some((item) => item.type === procType)) {
+          continue;
+        }
+
+        if (items.some((item) => item.type === procType)) {
+          const idx = items.findIndex((item) => item.type === procType);
+          items[idx].onClick = (e) => {
+            procmgr.setFront(_procs.at(0).id);
+          };
+        } else {
+          items.push({
+            type: procType,
+            onClickDefault: (e) => {
+              procmgr.setFront(_procs.at(0).id);
+            },
+            isOpen: true,
+          });
+        }
+      }
+      // console.log("items.length:", items.length);
+      items = items.filter(
+        (item, i) =>
+          initialItems.some((_item) => _item.type === item.type) ||
+          item.isOpen ||
+          (item.separator && i + 1 === items.length)
+      );
+
+      return items;
     });
+    return;
   }, [groups]);
 
   const buildContainerStyle = () => {
@@ -110,7 +168,23 @@ export default function Dock(props) {
           boxShadow: `2px 2px 10px ${colors["1"]}`,
         }}
       >
-        {items.map((item, i) => {
+        {items.map((item: DockIconProp, i) => {
+          if (item.separator) {
+            // return undefined;
+            if (i === items.length - 1) {
+              return undefined;
+            }
+            return (
+              <div
+                className={styles.separator}
+                key={i}
+                style={{
+                  // height: "100%",
+                  borderRight: `1px solid ${colors["1"]}aa`,
+                }}
+              ></div>
+            );
+          }
           return React.createElement(DockIcon, {
             props: item,
             key: i,

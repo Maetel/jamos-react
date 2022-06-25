@@ -185,8 +185,27 @@ export const selectProcProp = (id:string,prop:string)=>(state:AppState)=>{
   return proc?.[prop]
 }
 
-export const processesValue = ()=>{
-  return store.getState().proc.procs;
+export const processesValue = ():Process[]=>{
+  return [...store.getState().proc.procs];
+}
+export const selectGroupedProcs = (state:AppState)=>{
+
+  const procs:Process[] = state.proc.procs;
+    const grouped:{[key:string]:Process[]} = procs.reduce((prev,proc)=>{
+      if(!prev[proc.comp]) {
+        prev[proc.comp] = [];
+      }
+      prev[proc.comp].push(proc)
+      return prev;
+    },{});
+
+    //sort
+    for(let key in grouped){
+      grouped[key].sort((l,r)=>{return parseInt(l.zIndex) - parseInt(r.zIndex)})
+    }
+
+    return grouped;
+
 }
 
 export default procSlice.reducer;

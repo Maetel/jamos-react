@@ -15,6 +15,7 @@ import {
   killProc,
   openToolbar,
   processesValue,
+  selectGroupedProcs,
   selectIsToolbarOpen,
   selectProcessById,
   selectProcesses,
@@ -219,20 +220,6 @@ public psValue(){
   }
 
   public groupedProcs():{[key:string]:Process[]}{
-    const procs:Process[] = useSelector(selectProcesses);
-    const grouped:{[key:string]:Process[]} = procs.reduce((prev,proc)=>{
-      if(!prev[proc.comp]) {
-        prev[proc.comp] = [];
-      }
-      prev[proc.comp].push(proc)
-      return prev;
-    },{});
-
-    //sort
-    for(let key in grouped){
-      grouped[key].sort((l,r)=>{return parseInt(l.zIndex) - parseInt(r.zIndex)})
-    }
-
-    return grouped;
+    return useSelector(selectGroupedProcs);
   }
 }
