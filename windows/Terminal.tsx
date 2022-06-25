@@ -499,15 +499,13 @@ export default function Terminal(props) {
         procmgr.add(cmd);
         break;
 
+      case "dock":
+        procmgr.toggleDock();
+        break;
       case "toolbar":
         const _l = merged.toLowerCase();
         if (merged.length === 0) {
-          if (isToolbarOpen) {
-            //toggle toolbar
-            procmgr.closeToolbar();
-          } else {
-            procmgr.openToolbar();
-          }
+          procmgr.toggleToolbar();
           break;
         }
         if (_l === "open" || _l === "o") {

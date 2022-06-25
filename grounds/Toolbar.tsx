@@ -28,14 +28,21 @@ const systemMenu: ToolbarItem[] = [
   {
     caller: "system",
     menu: "🍞",
+    item: "System Monitor",
+    callback: "system.proc.add.systeminfo",
+    separator: true,
+  },
+  {
+    caller: "system",
+    menu: "🍞",
     item: "Fix toolbar",
     callback: "system.proc.toolbar.open",
   },
   {
     caller: "system",
     menu: "🍞",
-    item: "System Monitor",
-    callback: "system.proc.add.systeminfo",
+    item: "Fix dock",
+    callback: "system.proc.dock.open",
     separator: true,
   },
   {
@@ -93,6 +100,14 @@ export class ToolbarControl {
           }
           if (params === "close") {
             procmgr.closeToolbar();
+          }
+          return;
+        case "dock":
+          if (params === "open") {
+            procmgr.openDock();
+          }
+          if (params === "close") {
+            procmgr.closeDock();
           }
           return;
         default:
@@ -336,16 +351,30 @@ export default function Toolbar(props) {
   const containerStyle = buildContainerStyle();
 
   const isToolbarOpen = procmgr.isToolbarOpen();
-  useEffect(() => {}, [isToolbarOpen]);
+  const isDockOpen = procmgr.isDockOpen();
 
   const parseItems = (items: TbItem[]): TbProc => {
-    const idx = systemMenu.indexOf(
-      systemMenu.find((menu) => menu.item.includes("toolbar"))
-    );
-    systemMenu[idx].item = isToolbarOpen ? "Hide toolbar" : "Fix toolbar";
-    systemMenu[idx].callback = isToolbarOpen
-      ? "system.proc.toolbar.close"
-      : "system.proc.toolbar.open";
+    //toggle toolbar
+    {
+      const tbIdx = systemMenu.indexOf(
+        systemMenu.find((menu) => menu.item.includes("toolbar"))
+      );
+      systemMenu[tbIdx].item = isToolbarOpen ? "Hide toolbar" : "Fix toolbar";
+      systemMenu[tbIdx].callback = isToolbarOpen
+        ? "system.proc.toolbar.close"
+        : "system.proc.toolbar.open";
+    }
+
+    //toggle dock
+    {
+      const dockIdx = systemMenu.indexOf(
+        systemMenu.find((menu) => menu.item.includes("dock"))
+      );
+      systemMenu[dockIdx].item = isDockOpen ? "Hide dock" : "Fix dock";
+      systemMenu[dockIdx].callback = isDockOpen
+        ? "system.proc.dock.close"
+        : "system.proc.dock.open";
+    }
 
     const retval: TbMenu[] = [{ menu: "🍞", items: systemMenu }];
     if (!items || items.length === 0) {
@@ -376,7 +405,7 @@ export default function Toolbar(props) {
     // console.log("frontMenus update :", frontMenus);
     const _tbproc = parseItems(frontMenus);
     setMenus(_tbproc);
-  }, [frontMenus, isToolbarOpen]);
+  }, [frontMenus, isToolbarOpen, isDockOpen]);
 
   const uncollapse = (e) => {
     setHovered(false);

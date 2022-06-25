@@ -7,14 +7,6 @@ import styles from "../styles/Dock.module.css";
 import DockIcon, { DockIconProp } from "../components/DockIcon";
 import React from "react";
 
-function DockItem(props) {
-  return (
-    <div className={`${styles.dockitem}`}>
-      <DockIcon></DockIcon>
-    </div>
-  );
-}
-
 const DockIconSeparator: DockIconProp = {
   type: "",
   onClickDefault: (e) => {},
@@ -26,7 +18,8 @@ export default function Dock(props) {
   const procmgr = ProcMgr.getInstance();
   const [isEdge, setIsEdge] = useState(false);
   const [hovered, setHovered] = useState(false);
-  const show: boolean = isEdge || hovered || debugMode;
+  const fixed = procmgr.isDockOpen();
+  const show: boolean = isEdge || hovered || fixed || debugMode;
   const className = show ? styles.active : "";
   const colors = SetMgr.getInstance().themeReadable(useAppSelector).colors;
   const groups = procmgr.groupedProcs();

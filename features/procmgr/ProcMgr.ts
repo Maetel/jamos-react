@@ -9,13 +9,16 @@ import SetMgr from "../settings/SetMgr";
 
 import {
   addProc,
+  closeDock,
   closeToolbar,
   increaseIndices,
   killAllProcs,
   killProc,
+  openDock,
   openToolbar,
   processesValue,
   selectGroupedProcs,
+  selectIsDockOpen,
   selectIsToolbarOpen,
   selectProcessById,
   selectProcesses,
@@ -23,7 +26,9 @@ import {
   setActiveWindow,
   setProcProps,
   setToolbarItem,
+  toggleDock,
   toggleMaximize,
+  toggleToolbar,
 } from "./procSlice";
 import Process, { ProcessCommands } from "./ProcTypes";
 
@@ -211,12 +216,28 @@ public psValue(){
   public isToolbarOpen(){
     return useSelector(selectIsToolbarOpen)
   }
+  public isDockOpen(){
+    return useSelector(selectIsDockOpen)
+  }
 
+  public toggleToolbar(){
+    store.dispatch(toggleToolbar());
+  }
   public openToolbar(){
     store.dispatch(openToolbar());
   }
   public closeToolbar(){
     store.dispatch(closeToolbar());
+  }
+
+  public toggleDock(){
+    store.dispatch(toggleDock());
+  }
+  public openDock(){
+    store.dispatch(openDock());
+  }
+  public closeDock(){
+    store.dispatch(closeDock());
   }
 
   public groupedProcs():{[key:string]:Process[]}{

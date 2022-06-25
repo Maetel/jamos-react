@@ -12,11 +12,13 @@ import Process, { ProcessCommands, Rect } from "./ProcTypes";
 export interface ProcState {
   procs:Process[]
   openToolbar : boolean;
+  openDock : boolean;
 }
 
 const initialState: ProcState = {
   procs:[],
   openToolbar:false,
+  openDock:false,
 }
 
 export const procSlice = createSlice({
@@ -105,12 +107,7 @@ export const procSlice = createSlice({
         }
       }
     },
-    openToolbar:(state, action:PayloadAction<void>)=>{
-      state.openToolbar = true;
-    },
-    closeToolbar:(state, action:PayloadAction<void>)=>{
-      state.openToolbar = false;
-    },
+    
     setActiveWindow:(state, action:PayloadAction<string>)=>{
       const proc = state.procs.find(proc=>proc.id===action.payload)
       if(!proc){
@@ -165,12 +162,33 @@ export const procSlice = createSlice({
       proc.isMaximized = isMaximized();
     },
 
+    openToolbar:(state, action:PayloadAction<void>)=>{
+      state.openToolbar = true;
+    },
+    closeToolbar:(state, action:PayloadAction<void>)=>{
+      state.openToolbar = false;
+    },
+    toggleToolbar:(state, action:PayloadAction<void>)=>{
+      state.openToolbar = !state.openToolbar;
+    },
+
+    openDock:(state, action:PayloadAction<void>)=>{
+      state.openDock = true;
+    },
+    closeDock:(state, action:PayloadAction<void>)=>{
+      state.openDock = false;
+    },
+    toggleDock:(state, action:PayloadAction<void>)=>{
+      state.openDock = !state.openDock;
+    },
+
   },
 
   
 })
 
 export const selectIsToolbarOpen = (state:AppState)=>state.proc.openToolbar;
+export const selectIsDockOpen = (state:AppState)=>state.proc.openDock;
 
 export const selectProcessById = createSelector([state=>state.procs, (state, procId:string)=>procId], (procs,procId)=>{
   return procs.find(proc=>proc.id===procId);
@@ -209,4 +227,4 @@ export const selectGroupedProcs = (state:AppState)=>{
 }
 
 export default procSlice.reducer;
-export const { addProc, killProc, killAllProcs, increaseIndices, setActiveWindow,setProcProps, toggleMaximize,setToolbarItem, openToolbar, closeToolbar} = procSlice.actions
+export const { addProc, killProc, killAllProcs, increaseIndices, setActiveWindow,setProcProps, toggleMaximize,setToolbarItem, openToolbar, closeToolbar, toggleToolbar, openDock, closeDock,toggleDock} = procSlice.actions
