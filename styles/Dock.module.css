@@ -2,17 +2,32 @@
   width:100%;
   position:absolute;
   height:5rem;
-  bottom:10px;
+  bottom:1rem;
   left:50%;
-  transform:translateX(-50%) translateY(6rem);
+  transform:translateX(-50%) translateY(7rem);
   transition:0.2s;
   z-index: 1002;
   display:flex;
-  justify-content: space-between;
+  align-items: center;
+  justify-content: center;
   /* background-color:#dbdbdbdd; */
-  mix-blend-mode: screen;
+  /* mix-blend-mode: screen; */
+  
 }
 
 .container.active {
   transform:translateX(-50%);
+}
+
+.dock {
+  box-sizing: border-box;
+  padding:4px 10px;
+  display:flex;
+  gap:14px;
+  border-radius: 20px;
+}
+.item {
+  box-sizing: border-box;
+  /* padding:px; */
+  /* background-color: green; */
 }

@@ -39,6 +39,25 @@ export const ProcessCommands = [
   "broom", "savebread", "loadbread", "resetbread",
   'toolbar',
 ];
+export function getProcessCommandsIcon(type:string){
+  return ProcessCommandsIcons[type] || "/imgs/icon-default.svg";
+}
+export const ProcessCommandsIcons:{} = {
+  //windowed
+  "dir":"/imgs/dir.svg",
+  "text":"/imgs/text.svg",
+  "notepad":"/imgs/notepad.svg",
+  "terminal":"/imgs/terminal.svg",
+  "logger":"/imgs/logger.svg",
+  "finder":"/imgs/finder.svg",
+  "atelier":"/imgs/atelier.svg",
+  "postman":"/imgs/postman.svg",
+  "appstore":"/imgs/appstore.svg",
+  "about":"/imgs/jamos.png",
+  "settings":"/imgs/settings.svg",
+  "styler":"/imgs/styler.svg",
+  "systeminfo":"/imgs/chart.svg",
+};
 
 export interface Rect {
   top?: string; bottom?:string;

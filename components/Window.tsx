@@ -33,7 +33,8 @@ export default function Window(props) {
   };
 
   const procmgr = ProcMgr.getInstance();
-  const proc: Process = props.proc;
+  const proc: Process = { ...props.proc };
+  proc.name = proc.name ?? "Application";
   const get = (prop) => procmgr.getReadable(useAppSelector, proc.id, prop);
   // const get = (prop) => procmgr.get(proc.id, prop);
 
@@ -136,9 +137,10 @@ export default function Window(props) {
 
     // console.log("Currect style :", curRect());
     setElems();
-    if (proc.name) {
-      procmgr.set(proc.id, { name: proc.name });
-    }
+    // if (proc.name) {
+    //   procmgr.set(proc.id, { name: proc.name });
+    // }
+    procmgr.set(proc.id, { name: proc.name ?? "Application" });
   }, []);
   const rectReadable: Rect = get("rect");
   // console.log("rectReadable:", rectReadable);
@@ -412,9 +414,7 @@ export default function Window(props) {
             style={maxBtnStyle}
           />
         </ul>
-        <span className={styles["window-title"]}>
-          {proc.name ?? "Application"}
-        </span>
+        <span className={styles["window-title"]}>{proc.name}</span>
       </div>
       <div
         className={styles["content-container"]}

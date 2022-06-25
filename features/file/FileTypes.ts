@@ -1,5 +1,6 @@
 import Path from "../../scripts/Path";
 import Log from "../log/Log";
+import { getProcessCommandsIcon } from "../procmgr/ProcTypes";
 
 export interface Node {
   id: string,
@@ -16,7 +17,7 @@ export class NodeControl {
       path:path,
       type:type,
       exeCmd:exeCmd ?? this._setDefaultCmd(new Path(path), type),
-      iconPath : iconPath ?? this._setDefaultIcon(type),
+      iconPath : iconPath ?? getProcessCommandsIcon(type),
       data: data ?? {},
     }
   }
@@ -33,39 +34,6 @@ export class NodeControl {
     return JSON.stringify(node);
   };
   
-  private static _setDefaultIcon(type: string) {
-    let retval = "/imgs/icon-default.svg";
-    switch (type) {
-      case "text":
-      case "dir":
-      case "terminal":
-      case "logger":
-      case "broom":
-      case "postman":
-      case "atelier":
-      case "notepad":
-      case "appstore":
-      case "savebread":
-      case "styler":
-      case "loadbread":
-      case "finder":
-      case "settings":
-        retval = `/imgs/${type}.svg`;
-        break;
-      case "about":
-      case "hub":
-        retval = "/imgs/jamos256.png";
-        break;
-      case "resetbread":
-        retval = "/imgs/loading.svg";
-        break;
-
-      case "image":
-      default:
-        break;
-    }
-    return retval;
-  }
   private static _setDefaultCmd(path: Path, type: string): string {
     let retval = type;
     switch (type) {

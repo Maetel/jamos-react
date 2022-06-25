@@ -218,6 +218,21 @@ public psValue(){
     store.dispatch(closeToolbar());
   }
 
+  public groupedProcs():{[key:string]:Process[]}{
+    const procs:Process[] = useSelector(selectProcesses);
+    const grouped:{[key:string]:Process[]} = procs.reduce((prev,proc)=>{
+      if(!prev[proc.comp]) {
+        prev[proc.comp] = [];
+      }
+      prev[proc.comp].push(proc)
+      return prev;
+    },{});
 
-  //엄밀히 따지면 프로세스의 z-index는 별도의 어레이에 매핑되어 관리되는 것이 맞아보인다.
+    //sort
+    for(let key in grouped){
+      grouped[key].sort((l,r)=>{return parseInt(l.zIndex) - parseInt(r.zIndex)})
+    }
+
+    return grouped;
+  }
 }
