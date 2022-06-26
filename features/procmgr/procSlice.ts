@@ -205,7 +205,21 @@ export const procSlice = createSlice({
     toggleDock:(state, action:PayloadAction<void>)=>{
       state.openDock = !state.openDock;
     },
-
+    pushToLast:(state, action:PayloadAction<string>)=>{
+      const proc = state.procs.find(proc=>proc.id===action.payload);
+      if(!proc){
+        return;
+      }
+      const axis = parseInt(proc.zIndex);
+      const procCount = state.procs.length;
+      state.procs.forEach(_proc=>{
+        if(axis < parseInt(_proc.zIndex)){
+          _proc.zIndex = ''+(parseInt(_proc.zIndex)-1)
+        }
+      })
+      proc.zIndex = ''+(procCount-1);
+    }
+      
   },
 
   
@@ -255,4 +269,4 @@ export const selectIsMinimized = (procId:String)=>(state:AppState)=>{
 
 
 export default procSlice.reducer;
-export const { addProc, killProc, killAllProcs, increaseIndices, setActiveWindow,setProcProps, minimize, unMinimize,toggleMinimize,toggleMaximize,setToolbarItem, openToolbar, closeToolbar, toggleToolbar, openDock, closeDock,toggleDock} = procSlice.actions
+export const { addProc, killProc, killAllProcs, increaseIndices, setActiveWindow,setProcProps, minimize, unMinimize,toggleMinimize,toggleMaximize,setToolbarItem, openToolbar, closeToolbar, toggleToolbar, openDock, closeDock,toggleDock,pushToLast} = procSlice.actions

@@ -18,6 +18,7 @@ import {
   openDock,
   openToolbar,
   processesValue,
+  pushToLast,
   selectGroupedProcs,
   selectIsDockOpen,
   selectIsMinimized,
@@ -250,6 +251,7 @@ public psValue(){
   }
   public minimize(procId:string){
     store.dispatch(minimize(procId))
+    store.dispatch(pushToLast(procId));
   }
   public unminimize(procId:string){
     store.dispatch(unMinimize(procId))

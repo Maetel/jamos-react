@@ -85,13 +85,19 @@ export default function Dock(props) {
       if (setInitialItems) {
         return [...initialItems];
       }
+
+      // for initials
       items = items.map((item) => {
         if (groups[item.type]) {
+          // if is open
           item.isOpen = true;
           item.onClick = (e) => {
-            procmgr.setFront(groups[item.type].at(0).id);
+            groups[item.type].forEach((proc) => {
+              procmgr.setFront(proc.id);
+            });
           };
         } else if (initialItems.some((item) => !!groups[item.type])) {
+          // if none open
           item.isOpen = false;
           item.onClick = undefined;
         } else {
@@ -109,7 +115,9 @@ export default function Dock(props) {
         if (items.some((item) => item.type === procType)) {
           const idx = items.findIndex((item) => item.type === procType);
           items[idx].onClick = (e) => {
-            procmgr.setFront(_procs.at(0).id);
+            _procs.forEach((proc) => {
+              procmgr.setFront(proc.id);
+            });
           };
         } else {
           items.push({
