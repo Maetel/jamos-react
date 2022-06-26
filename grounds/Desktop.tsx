@@ -44,8 +44,10 @@ export default function Desktop(props) {
     ];
     filemgr.addFiles(f);
     procmgr.openToolbar();
+    procmgr.openDock();
     setTimeout(() => {
       procmgr.closeToolbar();
+      procmgr.closeDock();
     }, 1500);
   };
 

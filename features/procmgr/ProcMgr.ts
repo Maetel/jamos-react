@@ -14,11 +14,13 @@ import {
   increaseIndices,
   killAllProcs,
   killProc,
+  minimize,
   openDock,
   openToolbar,
   processesValue,
   selectGroupedProcs,
   selectIsDockOpen,
+  selectIsMinimized,
   selectIsToolbarOpen,
   selectProcessById,
   selectProcesses,
@@ -28,7 +30,9 @@ import {
   setToolbarItem,
   toggleDock,
   toggleMaximize,
+  toggleMinimize,
   toggleToolbar,
+  unMinimize,
 } from "./procSlice";
 import Process, { ProcessCommands } from "./ProcTypes";
 
@@ -189,6 +193,7 @@ public psValue(){
   }
 
   public setFront(procId:string){
+    store.dispatch(unMinimize(procId));
     store.dispatch(setActiveWindow(procId));
   }
 
@@ -238,6 +243,20 @@ public psValue(){
   }
   public closeDock(){
     store.dispatch(closeDock());
+  }
+
+  public toggleMinimize(procId:string){
+    store.dispatch(toggleMinimize(procId))
+  }
+  public minimize(procId:string){
+    store.dispatch(minimize(procId))
+  }
+  public unminimize(procId:string){
+    store.dispatch(unMinimize(procId))
+  }
+
+  public isMinimized(procId:string){
+    return useSelector(selectIsMinimized(procId));
   }
 
   public groupedProcs():{[key:string]:Process[]}{

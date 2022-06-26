@@ -1,9 +1,11 @@
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import store, { AppState } from "../../app/store";
+import officialThemes, { defaultTheme, ThemeColors } from "./Themes";
 
 
 
 export interface SettingsState {
+  theme:string,
   [key:string]:any;
 }
 
@@ -27,5 +29,7 @@ const settingsSlice = createSlice({
 
 export const getSettingsValue = (key:string)=>store.getState().settings[key];
 export const selectSettings = (key:string)=>(state:AppState)=>state.settings[key];
+export const selectTheme = (state:AppState)=>state.settings.theme;
+export const selectThemeColors = (state:AppState):ThemeColors=>officialThemes[state.settings.theme]?.colors ?? defaultTheme.colors;
 export default settingsSlice.reducer;
 export const { setSetting } = settingsSlice.actions;

@@ -1,7 +1,5 @@
-export interface Theme {
-  name: string;
-  colors: { 
-    '1':string,
+export interface ThemeColors {
+  '1':string,
     '2':string,
     '3':string,
     'okay':string,
@@ -9,7 +7,10 @@ export interface Theme {
     'error':string,
     'boxShadow':string,
     [key: string]: string
-  };
+}
+export interface Theme {
+  name: string;
+  colors:ThemeColors;
   nav: string; //define 'string : component' map at Window.svelte
 }
 

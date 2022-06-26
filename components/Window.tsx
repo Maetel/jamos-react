@@ -7,10 +7,12 @@ import ProcMgr from "../features/procmgr/ProcMgr";
 
 import Process, { Rect } from "../features/procmgr/ProcTypes";
 import SetMgr from "../features/settings/SetMgr";
+import { ThemeColors } from "../features/settings/Themes";
 import { ToolbarControl } from "../grounds/Toolbar";
 import { ToolbarItem } from "../scripts/ToolbarTypes";
 import { clamp, randomId } from "../scripts/utils";
 import styles from "../styles/Window.module.css";
+import Dialogue from "./Dialogue";
 
 const minHeight = 240;
 const minWidth = 300;
@@ -19,6 +21,82 @@ let pos1 = 0,
   pos3 = 0,
   pos4 = 0;
 let maximizeTransition = "0.3s";
+
+interface DialogueProps {
+  type: string; // 'buttons' | '
+  cancel: () => void;
+  rect?: Rect;
+  title?: string;
+  descs?: string[];
+  elem?: JSX.Element;
+  buttons?: string[];
+  callbacks?: ((params) => boolean)[];
+}
+
+function DialogueWindow(props) {
+  const dial: DialogueProps = props.dial;
+  const rect = dial.rect ?? {
+    top: "25%",
+    left: "25%",
+    width: "50%",
+    height: "50%",
+  };
+  // const colors = SetMgr.getInstance().themeReadable(useAppSelector).colors;
+  const colors: ThemeColors = SetMgr.colors();
+
+  const [style, setStyle] = useState((dial?.rect ?? rect) as {});
+
+  const handleKey = (e) => {
+    if (!dial.callbacks && dial.callbacks.length > 0) {
+      return;
+    }
+    // e.preventDefault();
+    switch (e.key) {
+      case "Escape":
+        console.log("Dialogue escape");
+        dial.cancel();
+        // dial.callbacks.at(dial.callbacks.length - 1);
+        break;
+      case "Enter":
+        dial.callbacks.at(0);
+        console.log("Dialogue enter");
+        break;
+      default:
+        break;
+    }
+  };
+  useEffect(() => {
+    window.addEventListener("keydown", handleKey);
+    return () => {
+      window.removeEventListener("keydown", handleKey);
+    };
+  }, [dial]);
+  useEffect(() => {
+    const buildStyle = () => {
+      const initialRect = dial?.rect ?? rect;
+      let retval: {} = { ...initialRect };
+      retval["color"] = colors["1"];
+      retval["backgroundColor"] = colors["2"];
+      retval["boxShadow"] = colors.boxShadow;
+      return retval;
+    };
+    const st = buildStyle();
+    // setStyle(() => st);
+  }, [colors, rect]);
+  return dial ? (
+    <div className={styles.dialogueWindow} style={style}>
+      <div
+        className={styles.dialNav}
+        style={{ backgroundColor: colors["1"], color: colors["2"] }}
+      >
+        <button
+          className={styles.dialCloseBtn}
+          style={{ backgroundColor: colors.error }}
+        ></button>
+      </div>
+    </div>
+  ) : undefined;
+}
 
 export default function Window(props) {
   let _winElem = useRef(null);
@@ -34,6 +112,11 @@ export default function Window(props) {
 
   const procmgr = ProcMgr.getInstance();
   const proc: Process = { ...props.proc };
+  // proc["disableMinBtn"] = true;
+  const btnMaxClass = proc["disableMaxBtn"] ? styles.disabled : "";
+  const btnMinClass = proc["disableMinBtn"] ? styles.disabled : "";
+  const btnCloseClass = proc["disableCloseBtn"] ? styles.disabled : "";
+
   proc.name = proc.name ?? "Application";
   const get = (prop) => procmgr.getReadable(useAppSelector, proc.id, prop);
   // const get = (prop) => procmgr.get(proc.id, prop);
@@ -44,6 +127,13 @@ export default function Window(props) {
   const buildStyle = (rect: Rect) => {
     const retval = {};
     // console.log(`Buildstyle from id:${id}, rect : ${JSON.stringify(rect)}`);
+
+    //handle minimized
+    if (isMin) {
+      retval["display"] = "none";
+    } else {
+      retval["display"] = "block";
+    }
 
     // min w/h
     {
@@ -174,6 +264,29 @@ export default function Window(props) {
     );
   }, []);
 
+  const closeDial = () => {
+    setDial(null);
+  };
+  //////////////////////////////////// dialogue
+  const initialDial: DialogueProps = {
+    type: "buttons",
+    cancel: closeDial,
+    title: "Dialogue",
+    descs: ["desc1", "desc2"],
+    buttons: ["Okay", "cancel"],
+    callbacks: [
+      (params) => {
+        console.log("Okay");
+        return true;
+      },
+      (params) => {
+        console.log("Cancel");
+        return false;
+      },
+    ],
+  };
+  const [dial, setDial] = useState({ ...initialDial });
+
   //////////////////////////////////// drag events
   function dragMouseDown(e: any) {
     // const el = e.currentTarget.parentElement;
@@ -240,6 +353,7 @@ export default function Window(props) {
 
   // console.log(`Win rect of ${proc.comp}, rect :`, rect);
   const isMax = get("isMaximized");
+  const isMin = get("isMinimized");
   const isFront = procmgr.isFront(proc.id);
 
   useEffect(() => {
@@ -247,7 +361,7 @@ export default function Window(props) {
       return;
     }
     setContElemStyle(() => buildStyle(rectReadable));
-  }, [rectReadable, _colors, isMax, isFront]);
+  }, [rectReadable, _colors, isMax, isMin, isFront]);
 
   ////////////////// detect resize
   const resizeObserver = new ResizeObserver((entries) => {
@@ -263,6 +377,13 @@ export default function Window(props) {
       color: _colors["2"],
       backgroundColor: _colors["1"],
     };
+  };
+  const buildMaxBtnStyle = () => {
+    const retval = { backgroundColor: _colors["okay"] };
+    if (proc.disableMaxBtn) {
+      // retval["disabled"] = true;
+    }
+    return retval;
   };
 
   const curRect = () => {
@@ -292,12 +413,13 @@ export default function Window(props) {
   const onCloseBtn = dispatchCloseWindow;
   const onMinimizeBtn = (e) => {
     // console.log("minimizeBtn clicked from ", proc.name);
+    procmgr.minimize(proc.id);
   };
 
   const navElemStyle = buildNavStyle();
   const closeBtnStyle = { backgroundColor: _colors["error"] };
   const minBtnStyle = { backgroundColor: _colors["warn"] };
-  const maxBtnStyle = { backgroundColor: _colors["okay"] };
+  const maxBtnStyle = buildMaxBtnStyle();
 
   const togglegrabbable = () => {
     //watches before transition, so toggle opposite way
@@ -335,15 +457,15 @@ export default function Window(props) {
     let cl = (e.target as HTMLElement).classList;
     {
       //handle switches
-      if (cl.contains(styles["btn-close"])) {
+      if (cl.contains(styles["btn-close"]) && !proc["disableCloseBtn"]) {
         onCloseBtn();
         return;
       }
-      if (cl.contains(styles["btn-minimize"])) {
+      if (cl.contains(styles["btn-minimize"]) && !proc["disableMinBtn"]) {
         onMinimizeBtn(e);
         return;
       }
-      if (cl.contains(styles["btn-maximize"])) {
+      if (cl.contains(styles["btn-maximize"]) && !proc["disableMaxBtn"]) {
         procmgr.setFront(proc.id);
         // dispatchRect();
         setTimeout((e) => {
@@ -365,65 +487,70 @@ export default function Window(props) {
   };
 
   return (
-    <section
-      className={`${styles["window-container"]}`}
-      id={winId}
-      onMouseDown={onContainerMouseDown}
-      style={contElemStyle}
-      onMouseUp={(e) => {
-        // console.log("On mouse up");
-      }}
-      ref={_winElem}
-    >
-      <div
-        className={`${styles["window-container-header"]} ${styles.grabbable}`}
-        id={navId}
-        ref={_navElem}
-        onMouseDown={(e) => {
-          if (!isMax) {
-            dragMouseDown(e);
-          }
+    <>
+      <section
+        className={`${styles["window-container"]}`}
+        id={winId}
+        onMouseDown={onContainerMouseDown}
+        style={contElemStyle}
+        onMouseUp={(e) => {
+          // console.log("On mouse up");
         }}
-        style={navElemStyle}
+        ref={_winElem}
       >
-        <ul
-          className={styles["button-container"]}
-          style={{ backgroundColor: navHovered ? _colors["2"] : "transparent" }}
-          onMouseEnter={(e) => {
-            // navElemStyle["backgroundColor"] = _colors["3"];
-            setNavHovered(true);
+        <div
+          className={`${styles["window-container-header"]} ${styles.grabbable}`}
+          id={navId}
+          ref={_navElem}
+          onMouseDown={(e) => {
+            if (!isMax) {
+              dragMouseDown(e);
+            }
           }}
-          onMouseLeave={(e) => {
-            setNavHovered(false);
-            // navElemStyle["backgroundColor"] = "transparent";
+          style={navElemStyle}
+        >
+          <ul
+            className={styles["button-container"]}
+            style={{
+              backgroundColor: navHovered ? _colors["2"] : "transparent",
+            }}
+            onMouseEnter={(e) => {
+              // navElemStyle["backgroundColor"] = _colors["3"];
+              setNavHovered(true);
+            }}
+            onMouseLeave={(e) => {
+              setNavHovered(false);
+              // navElemStyle["backgroundColor"] = "transparent";
+            }}
+          >
+            <li
+              className={`${styles["btn-close"]} ${styles["btn"]} ${btnCloseClass}`}
+              // onClick={onCloseBtn}
+              style={closeBtnStyle}
+            />
+            <li
+              className={`${styles["btn-minimize"]} ${styles["btn"]} ${btnMinClass}`}
+              style={minBtnStyle}
+              // onClick={onMinimizeBtn}
+            />
+            <li
+              className={`${styles["btn-maximize"]} ${styles["btn"]} ${btnMaxClass}`}
+              // onClick={toggleWindowMaximize}
+              style={maxBtnStyle}
+            />
+          </ul>
+          <span className={styles["window-title"]}>{proc.name}</span>
+        </div>
+        <div
+          className={styles["content-container"]}
+          onClick={(e) => {
+            proc.onFocus?.();
           }}
         >
-          <li
-            className={`${styles["btn-close"]} ${styles["btn"]}`}
-            // onClick={onCloseBtn}
-            style={closeBtnStyle}
-          />
-          <li
-            className={`${styles["btn-minimize"]} ${styles["btn"]}`}
-            style={minBtnStyle}
-            // onClick={onMinimizeBtn}
-          />
-          <li
-            className={`${styles["btn-maximize"]} ${styles["btn"]}`}
-            onClick={toggleWindowMaximize}
-            style={maxBtnStyle}
-          />
-        </ul>
-        <span className={styles["window-title"]}>{proc.name}</span>
-      </div>
-      <div
-        className={styles["content-container"]}
-        onClick={(e) => {
-          proc.onFocus?.();
-        }}
-      >
-        {(props as any).children}
-      </div>
-    </section>
+          {(props as any).children}
+        </div>
+      </section>
+      {/* {dial ? <Window {...dial}></Window> : undefined} */}
+    </>
   );
 }

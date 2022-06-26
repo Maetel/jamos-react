@@ -123,6 +123,30 @@ export const procSlice = createSlice({
       proc.zIndex = '0';
     },
     
+    unMinimize:(state, action:PayloadAction<string>)=>{
+      const proc = state.procs.find(proc=>proc.id===action.payload);
+      if(!proc){
+        return;
+      }
+      proc.isMinimized = false;
+    },
+    minimize:(state, action:PayloadAction<string>)=>{
+      const proc = state.procs.find(proc=>proc.id===action.payload);
+      if(!proc){
+        return;
+      }
+      proc.isMinimized = true;
+    },
+
+    toggleMinimize:(state, action:PayloadAction<string>)=>{
+      const proc = state.procs.find(proc=>proc.id===action.payload);
+      if(!proc){
+        return;
+      }
+      // okay even if proc.isMinimized is undefined
+      proc.isMinimized = !proc.isMinimized;
+    },
+
     toggleMaximize:(state, action:PayloadAction<string>)=>{
       const proc = state.procs.find(proc=>proc.id===action.payload);
       if(!proc){
@@ -225,6 +249,10 @@ export const selectGroupedProcs = (state:AppState)=>{
     return grouped;
 
 }
+export const selectIsMinimized = (procId:String)=>(state:AppState)=>{
+  return state.proc.procs.find(proc=>proc.id===procId)?.isMinimized
+}
+
 
 export default procSlice.reducer;
-export const { addProc, killProc, killAllProcs, increaseIndices, setActiveWindow,setProcProps, toggleMaximize,setToolbarItem, openToolbar, closeToolbar, toggleToolbar, openDock, closeDock,toggleDock} = procSlice.actions
+export const { addProc, killProc, killAllProcs, increaseIndices, setActiveWindow,setProcProps, minimize, unMinimize,toggleMinimize,toggleMaximize,setToolbarItem, openToolbar, closeToolbar, toggleToolbar, openDock, closeDock,toggleDock} = procSlice.actions

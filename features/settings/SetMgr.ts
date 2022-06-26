@@ -1,12 +1,17 @@
+import { useSelector } from "react-redux";
 import store from "../../app/store";
-import { getSettingsValue, selectSettings, setSetting } from "./settingsSlice";
-import officialThemes, { defaultTheme, Theme, themeByName } from "./Themes";
+import { getSettingsValue, selectSettings, selectThemeColors, setSetting } from "./settingsSlice";
+import officialThemes, { defaultTheme, Theme, themeByName, ThemeColors } from "./Themes";
 
 
 export default class SetMgr {
   private static instance:SetMgr;
   private constructor (){
 
+  }
+  public static colors():ThemeColors {
+    this.getInstance();
+    return useSelector(selectThemeColors);
   }
   public static getInstance(){
     if(!this.instance){

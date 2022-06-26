@@ -1,5 +1,12 @@
 import { ToolbarItem } from "../../scripts/ToolbarTypes";
 
+export interface Dialogue {
+  parentId:string,
+  comp:string,
+
+  [key:string]:any,
+}
+
 export default interface Process {
   id:string,
   comp:string,
@@ -7,6 +14,11 @@ export default interface Process {
   zIndex:string,
   //onFocus?:()=>void,
   toolbar:ToolbarItem[],
+  disableCloseBtn?:boolean,
+  disableMinBtn?:boolean,
+  disableMaxBtn?:boolean,
+  isMinimized?:boolean,
+  isMaximized?:boolean,
   [key:string]:any
 }
 
