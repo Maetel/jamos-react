@@ -50,6 +50,7 @@ export default function Terminal(props) {
     inputElem.current.focus();
   };
   proc.onFocus = focusOnInput;
+  const otherProcs = procmgr.procs;
 
   /////////////////////////
   const isToolbarOpen = procmgr.isToolbarOpen();
@@ -617,7 +618,9 @@ export default function Terminal(props) {
           break;
         }
         procmgr.kill(merged);
-        addSuccess("Process killed : " + merged);
+        const name =
+          otherProcs.find((_proc) => _proc.id === merged)?.name ?? "";
+        addSuccess(`Process killed : [${merged}] ${name}`);
         break;
       case "killall":
         procmgr.killAll(proc.id);

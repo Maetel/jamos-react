@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useAppSelector } from "../app/hooks";
 import Window from "../components/Window";
 import ProcMgr from "../features/procmgr/ProcMgr";
+import Process from "../features/procmgr/ProcTypes";
 import SetMgr from "../features/settings/SetMgr";
 import officialThemes, { defaultTheme } from "../features/settings/Themes";
 import { ToolbarControl } from "../grounds/Toolbar";
@@ -67,13 +68,14 @@ export default function Styler(props) {
   const themes = officialThemes;
   const [intro, setIntro] = useState("Click to Apply!");
 
-  const proc = { ...props.proc };
+  const proc: Process = { ...props.proc };
   proc.name = proc.name ?? "Styler";
   proc["rect"] = {
     width: 400,
     height: 210 + themes.length * 33,
   };
   proc["resize"] = "none";
+  proc.disableMaxBtn = true;
 
   const ThemeButton = (btnProps) => {
     const theme = btnProps.theme;
