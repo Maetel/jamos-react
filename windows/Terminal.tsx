@@ -71,7 +71,7 @@ export default function Terminal(props) {
           // addHelp();
           await handleTerminalCmd(["ps"]);
         },
-        true
+        { separator: true }
       )
       .register("File", "New window ", () => {
         procmgr.add("terminal");

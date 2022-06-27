@@ -248,7 +248,7 @@ export default function Window(props) {
         procmgr.kill(proc.id);
         // addHelp();
       },
-      true
+      { separator: true, order: -1 }
     );
   }, []);
 

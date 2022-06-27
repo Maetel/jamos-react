@@ -19,8 +19,7 @@ export default function Styler(props) {
         () => {
           // ProcMgr.getInstance().kill(proc.id);
         },
-        true,
-        true
+        { separator: true, disabled: true }
       )
       .register(
         "Edit",
@@ -28,7 +27,7 @@ export default function Styler(props) {
         () => {
           setmgr.setTheme(defaultTheme.name);
         },
-        true
+        { separator: true }
       );
     officialThemes.forEach((theme) => {
       builder.register("Edit", `Set to ${theme.name}`, () => {

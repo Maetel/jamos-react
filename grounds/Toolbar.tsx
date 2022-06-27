@@ -69,18 +69,27 @@ const systemMenu: ToolbarItem[] = [
 
 export class RegisterBuilder {
   constructor(public procId: string) {}
-  public register(menu, item, cb, seperator?: boolean, disabled?: boolean) {
+  public register(
+    menu,
+    item,
+    cb,
+    additional?: {
+      separator?: boolean;
+      disabled?: boolean;
+      order?: number;
+      callback?: string;
+    }
+  ) {
     const data: ToolbarItem = {
       caller: this.procId,
       menu: menu,
       item: item,
     };
-    if (seperator) {
-      data.separator = seperator;
+
+    for (let key in additional) {
+      data[key] = additional[key];
     }
-    if (disabled) {
-      data.disabled = disabled;
-    }
+
     ToolbarControl.getInstance().register(data, cb);
     return this;
   }
