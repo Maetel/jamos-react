@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import { useAppSelector } from "../app/hooks";
 import Window from "../components/Window";
+import JamOS from "../features/JamOS/JamOS";
 import { Rect } from "../features/procmgr/ProcTypes";
-import SetMgr from "../features/settings/SetMgr";
 import styles from "../styles/About.module.css";
 
 export default function About(props) {
@@ -22,8 +21,9 @@ export default function About(props) {
   const msgElem = useRef(null);
   const [clicked, setClicked] = useState(false);
   const msg = clicked ? "Copied!" : "Click to copy";
-  const color1 = SetMgr.getInstance().color1(useAppSelector);
-  const color2 = SetMgr.getInstance().color2(useAppSelector);
+  const colors = JamOS.theme().colors;
+  const color1 = colors["1"];
+  const color2 = colors["2"];
 
   const _copy = (e) => {
     setClicked(true);

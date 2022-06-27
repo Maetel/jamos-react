@@ -1,11 +1,10 @@
-import { useSelector } from "react-redux";
+import { useAppSelector } from "../../app/hooks";
 import store from "../../app/store";
 import { ToolbarControl } from "../../grounds/Toolbar";
-import Path, { addError, addLog } from "../../scripts/Path";
-import { parseToolbarItem, ToolbarItem } from "../../scripts/ToolbarTypes";
-import { dirValue, fileValue, selectFile } from "../file/fileSlice";
-import Log from "../log/Log";
-import SetMgr from "../settings/SetMgr";
+import Path, { addError } from "../../scripts/Path";
+import {  ToolbarItem } from "../../scripts/ToolbarTypes";
+import { dirValue, fileValue } from "../file/fileSlice";
+import JamOS from "../JamOS/JamOS";
 
 import {
   addProc,
@@ -14,6 +13,7 @@ import {
   increaseIndices,
   killAllProcs,
   killProc,
+  loadProcFromString,
   minimize,
   openDock,
   openToolbar,
@@ -37,32 +37,6 @@ import {
 } from "./procSlice";
 import Process, { ProcessCommands } from "./ProcTypes";
 
-export class ProcController {
-  public procmgr = ProcMgr.getInstance();
-  constructor(public procId:string, private appselector){
-  }
-  kill(){this.procmgr.kill(this.procId)};
-  killAll(){this.procmgr.killAll(this.procId)};
-  psValue(){return this.procmgr.psValue()};
-  public isFront(procId:string):boolean{
-    return this.appselector(selectProcesses)?.find(proc=>proc.zIndex==='0')?.id === procId;
-  }
-
-  public get procs(){
-    return this.appselector(selectProcesses);
-  }
-  public get procsInOrder(){
-    return this.appselector(selectProcInIndexOrder);
-  }
-
-  getReadable() {
-    return this.procs.find(proc=>proc.id===this.procId);
-  }
-
-  public maximize() {
-    store.dispatch(toggleMaximize(this.procId));
-  }
-}
 
 export default class ProcMgr{
   private static instance:ProcMgr;
@@ -134,7 +108,7 @@ public psValue(){
         break;
         case "styler":
           const style = _cmds.slice(1).join(" ");
-          SetMgr.getInstance().setTheme(style);
+          JamOS.setmgr().setTheme(style);
         // this.add(cmd, { style: style, ...args });
         break;
       default:
@@ -168,24 +142,24 @@ public psValue(){
   }
 
   public front(){
-    return useSelector(selectProcesses)?.find(proc=>proc.zIndex==='0');
+    return useAppSelector(selectProcesses)?.find(proc=>proc.zIndex==='0');
   }
   public isFront(procId:string):boolean{
     return this.front()?.id === procId;
   }
 
   public get procs(){
-    return useSelector(selectProcesses);
+    return useAppSelector(selectProcesses);
   }
   public get procsInOrder(){
-    return useSelector(selectProcInIndexOrder);
+    return useAppSelector(selectProcInIndexOrder);
   }
 
   public find(procId:string){
     return store.getState().proc.procs.find(proc=>proc.id===procId);
   }
   
-  public findReadable(selector,procId:string) {
+  public findReadable(procId:string) {
     return this.procs.find(proc=>proc.id===procId);
   }
 
@@ -207,8 +181,8 @@ public psValue(){
     return this.find?.[prop];
   }
 
-  public getReadable (selector, procId:string, prop:string){
-    return this.findReadable(selector, procId)?.[prop];
+  public getReadable ( procId:string, prop:string){
+    return this.findReadable( procId)?.[prop];
   }
 
   public getToolbarItems ( procId:string):ToolbarItem[] {
@@ -220,10 +194,10 @@ public psValue(){
   }
 
   public isToolbarOpen(){
-    return useSelector(selectIsToolbarOpen)
+    return useAppSelector(selectIsToolbarOpen)
   }
   public isDockOpen(){
-    return useSelector(selectIsDockOpen)
+    return useAppSelector(selectIsDockOpen)
   }
 
   public toggleToolbar(){
@@ -258,10 +232,26 @@ public psValue(){
   }
 
   public isMinimized(procId:string){
-    return useSelector(selectIsMinimized(procId));
+    return useAppSelector(selectIsMinimized(procId));
   }
 
   public groupedProcs():{[key:string]:Process[]}{
-    return useSelector(selectGroupedProcs);
+    return useAppSelector(selectGroupedProcs);
+  }
+
+  public stringify():string{
+    const s = store.getState().proc;
+    return JSON.stringify(s);
+  }
+
+  public async loadFromString(data:string) {
+    try {
+      const parsed = await JSON.parse(data);
+      this.killAll();
+      store.dispatch(loadProcFromString(parsed));
+      
+    } catch (error) {
+      console.error(error);
+    }
   }
 }

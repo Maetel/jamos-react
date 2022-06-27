@@ -1,31 +1,14 @@
-import { useEffect } from "react";
-import { useAppDispatch, useAppSelector } from "../app/hooks";
+import { useEffect, useState } from "react";
 import Window from "../components/Window";
-import FileMgr from "../features/file/FileMgr";
-import {
-  mkdir,
-  selectDir,
-  selectDirs,
-  selectFile,
-  selectHome,
-} from "../features/file/fileSlice";
 import { Dir } from "../features/file/FileTypes";
-import Log from "../features/log/Log";
-import { selectLogAll, selectLogSystem } from "../features/log/logSlice";
-import ProcMgr from "../features/procmgr/ProcMgr";
+import JamOS from "../features/JamOS/JamOS";
 import Process from "../features/procmgr/ProcTypes";
 
 export default function TestWindow(props) {
-  const procmgr = ProcMgr.getInstance();
-  const filemgr = FileMgr.getInstance();
+  const procmgr = JamOS.procmgr();
+  const filemgr = JamOS.filemgr();
   const proc: Process = { ...props.proc };
   proc.name = proc.name ?? "Test Window";
-  const logs = useAppSelector(selectLogAll);
-  const system = useAppSelector(selectLogSystem);
-  const home = useAppSelector(selectHome);
-  const dirs = useAppSelector(selectDirs);
-  const dir = useAppSelector(selectDir("~/hi/ho"));
-  // const f = useAppSelector(selectFile("f"));
 
   const DirView = (dir: Dir, key = 0) => {
     return (
@@ -45,6 +28,8 @@ export default function TestWindow(props) {
 
   useEffect(() => {}, []);
 
+  const [procstr, setProcstr] = useState("");
+
   return (
     <Window {...props} proc={proc}>
       <div className="test-window">
@@ -54,6 +39,28 @@ export default function TestWindow(props) {
           }}
         >
           killall
+        </button>
+        <div className="saveProc">
+          <button
+            onClick={() => {
+              // setProcstr(procmgr.stringify());
+              setProcstr(JamOS.stringify());
+            }}
+          >
+            Save
+          </button>
+          <br></br>Stringify : {procstr}
+        </div>
+        <button
+          onClick={() => {
+            if (procstr === "") {
+              return;
+            }
+            // procmgr.loadFromString(procstr);
+            JamOS.loadFromString(procstr);
+          }}
+        >
+          Load
         </button>
       </div>
     </Window>

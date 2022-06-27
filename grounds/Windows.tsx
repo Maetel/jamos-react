@@ -2,7 +2,6 @@ import React from "react";
 import { Provider } from "react-redux";
 import store from "../app/store";
 
-import ProcMgr from "../features/procmgr/ProcMgr";
 import styles from "../styles/Windows.module.css";
 import TestWindow from "../windows/TestWindow";
 import Logger from "../windows/Logger";
@@ -15,6 +14,7 @@ import SystemInfo from "../windows/SystemInfo";
 import About from "../windows/About";
 import Settings from "../windows/Settings";
 import AppStore from "../windows/AppStore";
+import JamOS from "../features/JamOS/JamOS";
 
 const winCmdMap: { [key: string]: (props) => JSX.Element } = {
   testwindow: TestWindow,
@@ -31,7 +31,7 @@ const winCmdMap: { [key: string]: (props) => JSX.Element } = {
 };
 
 export default function Windows(props) {
-  const procmgr = ProcMgr.getInstance();
+  const procmgr = JamOS.procmgr();
   const processes = procmgr.procsInOrder;
 
   return (

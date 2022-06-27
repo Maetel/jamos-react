@@ -4,28 +4,19 @@ import styles from "../styles/Terminal.module.css";
 import { clamp, randomId } from "../scripts/utils";
 import PromptTextView from "../components/PromptTextView";
 import Path from "../scripts/Path";
-import { useAppDispatch, useAppSelector } from "../app/hooks";
-import ProcMgr from "../features/procmgr/ProcMgr";
 import { Provider } from "react-redux";
 import store from "../app/store";
 import React from "react";
 import PromptTableView, { TableData } from "../components/PromptTableView";
-import {
-  killProc,
-  setProcProps,
-  toggleMaximize,
-} from "../features/procmgr/procSlice";
-import FileMgr from "../features/file/FileMgr";
 import PromptGridView, {
   PromptFileViewGroup,
 } from "../components/PromptGridView";
 import { Dir } from "../features/file/FileTypes";
 import Log from "../features/log/Log";
 import Commands from "../scripts/CommandParser";
-import SetMgr from "../features/settings/SetMgr";
 import officialThemes, { themeExists } from "../features/settings/Themes";
 import { ToolbarControl } from "../grounds/Toolbar";
-import { CollapsibleMenu, ToolbarItem } from "../scripts/ToolbarTypes";
+import JamOS from "../features/JamOS/JamOS";
 
 const viewMap = {
   PromptTextView: PromptTextView,
@@ -40,10 +31,9 @@ interface PromptItem {
 }
 
 export default function Terminal(props) {
-  const procmgr = ProcMgr.getInstance();
-  const filemgr = FileMgr.getInstance();
-  const setmgr = SetMgr.getInstance();
-  const selector = useAppSelector;
+  const procmgr = JamOS.procmgr();
+  const filemgr = JamOS.filemgr();
+  const setmgr = JamOS.setmgr();
   const proc = { ...props.proc };
   proc.name = proc.name ?? `Terminal`;
   const focusOnInput = () => {
@@ -641,8 +631,14 @@ export default function Terminal(props) {
           addWarn("Failed to remove file");
         }
         return;
-      // case "savebread":
-      // case "loadbread":
+      case "savebread":
+        JamOS.saveData("breadData", JamOS.stringify());
+        return;
+      case "loadbread":
+        const loaded = JamOS.loadData("breadData");
+        // addText(loaded);
+        JamOS.loadFromString(loaded);
+        return;
       // case "resetbread":
       //   let forceAction = false;
       //   if (merged === "-f") {

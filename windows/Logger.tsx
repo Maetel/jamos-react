@@ -1,8 +1,6 @@
 import { useAppSelector } from "../app/hooks";
 import Window from "../components/Window";
-import { selectLogAll, selectLogSystem } from "../features/log/logSlice";
-import ProcMgr from "../features/procmgr/ProcMgr";
-import { selectProcesses } from "../features/procmgr/procSlice";
+import { selectLogAll } from "../features/log/logSlice";
 import Process from "../features/procmgr/ProcTypes";
 
 import styles from "../styles/Logger.module.css";
@@ -12,7 +10,6 @@ export default function Logger(props) {
   proc.name = proc.name || "Logger";
   const logs = [...useAppSelector(selectLogAll)].reverse();
 
-  const procs = useAppSelector(selectProcesses);
   return (
     <Window {...props} proc={proc}>
       <div className={styles.container}>

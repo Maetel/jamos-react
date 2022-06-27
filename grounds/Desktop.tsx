@@ -1,23 +1,18 @@
 import React from "react";
 import { useEffect } from "react";
-import { useAppSelector } from "../app/hooks";
 import FinderIcon from "../components/FinderIcon";
-import FileMgr from "../features/file/FileMgr";
-import { selectNodesInDir } from "../features/file/fileSlice";
-import ProcMgr from "../features/procmgr/ProcMgr";
-import SetMgr from "../features/settings/SetMgr";
-import { randomId } from "../scripts/utils";
 import { File } from "../features/file/FileTypes";
 
 import styles from "../styles/Desktop.module.css";
+import JamOS from "../features/JamOS/JamOS";
 
 let initted = false;
 const backgroundImg = "/imgs/wall2.jpg";
 const broomImg = "/imgs/broom.svg";
 
 export default function Desktop(props) {
-  const procmgr = ProcMgr.getInstance();
-  const filemgr = FileMgr.getInstance();
+  const procmgr = JamOS.procmgr();
+  const filemgr = JamOS.filemgr();
 
   const init = () => {
     procmgr.add("terminal");
@@ -58,9 +53,9 @@ export default function Desktop(props) {
     }
   }, []);
 
-  const homeNodes = useAppSelector(selectNodesInDir("~/"));
-  const theme = SetMgr.getInstance().themeReadable(useAppSelector);
-  const _colors = theme.colors;
+  const homeNodes = JamOS.filemgr().nodesReadable("~");
+
+  const _colors = JamOS.theme().colors;
 
   return (
     <div id="desktop" className={styles.container}>

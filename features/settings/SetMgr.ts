@@ -1,6 +1,7 @@
 import { useSelector } from "react-redux";
+import { useAppSelector } from "../../app/hooks";
 import store from "../../app/store";
-import { getSettingsValue, selectSettings, selectThemeColors, setSetting } from "./settingsSlice";
+import { getSettingsValue, loadSettingsFromString, selectSettings, selectThemeColors, setSetting } from "./settingsSlice";
 import officialThemes, { defaultTheme, Theme, themeByName, ThemeColors } from "./Themes";
 
 
@@ -42,7 +43,7 @@ export default class SetMgr {
   public setData(data:{}){
     store.dispatch(setSetting(data));
   }
-  public getReadable(useAppSelector,key:string){
+  public getReadable(key:string){
     return useAppSelector(selectSettings(key))
   }
   public getValue(key:string) {
@@ -57,27 +58,38 @@ export default class SetMgr {
     return themeByName(this.getValue('theme'))
   }
 
-  public themeReadable(useAppSelector):Theme {
-    return themeByName(this.getReadable(useAppSelector, 'theme'));
+  public themeReadable():Theme {
+    return themeByName(useAppSelector(selectSettings('theme')));
   }
 
-  public color1(useAppSelector):string {
-    return this.themeReadable(useAppSelector).colors['1']
+  public color1():string {
+    return this.themeReadable().colors['1']
   }
-  public color2(useAppSelector):string {
-    return this.themeReadable(useAppSelector).colors['2']
+  public color2():string {
+    return this.themeReadable().colors['2']
   }
-  public color3(useAppSelector):string {
-    return this.themeReadable(useAppSelector).colors['3']
+  public color3():string {
+    return this.themeReadable().colors['3']
   }
-  public colorOkay(useAppSelector):string {
-    return this.themeReadable(useAppSelector).colors.okay
+  public colorOkay():string {
+    return this.themeReadable().colors.okay
   }
-  public colorWarn(useAppSelector):string {
-    return this.themeReadable(useAppSelector).colors.warn
+  public colorWarn():string {
+    return this.themeReadable().colors.warn
   }
-  public colorError(useAppSelector):string {
-    return this.themeReadable(useAppSelector).colors.error
+  public colorError():string {
+    return this.themeReadable().colors.error
   }
-  
+  public stringify ():string{
+    return JSON.stringify(store.getState().settings);
+  }
+  public async loadFromString(data:string) {
+    try {
+      const parsed = await JSON.parse(data);
+      store.dispatch(loadSettingsFromString(parsed));
+      
+    } catch (error) {
+      console.error(error);
+    }
+  }
 }

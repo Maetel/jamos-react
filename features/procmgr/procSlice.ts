@@ -1,9 +1,7 @@
 import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { WritableDraft } from 'immer/dist/internal';
-import type { AppState, AppThunk } from '../../app/store'
+import type { AppState } from '../../app/store'
 import store from '../../app/store';
-import { serializeToolbarItem, ToolbarItem, ToolbarItemId } from '../../scripts/ToolbarTypes';
-import ProcMgr from './ProcMgr';
+import {  ToolbarItem, ToolbarItemId } from '../../scripts/ToolbarTypes';
 
 
 import Process, { ProcessCommands, Rect } from "./ProcTypes";
@@ -218,8 +216,21 @@ export const procSlice = createSlice({
         }
       })
       proc.zIndex = ''+(procCount-1);
+    },
+    
+    loadProcFromString:(state, action:PayloadAction<{}>)=>{
+      console.warn("Load process...")
+      for(let key in state){
+        console.warn(' - deleting : ',key);
+        delete state[key];
+      }
+      const loaded =action.payload;
+      for ( let key in loaded){
+        state[key] = loaded[key];
+        console.log(' - loading : ',key);
+      }
+      console.warn("Load process finished");
     }
-      
   },
 
   
@@ -269,4 +280,4 @@ export const selectIsMinimized = (procId:String)=>(state:AppState)=>{
 
 
 export default procSlice.reducer;
-export const { addProc, killProc, killAllProcs, increaseIndices, setActiveWindow,setProcProps, minimize, unMinimize,toggleMinimize,toggleMaximize,setToolbarItem, openToolbar, closeToolbar, toggleToolbar, openDock, closeDock,toggleDock,pushToLast} = procSlice.actions
+export const { addProc, killProc, killAllProcs, increaseIndices, setActiveWindow,setProcProps, minimize, unMinimize,toggleMinimize,toggleMaximize,setToolbarItem, openToolbar, closeToolbar, toggleToolbar, openDock, closeDock,toggleDock,pushToLast, loadProcFromString} = procSlice.actions

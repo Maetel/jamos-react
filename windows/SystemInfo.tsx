@@ -1,23 +1,18 @@
 import { useRef, useState } from "react";
-import { useAppSelector } from "../app/hooks";
 import PromptTableView, { TableData } from "../components/PromptTableView";
 import Window from "../components/Window";
-import { selectLogAll, selectLogSystem } from "../features/log/logSlice";
-import ProcMgr from "../features/procmgr/ProcMgr";
-import { selectProcesses } from "../features/procmgr/procSlice";
+import JamOS from "../features/JamOS/JamOS";
 import Process from "../features/procmgr/ProcTypes";
-import SetMgr from "../features/settings/SetMgr";
 
 import styles from "../styles/SystemInfo.module.css";
 
 export default function SystemInfo(props) {
-  const procmgr = ProcMgr.getInstance();
+  const procmgr = JamOS.procmgr();
   const proc: Process = { ...props.proc };
   proc.name = proc.name ?? "System Info";
-  const logs = [...useAppSelector(selectLogAll)].reverse();
-  const colors = SetMgr.getInstance().themeReadable(useAppSelector).colors;
+  const colors = JamOS.theme().colors;
 
-  const procs = useAppSelector(selectProcesses);
+  const procs = procmgr.procs;
 
   const [isOpen, setIsOpen] = useState({});
 

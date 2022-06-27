@@ -1,11 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useAppDispatch, useAppSelector } from "../app/hooks";
 import FinderIcon from "../components/FinderIcon";
 import Window from "../components/Window";
-import FileMgr from "../features/file/FileMgr";
 import { Node } from "../features/file/FileTypes";
-import Log from "../features/log/Log";
-import ProcMgr from "../features/procmgr/ProcMgr";
+import JamOS from "../features/JamOS/JamOS";
 import { ToolbarControl } from "../grounds/Toolbar";
 import Path from "../scripts/Path";
 
@@ -52,13 +49,11 @@ export default function Finder(props) {
     );
   }, [currentPath]);
 
-  const procmgr = ProcMgr.getInstance();
-  const filemgr = FileMgr.getInstance();
-
-  const selector = useAppSelector;
+  const procmgr = JamOS.procmgr();
+  const filemgr = JamOS.filemgr();
 
   ////////////// browse back and forth
-  const nodes = filemgr.nodesReadable(selector, currentPath);
+  const nodes = filemgr.nodesReadable(currentPath);
   return nodes ? (
     <Window {...props} proc={proc}>
       <div className={styles.container}>

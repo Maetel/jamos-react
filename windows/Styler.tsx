@@ -1,12 +1,9 @@
 import { useEffect, useState } from "react";
-import { useAppSelector } from "../app/hooks";
 import Window from "../components/Window";
-import ProcMgr from "../features/procmgr/ProcMgr";
+import JamOS from "../features/JamOS/JamOS";
 import Process from "../features/procmgr/ProcTypes";
-import SetMgr from "../features/settings/SetMgr";
 import officialThemes, { defaultTheme } from "../features/settings/Themes";
 import { ToolbarControl } from "../grounds/Toolbar";
-import { ToolbarItem } from "../scripts/ToolbarTypes";
 import styles from "../styles/Styler.module.css";
 
 export default function Styler(props) {
@@ -39,9 +36,9 @@ export default function Styler(props) {
     registerToolbarCallback();
   }, []);
 
-  const setmgr = SetMgr.getInstance();
+  const setmgr = JamOS.setmgr();
   const [prevTheme, setPrevTheme] = useState(setmgr.themeValue().name);
-  const clicked = setmgr.themeReadable(useAppSelector).name;
+  const clicked = JamOS.theme().name;
   const themes = officialThemes;
   const [intro, setIntro] = useState("Click to Apply!");
 

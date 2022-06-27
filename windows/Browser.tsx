@@ -2,7 +2,7 @@ import Window from "../components/Window";
 import Loading from "../components/Loading";
 import styles from "../styles/Browser.module.css";
 import { useState } from "react";
-import ProcMgr from "../features/procmgr/ProcMgr";
+import JamOS from "../features/JamOS/JamOS";
 
 export default function Browser(props) {
   // console.log("Browser prsop : ", props);
@@ -21,7 +21,7 @@ export default function Browser(props) {
   const refreshPage = (e) => {};
   const contentLoaded = (e) => {
     setIsLoading(false);
-    ProcMgr.getInstance().toggleMaximize(proc.id);
+    JamOS.procmgr().toggleMaximize(proc.id);
   };
   const [isLoading, setIsLoading] = useState(true);
   const barHeight = "40px";

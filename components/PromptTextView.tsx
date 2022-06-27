@@ -1,5 +1,4 @@
-import { useAppSelector } from "../app/hooks";
-import SetMgr from "../features/settings/SetMgr";
+import JamOS from "../features/JamOS/JamOS";
 const styles = {
   container: {
     position: "relative",
@@ -26,12 +25,8 @@ const styles = {
 
 export default function PromptTextView(props) {
   const TextElem = (props) => {
-    if (!props.text) {
-      return;
-    }
-    const setmgr = SetMgr.getInstance();
-    const selector = useAppSelector;
-    const theme = setmgr.themeReadable(selector);
+    const text = props.text;
+    const theme = JamOS.theme();
     const _colors = theme.colors;
     const textColor = () => {
       let retval = _colors["1"];
@@ -52,7 +47,7 @@ export default function PromptTextView(props) {
           color: textColor(),
         }}
       >
-        &nbsp;&gt;&nbsp;{props.text}
+        &nbsp;&gt;&nbsp;{text ?? ""}
       </div>
     );
   };

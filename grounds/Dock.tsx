@@ -1,11 +1,9 @@
 import { useEffect, useState } from "react";
-import { useAppSelector } from "../app/hooks";
-import ProcMgr from "../features/procmgr/ProcMgr";
-import SetMgr from "../features/settings/SetMgr";
 import styles from "../styles/Dock.module.css";
 
 import DockIcon, { DockIconProp } from "../components/DockIcon";
 import React from "react";
+import JamOS from "../features/JamOS/JamOS";
 
 const DockIconSeparator: DockIconProp = {
   type: "",
@@ -15,13 +13,13 @@ const DockIconSeparator: DockIconProp = {
 
 export default function Dock(props) {
   const debugMode = !true;
-  const procmgr = ProcMgr.getInstance();
+  const procmgr = JamOS.procmgr();
   const [isEdge, setIsEdge] = useState(false);
   const [hovered, setHovered] = useState(false);
   const fixed = procmgr.isDockOpen();
   const show: boolean = isEdge || hovered || fixed || debugMode;
   const className = show ? styles.active : "";
-  const colors = SetMgr.getInstance().themeReadable(useAppSelector).colors;
+  const colors = JamOS.theme().colors;
   const groups = procmgr.groupedProcs();
   const [items, setItems] = useState([]);
 
@@ -149,7 +147,6 @@ export default function Dock(props) {
     };
   };
   const containerStyle = buildContainerStyle();
-  const front = ProcMgr.getInstance().front();
 
   return (
     <div

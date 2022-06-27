@@ -1,7 +1,4 @@
-import { useAppSelector } from "../app/hooks";
-import ProcMgr from "../features/procmgr/ProcMgr";
-import SetMgr from "../features/settings/SetMgr";
-import Path from "../scripts/Path";
+import JamOS from "../features/JamOS/JamOS";
 import styles from "../styles/PromptGridView.module.css";
 
 export interface PromptFileViewGroup {
@@ -13,8 +10,7 @@ export interface PromptFileViewGroup {
 }
 
 export default function PromptGridView(props) {
-  const sel = useAppSelector;
-  const theme = SetMgr.getInstance().themeReadable(sel);
+  const theme = JamOS.theme();
   const _colors = theme.colors;
   const buildColor = (type, color?: string, bgColor?: string) => {
     const retval = {
@@ -58,7 +54,7 @@ export default function PromptGridView(props) {
                         // console.log("Cmds/j : ", group.cmds, ", ", j);
                         // console.log("Cmd : ", group.cmds?.at(j));
                         if (group.cmds?.at(j)) {
-                          ProcMgr.getInstance().exeCmd(group.cmds.at(j));
+                          JamOS.procmgr().exeCmd(group.cmds.at(j));
                         }
                       }}
                       style={{

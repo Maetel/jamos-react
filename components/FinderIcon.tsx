@@ -1,11 +1,7 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { useAppSelector } from "../app/hooks";
-import { selectFile, selectNode } from "../features/file/fileSlice";
 import { Node } from "../features/file/FileTypes";
-import Log from "../features/log/Log";
-import ProcMgr from "../features/procmgr/ProcMgr";
-import SetMgr from "../features/settings/SetMgr";
+import JamOS from "../features/JamOS/JamOS";
 import Path from "../scripts/Path";
 import { randomId } from "../scripts/utils";
 import styles from "../styles/FinderIcon.module.css";
@@ -39,9 +35,9 @@ export default function FinderIcon(props) {
     setElems();
   }, []);
 
-  const procmgr = ProcMgr.getInstance();
+  const procmgr = JamOS.procmgr();
   const nodepath: string = props.node.path;
-  const node: Node = useAppSelector(selectNode(nodepath));
+  const node: Node = JamOS.filemgr().nodeReadable(nodepath);
   const onClick: (Event) => void =
     props.onClick ??
     function (node: Node) {
@@ -59,9 +55,10 @@ export default function FinderIcon(props) {
     borderRadius: width / 2,
   };
   const [hovered, setHovered] = useState(false);
-  const color1 = SetMgr.getInstance().color1(useAppSelector);
-  const color2 = SetMgr.getInstance().color2(useAppSelector);
-  const color3 = SetMgr.getInstance().color3(useAppSelector);
+  const colors = JamOS.theme().colors;
+  const color1 = colors["1"];
+  const color2 = colors["2"];
+  const color3 = colors["3"];
 
   const callHover = (e, hoverIn) => {
     setHovered(hoverIn);

@@ -30,23 +30,23 @@ const _verifyPath = (path:string)=>{
   return true;
 }
 
-export const bfsDir = (from:WritableDraft<Dir>|Dir, to:string):WritableDraft<Dir>|Dir=>{
+export const dfsDir = (from:WritableDraft<Dir>|Dir, to:string):WritableDraft<Dir>|Dir=>{
   if(Path.areSame(from.node.path, to)){
     return from;
   }
-  return from.dirs.map(dir=>bfsDir(dir, to)).filter(dir=>dir!==undefined).at(0);
+  return from.dirs.map(dir=>dfsDir(dir, to)).filter(dir=>dir!==undefined).at(0);
 }
 
 //slice internal use only
 const findDir = (state:WritableDraft<FileState>, path:string):WritableDraft<Dir>|Dir=>{
-  // return bfsDir(state.root, new Path(path));
+  // return dfsDir(state.root, new Path(path));
   const query = new Path(path);
   const dir = state.root;
   if(!dir || query.isEmpty){
     return undefined;
   }
 
-  return bfsDir(dir, path);
+  return dfsDir(dir, path);
 }
 const findFile = (state:WritableDraft<FileState>, path:string):WritableDraft<File>|File=>{
   const p = new Path(path);
@@ -151,6 +151,19 @@ const fileSlice = createSlice({
         return;
       }
       _rmdir(state, dir, new Path(path));
+    }, 
+    loadFilesFromString:(state, action:PayloadAction<{}>)=>{
+      console.warn("Load files...")
+      for(let key in state){
+        console.warn(' - deleting : ',key);
+        delete state[key];
+      }
+      const loaded =action.payload;
+      for ( let key in loaded){
+        state[key] = loaded[key];
+        console.log(' - loading : ',key);
+      }
+      console.warn("Load files finished");
     }
   }
 });
@@ -185,16 +198,16 @@ export const selectFiles = (state:AppState)=>{
 
 
 export const selectNode = (path:string)=>((state:AppState)=>{
-  const dir = bfsDir(state.file.root, path);
+  const dir = dfsDir(state.file.root, path);
   if(dir){
     return dir.node;
   }
-  const file = bfsDir(state.file.root, new Path(path).parent).files.find(file=>file.node.path===path);
+  const file = dfsDir(state.file.root, new Path(path).parent).files.find(file=>file.node.path===path);
   return file?.node;
 })
 
 export const selectNodesInDir = (path:string)=>((state:AppState)=>{
-  const dir = bfsDir(state.file.root, path);
+  const dir = dfsDir(state.file.root, path);
   if(!dir){
     return;
   }
@@ -204,20 +217,20 @@ export const selectNodesInDir = (path:string)=>((state:AppState)=>{
   return nodes;
 })
 export const selectDir = (path:string)=>((state:AppState)=>{
-  return bfsDir(state.file.root, path);
+  return dfsDir(state.file.root, path);
 })
 
 
 export const selectFile = (path:string)=>((state:AppState)=>{
-  return bfsDir(state.file.root, path)?.files.filter(file=>Path.areSame(file.node.path, path)).at(0);
+  return dfsDir(state.file.root, path)?.files.filter(file=>Path.areSame(file.node.path, path)).at(0);
 })
 
-export const dirValue = (path: string) =>bfsDir(store.getState()?.file.root, path);
+export const dirValue = (path: string) =>dfsDir(store.getState()?.file.root, path);
 export const dirExists = (path: string) =>!!dirValue(path);
 
 
 export const fileValue = (path: string) =>{
-  return bfsDir(store.getState().file.root, new Path(path).parent)?.files.filter(file=>Path.areSame(file.node.path, path)).at(0);
+  return dfsDir(store.getState().file.root, new Path(path).parent)?.files.filter(file=>Path.areSame(file.node.path, path)).at(0);
 }
 export const fileExists = (path:string)=>!!fileValue(path)
 
@@ -226,4 +239,4 @@ export const fileExists = (path:string)=>!!fileValue(path)
 ////////////////////////
 
 export default fileSlice.reducer;
-export const { mkdir, addFile, rm, rmdir } = fileSlice.actions;
+export const { mkdir, addFile, rm, rmdir, loadFilesFromString } = fileSlice.actions;

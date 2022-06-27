@@ -1,15 +1,11 @@
 import React from "react";
 import { useEffect, useRef, useState } from "react";
-import { useAppSelector } from "../app/hooks";
-import FileMgr from "../features/file/FileMgr";
+import JamOS from "../features/JamOS/JamOS";
 import Log from "../features/log/Log";
-import ProcMgr from "../features/procmgr/ProcMgr";
 
 import Process, { Rect } from "../features/procmgr/ProcTypes";
-import SetMgr from "../features/settings/SetMgr";
 import { ThemeColors } from "../features/settings/Themes";
 import { ToolbarControl } from "../grounds/Toolbar";
-import { ToolbarItem } from "../scripts/ToolbarTypes";
 import { clamp, randomId } from "../scripts/utils";
 import styles from "../styles/Window.module.css";
 import Dialogue from "./Dialogue";
@@ -41,8 +37,7 @@ function DialogueWindow(props) {
     width: "50%",
     height: "50%",
   };
-  // const colors = SetMgr.getInstance().themeReadable(useAppSelector).colors;
-  const colors: ThemeColors = SetMgr.colors();
+  const colors: ThemeColors = JamOS.theme().colors;
 
   const [style, setStyle] = useState((dial?.rect ?? rect) as {});
 
@@ -110,7 +105,7 @@ export default function Window(props) {
     navElem = document.querySelector(`#${navId}`) as HTMLElement;
   };
 
-  const procmgr = ProcMgr.getInstance();
+  const procmgr = JamOS.procmgr();
   const proc: Process = { ...props.proc };
   // proc["disableMinBtn"] = true;
   const btnMaxClass = proc["disableMaxBtn"] ? styles.disabled : "";
@@ -118,12 +113,11 @@ export default function Window(props) {
   const btnCloseClass = proc["disableCloseBtn"] ? styles.disabled : "";
 
   proc.name = proc.name ?? "Application";
-  const get = (prop) => procmgr.getReadable(useAppSelector, proc.id, prop);
+  const get = (prop) => procmgr.getReadable(proc.id, prop);
   // const get = (prop) => procmgr.get(proc.id, prop);
 
   ////////////////// rect / style / theme
-  const themeReadable = SetMgr.getInstance().themeReadable(useAppSelector);
-  const _colors = themeReadable.colors;
+  const _colors = JamOS.theme().colors;
   const buildStyle = (rect: Rect) => {
     const retval = {};
     // console.log(`Buildstyle from id:${id}, rect : ${JSON.stringify(rect)}`);

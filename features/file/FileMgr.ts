@@ -1,7 +1,9 @@
 import store from "../../app/store";
 import Path from "../../scripts/Path";
-import { addFile, dirExists, dirValue, fileExists, fileValue, mkdir, rm, rmdir, selectDir, selectNodesInDir } from "./fileSlice";
+import { addFile, dirExists, dirValue, fileExists, fileValue, loadFilesFromString, mkdir, rm, rmdir, selectDir, selectNode, selectNodesInDir } from "./fileSlice";
 import { File, NodeControl } from "./FileTypes";
+import {useAppSelector} from '../../app/hooks'
+import type {Node} from './FileTypes'
 
 export default class FileMgr {
   private static instance:FileMgr;
@@ -26,15 +28,19 @@ export default class FileMgr {
   public dirValue(path:string){
     return dirValue(path);
   }
-  public dirReadable(useAppSelector, path:string){
+  public dirReadable(path:string){
     return useAppSelector(selectDir(path));
   }
 
-  public nodesReadable(useAppSelector, path:string):Node[]{
-    if(!dirExists(path)){
+  public nodeReadable(path:string):Node{
+    return useAppSelector(selectNode(path));
+  }
+
+  public nodesReadable(dirPath:string):Node[]{
+    if(!dirExists(dirPath)){
       return undefined;
     }
-    return useAppSelector(selectNodesInDir(path));
+    return useAppSelector(selectNodesInDir(dirPath));
   }
 
   public dirExists(path:string){
@@ -105,5 +111,18 @@ export default class FileMgr {
     }
     store.dispatch(addFile(this.makeFile(path, 'text')))
     return true;
+  }
+
+  public stringify ():string{
+    return JSON.stringify(store.getState().file);
+  }
+  public async loadFromString(data:string) {
+    try {
+      const parsed = await JSON.parse(data);
+      store.dispatch(loadFilesFromString(parsed));
+      
+    } catch (error) {
+      console.error(error);
+    }
   }
 }

@@ -1,13 +1,7 @@
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
-import { useAppSelector } from "../app/hooks";
-import { Node } from "../features/file/FileTypes";
-import Log from "../features/log/Log";
-import ProcMgr from "../features/procmgr/ProcMgr";
+import JamOS from "../features/JamOS/JamOS";
 import { getProcessCommandsIcon } from "../features/procmgr/ProcTypes";
-import SetMgr from "../features/settings/SetMgr";
-import Path from "../scripts/Path";
-import { randomId } from "../scripts/utils";
 import styles from "../styles/DockIcon.module.css";
 
 export interface DockIconProp {
@@ -25,7 +19,7 @@ export default function DockIcon(props) {
   const src = getProcessCommandsIcon(type);
 
   let contElem = useRef(null);
-  const procmgr = ProcMgr.getInstance();
+  const procmgr = JamOS.procmgr();
 
   // if (!node) {
   //   Log.warn("No such file : " + nodepath);
@@ -38,9 +32,10 @@ export default function DockIcon(props) {
     borderRadius: width / 2,
   };
   const [hovered, setHovered] = useState(false);
-  const color1 = SetMgr.getInstance().color1(useAppSelector);
-  const color2 = SetMgr.getInstance().color2(useAppSelector);
-  const color3 = SetMgr.getInstance().color3(useAppSelector);
+  const colors = JamOS.theme().colors;
+  const color1 = colors["1"];
+  const color2 = colors["2"];
+  const color3 = colors["3"];
 
   useEffect(() => {
     contElem.current.style.overflow = hovered ? "show" : "hidden";

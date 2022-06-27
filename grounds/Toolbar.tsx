@@ -1,8 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { useAppSelector } from "../app/hooks";
+import JamOS from "../features/JamOS/JamOS";
 import Log from "../features/log/Log";
-import ProcMgr from "../features/procmgr/ProcMgr";
-import SetMgr from "../features/settings/SetMgr";
 import { ToolbarItem, ToolbarItemId } from "../scripts/ToolbarTypes";
 
 import styles from "../styles/Toolbar.module.css";
@@ -110,7 +108,7 @@ export class ToolbarControl {
     const func = qs.at(2);
     const params = qs.at(3);
 
-    const procmgr = ProcMgr.getInstance();
+    const procmgr = JamOS.procmgr();
     // debugger;
     if (cmd === "proc") {
       switch (func) {
@@ -162,7 +160,7 @@ export class ToolbarControl {
   public register(item: ToolbarItem, callback: () => void) {
     const id = ToolbarItemId(item);
     ToolbarControl.callbacks[id] = callback;
-    ProcMgr.getInstance().setToolbarItem(item.caller, item);
+    JamOS.procmgr().setToolbarItem(item.caller, item);
   }
 
   public unregister(procId: string) {
@@ -213,7 +211,7 @@ function ToolbarClock(props) {
 function MenuItem(props) {
   const item: ToolbarItem = props.item;
   const disabled = item.disabled;
-  const colors = SetMgr.getInstance().themeReadable(useAppSelector).colors;
+  const colors = JamOS.theme().colors;
   const [hovered, setHovered] = useState(false);
   const buildStyle = () => {
     const retval = {
@@ -261,13 +259,13 @@ function MenuItem(props) {
 
 function CollapsibleMenu(props) {
   const menu: TbMenu = props.menu;
-  const colors = SetMgr.getInstance().themeReadable(useAppSelector).colors;
+  const colors = JamOS.theme().colors;
   const collMenuElem = useRef(null);
   const [collActive, setCollActive] = useState(false);
   const isActive = collActive && props.clicked === props.id;
   const itemClassName = isActive ? styles.active : "";
 
-  const front = ProcMgr.getInstance().front();
+  const front = JamOS.procmgr().front();
   useEffect(() => {
     setCollActive(false);
   }, [front]);
@@ -346,7 +344,7 @@ function CollapsibleMenu(props) {
 }
 
 export default function Toolbar(props) {
-  const procmgr = ProcMgr.getInstance();
+  const procmgr = JamOS.procmgr();
   const [isEdge, setIsEdge] = useState(false);
   const [hovered, setHovered] = useState(false);
   const [clicked, setClicked] = useState(null);
@@ -354,9 +352,9 @@ export default function Toolbar(props) {
   const show: boolean = isEdge || hovered || clicked !== null;
   const className = show || openByMgr ? styles.active : "";
   const bgClassName = show && !openByMgr ? styles.active : "";
-  const colors = SetMgr.getInstance().themeReadable(useAppSelector).colors;
+  const colors = JamOS.theme().colors;
 
-  const front = ProcMgr.getInstance().front();
+  const front = JamOS.procmgr().front();
   const frontMenus: ToolbarItem[] = front?.["toolbar"];
 
   const _mouseEdgeDetect = () => {
