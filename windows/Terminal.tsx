@@ -55,43 +55,28 @@ export default function Terminal(props) {
   /////////////////////////
   const isToolbarOpen = procmgr.isToolbarOpen();
   const registerToolbarCallback = () => {
-    const tb = ToolbarControl.getInstance();
-    const register = (menu, item, cb, seperator?: boolean) => {
-      const data: ToolbarItem = {
-        caller: proc.id,
-        menu: menu,
-        item: item,
-      };
-      if (seperator) {
-        data.separator = seperator;
-      }
-      tb.register(data, cb);
-    };
-    register("Terminal", "About terminal", async () => {
-      // addHelp();
-      await handleTerminalCmd(["terminal", "-h"]);
-    });
-    register("Terminal", "Help", async () => {
-      // addHelp();
-      await handleTerminalCmd(["help"]);
-    });
-    register(
-      "Terminal",
-      "View process list",
-      async () => {
+    ToolbarControl.RegisterBuilder(proc.id)
+      .register("Terminal", "About terminal", async () => {
         // addHelp();
-        await handleTerminalCmd(["ps"]);
-      },
-      true
-    );
-    // register("Terminal", "Quit Terminal", () => {
-    //   procmgr.kill(proc.id);
-    // });
-    register("File", "New window ", () => {
-      procmgr.add("terminal");
-    });
+        await handleTerminalCmd(["terminal", "-h"]);
+      })
+      .register("Terminal", "Help", async () => {
+        // addHelp();
+        await handleTerminalCmd(["help"]);
+      })
+      .register(
+        "Terminal",
+        "View process list",
+        async () => {
+          // addHelp();
+          await handleTerminalCmd(["ps"]);
+        },
+        true
+      )
+      .register("File", "New window ", () => {
+        procmgr.add("terminal");
+      });
   };
-
   /////////// init setup
   const inputElem = useRef(null);
   useEffect(() => {
@@ -473,7 +458,7 @@ export default function Terminal(props) {
         return;
       }
     }
-    let mergedFilePath = merged.startsWith("~/")
+    let mergedFilePath = merged.startsWith("~")
       ? new Path(merged)
       : Path.join(pwd.path, merged);
 

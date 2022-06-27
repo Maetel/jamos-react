@@ -67,7 +67,28 @@ const systemMenu: ToolbarItem[] = [
   },
 ];
 
+export class RegisterBuilder {
+  constructor(public procId: string) {}
+  public register(menu, item, cb, seperator?: boolean, disabled?: boolean) {
+    const data: ToolbarItem = {
+      caller: this.procId,
+      menu: menu,
+      item: item,
+    };
+    if (seperator) {
+      data.separator = seperator;
+    }
+    if (disabled) {
+      data.disabled = disabled;
+    }
+    ToolbarControl.getInstance().register(data, cb);
+    return this;
+  }
+}
 export class ToolbarControl {
+  public static RegisterBuilder(procId: string): RegisterBuilder {
+    return new RegisterBuilder(procId);
+  }
   private static instance: ToolbarControl;
   private constructor() {}
 

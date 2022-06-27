@@ -239,21 +239,9 @@ export default function Window(props) {
   /*
         'Cannot update a component (`Toolbar`) while rendering a different component (`Toolbar`). To locate the bad setState() call inside `Toolbar`'
         */
-  const register = (menu, item, cb, seperator?: boolean) => {
-    const data: ToolbarItem = {
-      caller: proc.id,
-      menu: menu,
-      item: item,
-      order: -1, //last
-    };
-    if (seperator) {
-      data.separator = seperator;
-    }
-    ToolbarControl.getInstance().register(data, cb);
-  };
+
   useEffect(() => {
-    // console.log("call");
-    register(
+    ToolbarControl.RegisterBuilder(proc.id).register(
       proc.name,
       `Quit ${proc.name}`,
       () => {

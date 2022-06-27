@@ -12,48 +12,26 @@ import styles from "../styles/Styler.module.css";
 export default function Styler(props) {
   /////////////////////////
   const registerToolbarCallback = () => {
-    const tb = ToolbarControl.getInstance();
-    const register = (
-      menu,
-      item,
-      cb,
-      seperator?: boolean,
-      disabled?: boolean
-    ) => {
-      const data: ToolbarItem = {
-        caller: proc.id,
-        menu: menu,
-        item: item,
-      };
-      if (seperator) {
-        data.separator = seperator;
-      }
-      if (disabled) {
-        data.disabled = disabled;
-      }
-      tb.register(data, cb);
-    };
-
-    register(
-      "Styler",
-      "About",
-      () => {
-        // ProcMgr.getInstance().kill(proc.id);
-      },
-      true,
-      true
-    );
-
-    register(
-      "Edit",
-      `Set to default style : ${defaultTheme.name}`,
-      () => {
-        setmgr.setTheme(defaultTheme.name);
-      },
-      true
-    );
+    const builder = ToolbarControl.RegisterBuilder(proc.id)
+      .register(
+        "Styler",
+        "About",
+        () => {
+          // ProcMgr.getInstance().kill(proc.id);
+        },
+        true,
+        true
+      )
+      .register(
+        "Edit",
+        `Set to default style : ${defaultTheme.name}`,
+        () => {
+          setmgr.setTheme(defaultTheme.name);
+        },
+        true
+      );
     officialThemes.forEach((theme) => {
-      register("Edit", `Set to ${theme.name}`, () => {
+      builder.register("Edit", `Set to ${theme.name}`, () => {
         setmgr.setTheme(theme.name);
       });
     });

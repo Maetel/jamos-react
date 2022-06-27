@@ -6,6 +6,7 @@ import FileMgr from "../features/file/FileMgr";
 import { Node } from "../features/file/FileTypes";
 import Log from "../features/log/Log";
 import ProcMgr from "../features/procmgr/ProcMgr";
+import { ToolbarControl } from "../grounds/Toolbar";
 import Path from "../scripts/Path";
 
 import styles from "../styles/Finder.module.css";
@@ -40,6 +41,16 @@ export default function Finder(props) {
       (backBtn.current as HTMLButtonElement).disabled = pathList.length <= 1;
     }
   });
+
+  useEffect(() => {
+    ToolbarControl.RegisterBuilder(proc.id).register(
+      "Finder",
+      "New directory",
+      () => {
+        filemgr.mkdir(Path.join(currentPath, "New directory").path);
+      }
+    );
+  }, [currentPath]);
 
   const procmgr = ProcMgr.getInstance();
   const filemgr = FileMgr.getInstance();
