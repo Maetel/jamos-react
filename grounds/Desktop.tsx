@@ -16,6 +16,7 @@ export default function Desktop(props) {
   const setmgr = JamOS.setmgr();
   const saveOnExit = setmgr.getReadable("saveOnExit");
   const askOnExit = setmgr.getReadable("askOnExit");
+  const muteOptions = setmgr.getReadable("muteAllOptions");
 
   const init = () => {
     procmgr.add("terminal");
@@ -25,6 +26,7 @@ export default function Desktop(props) {
       filemgr.makeFile("~/Terminal", "terminal", "/imgs/terminal.svg"),
       // filemgr.makeFile("~/Logger", "logger", "/imgs/logger.svg"),
       filemgr.makeFile("~/System Info", "systeminfo", "/imgs/chart.svg"),
+      filemgr.makeFile("~/Settings", "settings", "/imgs/settings.svg"),
       filemgr.makeFile("~/Tester", "testwindow"),
       filemgr.makeFile(
         "~/Portfolio/Clips/1. Intro",
@@ -50,6 +52,13 @@ export default function Desktop(props) {
   };
 
   useEffect(() => {
+    if (muteOptions) {
+      if (!initted) {
+        init();
+        initted = true;
+      }
+      return;
+    }
     const d = JamOS.loadData("breadData");
     if (d && true) {
       JamOS.loadFromString(d);
@@ -63,6 +72,10 @@ export default function Desktop(props) {
 
   let beforeUnloadFunc;
   useEffect(() => {
+    if (muteOptions) {
+      return;
+    }
+
     console.log(
       `Update option. saveOnExit:${saveOnExit}, askOnExit:${askOnExit}`
     );
@@ -84,7 +97,7 @@ export default function Desktop(props) {
     }
     beforeUnloadFunc = f;
     window.addEventListener("beforeunload", f);
-  }, [saveOnExit, askOnExit]);
+  }, [saveOnExit, askOnExit, muteOptions]);
 
   const homeNodes = JamOS.filemgr().nodesReadable("~");
 

@@ -9,6 +9,7 @@ export const settingDescription = {
   // loadOnMount: "Automatically load data on startup",
   saveOnExit: "Save all data when closed",
   askOnExit: "Ask on exit",
+  muteAllOptions : "Mute all options and always initialize"
 };
 
 export default class SetMgr {

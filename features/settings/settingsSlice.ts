@@ -8,6 +8,7 @@ export interface SettingsState {
   theme:string,
   saveOnExit:boolean,
   askOnExit:boolean,
+  muteAllOptions:boolean,
   [key:string]:any;
 }
 
@@ -15,6 +16,7 @@ const initialState :SettingsState = {
   theme:"Forest",
   saveOnExit:true,
   askOnExit:false,
+  muteAllOptions:true,
 }
 
 const settingsSlice = createSlice({
