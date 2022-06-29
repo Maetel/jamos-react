@@ -327,9 +327,7 @@ function topParent (state:AppState, proc:Process):Process{
     const parentFound =state.proc.procs.find(_p=>_p.id===_proc?.parent);
     if(parentFound){
       retval = parentFound;
-      // return findParent(retval);
-    } else {
-      // return retval;
+      findParent(retval);
     }
   }
   findParent(proc);

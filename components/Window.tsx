@@ -159,7 +159,7 @@ export default function Window(props) {
     procmgr.set(proc.id, { name: proc.name ?? "Application" });
 
     {
-      console.log(proc.name, ": disableBackground:", disableBackground);
+      // console.log(proc.name, ": disableBackground:", disableBackground);
     }
   }, []);
   const rectReadable: Rect = get("rect");

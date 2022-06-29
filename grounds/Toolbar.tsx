@@ -269,7 +269,7 @@ function CollapsibleMenu(props) {
   // const front = JamOS.procmgr().frontsParent();
   useEffect(() => {
     setCollActive(false);
-    console.log("front toolbar, ", front);
+    // console.log("front toolbar, ", front);
   }, [front]);
 
   const [posX, setPosX] = useState(undefined);
