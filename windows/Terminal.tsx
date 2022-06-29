@@ -639,7 +639,9 @@ export default function Terminal(props) {
         // addText(loaded);
         JamOS.loadFromString(loaded);
         return;
-      // case "resetbread":
+      case "resetbread":
+        JamOS.reset();
+        return;
       //   let forceAction = false;
       //   if (merged === "-f") {
       //     forceAction = true;

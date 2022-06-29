@@ -13,6 +13,9 @@ const broomImg = "/imgs/broom.svg";
 export default function Desktop(props) {
   const procmgr = JamOS.procmgr();
   const filemgr = JamOS.filemgr();
+  const setmgr = JamOS.setmgr();
+  const saveOnExit = setmgr.getReadable("saveOnExit");
+  const askOnExit = setmgr.getReadable("askOnExit");
 
   const init = () => {
     procmgr.add("terminal");
@@ -47,11 +50,41 @@ export default function Desktop(props) {
   };
 
   useEffect(() => {
-    if (!initted) {
-      init();
-      initted = true;
+    const d = JamOS.loadData("breadData");
+    if (d && true) {
+      JamOS.loadFromString(d);
+    } else {
+      if (!initted) {
+        init();
+        initted = true;
+      }
     }
   }, []);
+
+  let beforeUnloadFunc;
+  useEffect(() => {
+    console.log(
+      `Update option. saveOnExit:${saveOnExit}, askOnExit:${askOnExit}`
+    );
+    const f = (e) => {
+      if (saveOnExit) {
+        JamOS.saveData("breadData", JamOS.stringify());
+        console.log("Save on exit");
+        debugger;
+      }
+      if (askOnExit) {
+        e.preventDefault();
+        e.returnValue = "";
+        console.log("Ask on exit");
+      }
+    };
+    if (beforeUnloadFunc) {
+      window.removeEventListener("beforeunload", beforeUnloadFunc);
+    } else {
+    }
+    beforeUnloadFunc = f;
+    window.addEventListener("beforeunload", f);
+  }, [saveOnExit, askOnExit]);
 
   const homeNodes = JamOS.filemgr().nodesReadable("~");
 

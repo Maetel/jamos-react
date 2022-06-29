@@ -26,7 +26,7 @@ export default class JamOS {
     return JSON.stringify(retval);
   }
   public static async loadFromString(data:string){
-      console.log("JamOS load data :",data);
+      // console.log("JamOS load data :",data);
       const parsed:SerializedData = JSON.parse(data);
     const cbs = {
       'proc' : async (_data)=>{ await ProcMgr.getInstance().loadFromString(_data) },
@@ -48,5 +48,8 @@ export default class JamOS {
     return localStorage.getItem(key);
   }
 
+    public static reset(){
+      localStorage.clear();
+    }
   
 }

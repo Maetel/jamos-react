@@ -32,7 +32,7 @@ export const procSlice = createSlice({
       const actionId = action.payload.id;
       const sameFound = state.procs.find(proc=>proc.id===actionId);
       if(sameFound){
-        throw new Error("Same id process found error");
+        throw new Error("Same id process found error. Requested id : " + actionId + ', Existing ids : '+ state.procs.map(proc=>proc.id).join(', '));
       }
       
       state.procs.push(action.payload);
@@ -221,15 +221,15 @@ export const procSlice = createSlice({
     loadProcFromString:(state, action:PayloadAction<{}>)=>{
       console.warn("Load process...")
       for(let key in state){
-        console.warn(' - deleting : ',key);
+        // console.warn(' - deleting : ',key);
         delete state[key];
       }
       const loaded =action.payload;
       for ( let key in loaded){
         state[key] = loaded[key];
-        console.log(' - loading : ',key);
+        // console.log(' - loading : ',key);
       }
-      console.warn("Load process finished");
+      // console.warn("Load process finished");
     }
   },
 

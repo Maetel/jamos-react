@@ -133,7 +133,7 @@ public psValue(){
       zIndex:'0',
       resize:'both',
       toolbar:[],
-      ...args
+      ...args //override by args
     }
     
     store.dispatch(addProc(proc));
@@ -250,8 +250,11 @@ public psValue(){
       this.killAll();
       store.dispatch(loadProcFromString(parsed));
       
+      
     } catch (error) {
       console.error(error);
     }
+    this.id = this.psValue().length+1;
+      console.log("Id after load: ",this.id);
   }
 }

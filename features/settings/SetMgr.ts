@@ -1,9 +1,15 @@
 import { useSelector } from "react-redux";
 import { useAppSelector } from "../../app/hooks";
 import store from "../../app/store";
-import { getSettingsValue, loadSettingsFromString, selectSettings, selectThemeColors, setSetting } from "./settingsSlice";
+import { getSettingsValue, loadSettingsFromString, selectSettings, selectSettingsAll, selectThemeColors, setSetting, toggleSetting } from "./settingsSlice";
 import officialThemes, { defaultTheme, Theme, themeByName, ThemeColors } from "./Themes";
 
+export const settingDescription = {
+  theme: "JamOS Theme",
+  // loadOnMount: "Automatically load data on startup",
+  saveOnExit: "Save all data when closed",
+  askOnExit: "Ask on exit",
+};
 
 export default class SetMgr {
   private static instance:SetMgr;
@@ -42,6 +48,10 @@ export default class SetMgr {
   }
   public setData(data:{}){
     store.dispatch(setSetting(data));
+  }
+  public getAllReadable(){
+    return useAppSelector(selectSettingsAll);
+
   }
   public getReadable(key:string){
     return useAppSelector(selectSettings(key))
@@ -91,5 +101,9 @@ export default class SetMgr {
     } catch (error) {
       console.error(error);
     }
+  }
+
+  public toggleBoolean(key:string){
+    store.dispatch(toggleSetting(key));
   }
 }

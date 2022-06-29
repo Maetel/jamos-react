@@ -155,15 +155,15 @@ const fileSlice = createSlice({
     loadFilesFromString:(state, action:PayloadAction<{}>)=>{
       console.warn("Load files...")
       for(let key in state){
-        console.warn(' - deleting : ',key);
+        // console.warn(' - deleting : ',key);
         delete state[key];
       }
       const loaded =action.payload;
       for ( let key in loaded){
         state[key] = loaded[key];
-        console.log(' - loading : ',key);
+        // console.log(' - loading : ',key);
       }
-      console.warn("Load files finished");
+      // console.warn("Load files finished");
     }
   }
 });
