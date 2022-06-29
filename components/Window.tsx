@@ -8,7 +8,7 @@ import { ThemeColors } from "../features/settings/Themes";
 import { ToolbarControl } from "../grounds/Toolbar";
 import { clamp, randomId } from "../scripts/utils";
 import styles from "../styles/Window.module.css";
-import Dialogue from "./Dialogue";
+import DialogueWindow, { DialogueProps } from "./DialogueWindow";
 
 const minHeight = 240;
 const minWidth = 300;
@@ -17,81 +17,6 @@ let pos1 = 0,
   pos3 = 0,
   pos4 = 0;
 let maximizeTransition = "0.3s";
-
-interface DialogueProps {
-  type: string; // 'buttons' | '
-  cancel: () => void;
-  rect?: Rect;
-  title?: string;
-  descs?: string[];
-  elem?: JSX.Element;
-  buttons?: string[];
-  callbacks?: ((params) => boolean)[];
-}
-
-function DialogueWindow(props) {
-  const dial: DialogueProps = props.dial;
-  const rect = dial.rect ?? {
-    top: "25%",
-    left: "25%",
-    width: "50%",
-    height: "50%",
-  };
-  const colors: ThemeColors = JamOS.theme().colors;
-
-  const [style, setStyle] = useState((dial?.rect ?? rect) as {});
-
-  const handleKey = (e) => {
-    if (!dial.callbacks && dial.callbacks.length > 0) {
-      return;
-    }
-    // e.preventDefault();
-    switch (e.key) {
-      case "Escape":
-        console.log("Dialogue escape");
-        dial.cancel();
-        // dial.callbacks.at(dial.callbacks.length - 1);
-        break;
-      case "Enter":
-        dial.callbacks.at(0);
-        console.log("Dialogue enter");
-        break;
-      default:
-        break;
-    }
-  };
-  useEffect(() => {
-    window.addEventListener("keydown", handleKey);
-    return () => {
-      window.removeEventListener("keydown", handleKey);
-    };
-  }, [dial]);
-  useEffect(() => {
-    const buildStyle = () => {
-      const initialRect = dial?.rect ?? rect;
-      let retval: {} = { ...initialRect };
-      retval["color"] = colors["1"];
-      retval["backgroundColor"] = colors["2"];
-      retval["boxShadow"] = colors.boxShadow;
-      return retval;
-    };
-    const st = buildStyle();
-    // setStyle(() => st);
-  }, [colors, rect]);
-  return dial ? (
-    <div className={styles.dialogueWindow} style={style}>
-      <div
-        className={styles.dialNav}
-        style={{ backgroundColor: colors["1"], color: colors["2"] }}
-      >
-        <button
-          className={styles.dialCloseBtn}
-          style={{ backgroundColor: colors.error }}
-        ></button>
-      </div>
-    </div>
-  ) : undefined;
-}
 
 export default function Window(props) {
   let _winElem = useRef(null);
@@ -233,7 +158,8 @@ export default function Window(props) {
   /*
         'Cannot update a component (`Toolbar`) while rendering a different component (`Toolbar`). To locate the bad setState() call inside `Toolbar`'
         */
-
+  const [dial, setDial] = useState(null);
+  const [dialValue, setDialValue] = useState(null);
   useEffect(() => {
     ToolbarControl.RegisterBuilder(proc.id).register(
       proc.name,
@@ -249,10 +175,12 @@ export default function Window(props) {
   const closeDial = () => {
     setDial(null);
   };
+
   //////////////////////////////////// dialogue
   const initialDial: DialogueProps = {
     type: "buttons",
     cancel: closeDial,
+    setValue: setDialValue,
     title: "Dialogue",
     descs: ["desc1", "desc2"],
     buttons: ["Okay", "cancel"],
@@ -267,7 +195,17 @@ export default function Window(props) {
       },
     ],
   };
-  const [dial, setDial] = useState({ ...initialDial });
+
+  useEffect(() => {
+    // console.log("Set inital dial");
+    // setDial({ ...initialDial });
+  }, []);
+
+  //handle value input from dialogue
+  useEffect(() => {
+    //pass
+    console.log("Change on dialogue value. dialValue : ", dialValue);
+  }, [dialValue]);
 
   //////////////////////////////////// drag events
   function dragMouseDown(e: any) {
@@ -532,7 +470,7 @@ export default function Window(props) {
           {(props as any).children}
         </div>
       </section>
-      {/* {dial ? <Window {...dial}></Window> : undefined} */}
+      {dial ? <DialogueWindow dial={dial}></DialogueWindow> : undefined}
     </>
   );
 }

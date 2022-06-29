@@ -1,0 +1,45 @@
+
+.dialogueWindow {
+  overflow: hidden;
+  border-radius: 8px;
+  position:absolute;
+  min-width: 300px;
+  min-height: 300px;
+}
+.dialNav {
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:30px;
+}
+.dialCloseBtn {
+  position: absolute;
+  padding: 0;
+  margin: 0;
+  left:6px;
+  top: 50%;
+  
+  transform: translateY(-50%);
+  width: 10px;
+  height: 10px;
+  border-radius: 5px;
+  border:0;
+}
+.dialTitle {
+  font-weight: 500;
+  font-size: 1.1rem;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+.dialBody {
+  height:100%;
+}
+.navTitle {
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform: translate(-50%,-50%);
+}

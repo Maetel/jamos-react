@@ -11,14 +11,19 @@ export default function Notepad(props) {
   proc.name = proc.name || "Notepad";
   const [filePath, setFilePath] = useState("");
   const [textAreaValue, setTextAreaValue] = useState("");
+
   const setFile = (e) => {};
   const loadFile = (e) => {
     //test
     setFilePath("~/Text2.txt");
   };
   const saveFile = (e) => {
-    console.log("Save file @" + filePath + ", :", textAreaValue);
-    filemgr.updateFileData(filePath, "text", textAreaValue);
+    if (filePath.length) {
+      console.log("Save file @" + filePath + ", :", textAreaValue);
+      filemgr.updateFileData(filePath, "text", textAreaValue);
+    } else {
+      console.error("Filepath not designated path:", filePath);
+    }
   };
   useEffect(() => {
     if (proc.node) {
