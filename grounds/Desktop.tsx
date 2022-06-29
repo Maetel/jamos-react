@@ -23,25 +23,33 @@ export default function Desktop(props) {
     // procmgr.add("testwindow");
     filemgr.mkdir("~/1/2/3");
     const f: File[] = [
-      filemgr.makeFile("~/Terminal", "terminal", "/imgs/terminal.svg"),
+      filemgr.makeFile("~/Terminal", "terminal", {
+        iconPath: "/imgs/terminal.svg",
+      }),
       // filemgr.makeFile("~/Logger", "logger", "/imgs/logger.svg"),
-      filemgr.makeFile("~/System Info", "systeminfo", "/imgs/chart.svg"),
-      filemgr.makeFile("~/Settings", "settings", "/imgs/settings.svg"),
-      filemgr.makeFile("~/Postman", "postman", "/imgs/postman.svg"),
+      filemgr.makeFile("~/System Info", "systeminfo", {
+        iconPath: "/imgs/chart.svg",
+      }),
+      filemgr.makeFile("~/Settings", "settings", {
+        iconPath: "/imgs/settings.svg",
+      }),
+      filemgr.makeFile("~/Postman", "postman", {
+        iconPath: "/imgs/postman.svg",
+      }),
       filemgr.makeFile("~/Tester", "testwindow"),
-      filemgr.makeFile(
-        "~/Portfolio/Clips/1. Intro",
-        "browser",
-        "/imgs/jamos.png",
-        "browser https://www.youtube.com/embed/8CfT8yN5tgw"
-      ),
-      filemgr.makeFile(
-        "~/Portfolio/Career description",
-        "browser",
-        "/imgs/career.svg",
-        "browser https://v1.embednotion.com/embed/9091c7d511f941b387d3064690d4d2dd"
-      ),
-      filemgr.makeFile("~/Styler", "styler", "/imgs/styler.svg"),
+      filemgr.makeFile("~/Sample text.txt", "text", {
+        data: { text: "This is a sample text." },
+      }),
+      filemgr.makeFile("~/Portfolio/Clips/1. Intro", "browser", {
+        iconPath: "/imgs/jamos.png",
+        exeCmd: "browser https://www.youtube.com/embed/8CfT8yN5tgw",
+      }),
+      filemgr.makeFile("~/Portfolio/Career description", "browser", {
+        iconPath: "/imgs/career.svg",
+        exeCmd:
+          "browser https://v1.embednotion.com/embed/9091c7d511f941b387d3064690d4d2dd",
+      }),
+      filemgr.makeFile("~/Styler", "styler", { iconPath: "/imgs/styler.svg" }),
     ];
     filemgr.addFiles(f);
     procmgr.openToolbar();

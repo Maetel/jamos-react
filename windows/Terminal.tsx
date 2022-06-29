@@ -772,24 +772,24 @@ export default function Terminal(props) {
         }
         _pwd = mergedFilePath;
         break;
-      // case "cat":
-      //   dest = cmds.slice(1).join(" ");
-      //   if (!dest) {
-      //     addWarn("cat : path required");
-      //     return;
-      //   }
-      //   const textpath = Path.join(pwd.path, dest);
-      //   const f = filemgr.findFile(textpath);
-      //   if (!f) {
-      //     addError(`File : '${f.node.path.path}' does not exist `);
-      //     return;
-      //   }
-      //   if (f.node.type !== "text") {
-      //     addError(`${textpath.path} is not a text file!`);
-      //     return;
-      //   }
-      //   addText((f.data as any)?.text);
-      //   break;
+      case "cat":
+        dest = cmds.slice(1).join(" ");
+        if (!dest) {
+          addWarn("cat : path required");
+          return;
+        }
+        const textpath = Path.join(pwd.path, dest);
+        const f = filemgr.fileValue(textpath.path);
+        if (!f) {
+          addError(`File : '${f.node.path}' does not exist `);
+          return;
+        }
+        if (f.node.type !== "text") {
+          addError(`${textpath.path} is not a text file!`);
+          return;
+        }
+        addText((f.data as any)?.text);
+        break;
       case "finder":
         dest = Path.join(pwd.path, cmds.at(1)).path;
         procmgr.add("finder", { path: dest });

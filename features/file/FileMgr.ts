@@ -1,6 +1,6 @@
 import store from "../../app/store";
 import Path from "../../scripts/Path";
-import { addFile, dirExists, dirValue, fileExists, fileValue, loadFilesFromString, mkdir, rm, rmdir, selectDir, selectNode, selectNodesInDir } from "./fileSlice";
+import { addFile, dirExists, dirValue, fileExists, fileValue, loadFilesFromString, mkdir, rm, rmdir, selectDir, selectFileData, selectNode, selectNodesInDir } from "./fileSlice";
 import { File, NodeControl } from "./FileTypes";
 import {useAppSelector} from '../../app/hooks'
 import type {Node} from './FileTypes'
@@ -72,11 +72,11 @@ export default class FileMgr {
     return true;
   }
 
-  public makeFile(path:string, type:string, iconPath?:string, exeCmd?:string, data?:any){
+  public makeFile(path:string, type:string, args?: {iconPath?:string, exeCmd?:string, data?:any}){
     
     const f:File = {
-      node:NodeControl.build(path, type, exeCmd, iconPath, data),
-      data:data
+      node:NodeControl.build(path, type, args?.exeCmd, args?.iconPath, args?.data),
+      data:args?.data
     }
     return f;
   }
@@ -124,5 +124,12 @@ export default class FileMgr {
     } catch (error) {
       console.error(error);
     }
+  }
+  public fileDataReadable(path:string, dataKey?:string){
+    return useAppSelector(selectFileData(path, dataKey));
+  }
+
+  public fileDataValue(path:string, dataKey?:string){
+    return dataKey ? fileValue(path)?.data[dataKey] : fileValue(path)?.data
   }
 }

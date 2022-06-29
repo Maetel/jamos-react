@@ -136,14 +136,26 @@ const fileSlice = createSlice({
       //then finally add
       parent.files.push(action.payload);
     },
+    setFileData:(state,action:PayloadAction<{filePath:string, dataKey:string, dataValue:any}>)=>{
+      const _path = action.payload.filePath;
+      const refined = new Path(_path);
+      if(!_verifyPath(refined.path)){
+        log(`Path must begin with '${initialHomePath}'`);
+        return;
+      }
+      if(!fileExists(_path)){
+        log(`File does not exist @setFileData : ${_path}`)
+        return;
+      }
+      const f:WritableDraft<File> = findFile(state, _path);
+      const {dataKey, dataValue} = action.payload;
+      f.data[dataKey] = dataValue;
+    },
     rm : (state,action:PayloadAction<string>)=>{
       _rm(state, action.payload);
     },
     rmdir : (state,action:PayloadAction<string>)=>{
-      //pass
-
       //delete recursively
-      
       const path = action.payload;
       const dir = findDir(state, path);
       if(!dir){
@@ -187,13 +199,10 @@ export const selectFiles = (state:AppState)=>{
     dir.files.forEach(file=>{retval.push(file)});
     dir.dirs.forEach(dir=>{
       dir.dirs.forEach(dir=>selectRecursively(dir))
-    }
-      );
-      
-    
+    });
   }
   selectRecursively(root);
-      return retval;
+  return retval;
 };
 
 
@@ -223,6 +232,17 @@ export const selectDir = (path:string)=>((state:AppState)=>{
 
 export const selectFile = (path:string)=>((state:AppState)=>{
   return dfsDir(state.file.root, path)?.files.filter(file=>Path.areSame(file.node.path, path)).at(0);
+})
+export const selectFileData = (path:string, dataKey?:string)=>((state:AppState)=>{
+  const f = dfsDir(state.file.root, path)?.files.filter(file=>Path.areSame(file.node.path, path)).at(0);
+  if(!f){
+    return undefined;
+  }
+  if(dataKey){
+    return f.data[dataKey];
+  } else {
+    return f.data;
+  }
 })
 
 export const dirValue = (path: string) =>dfsDir(store.getState()?.file.root, path);

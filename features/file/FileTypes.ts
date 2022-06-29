@@ -11,6 +11,7 @@ export interface Node {
 }
 
 export class NodeControl {
+  //TODO : node.data & file.data?
   public static build(path:string, type:string, exeCmd?:string, iconPath?:string, data?:{}) {
     return {
       id :type + path,
