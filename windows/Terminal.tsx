@@ -462,9 +462,9 @@ export default function Terminal(props) {
     }
     switch (cmd) {
       //   case "atelier":
-      // case "postman":
       // case "markdown":
       // case "broom":
+      case "postman":
       case "about":
       case "settings":
       case "terminal":

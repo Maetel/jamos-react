@@ -27,6 +27,7 @@ export default function Desktop(props) {
       // filemgr.makeFile("~/Logger", "logger", "/imgs/logger.svg"),
       filemgr.makeFile("~/System Info", "systeminfo", "/imgs/chart.svg"),
       filemgr.makeFile("~/Settings", "settings", "/imgs/settings.svg"),
+      filemgr.makeFile("~/Postman", "postman", "/imgs/postman.svg"),
       filemgr.makeFile("~/Tester", "testwindow"),
       filemgr.makeFile(
         "~/Portfolio/Clips/1. Intro",
