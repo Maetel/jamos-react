@@ -15,8 +15,15 @@ export default function Styler(props) {
         "About",
         () => {
           // ProcMgr.getInstance().kill(proc.id);
-        },
-        { separator: true, disabled: true }
+          JamOS.procmgr().add("simpleabout", {
+            aboutProps: {
+              title: "About Styler",
+              desc: "Change theme as your taste!",
+            },
+            parent: proc.id,
+          });
+        }
+        // { separator: true, disabled: true }
       )
       .register(
         "Edit",

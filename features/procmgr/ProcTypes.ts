@@ -17,11 +17,19 @@ export default interface Process {
   toolbar:ToolbarItem[],
   node?:Node,
 
+  children?:string[] // automatically added in procSlice.addProc reducer
+  parent?:string, //in case this is a child process
+
+  //window options
+  disableBackground?:boolean,
+  translucentBackgroundOnDisable?:boolean,
+  disableDrag?:boolean,
   disableCloseBtn?:boolean,
   disableMinBtn?:boolean,
   disableMaxBtn?:boolean,
   isMinimized?:boolean,
   isMaximized?:boolean,
+
   [key:string]:any
 }
 
@@ -49,6 +57,9 @@ export const ProcessCommands = [
   "settings",
   "styler",
   "systeminfo",
+
+  //for child window
+  'simpleabout',
 
   //daemon/app
   "broom", "savebread", "loadbread", "resetbread",

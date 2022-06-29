@@ -15,6 +15,13 @@ export default function Notepad(props) {
   const setFile = (e) => {};
   const loadFile = (e) => {
     //test
+    interface FileModalProps {
+      hint?: string; //file or dir path, okay to be undefined
+      type?: string; // ex) 'dir', 'text', ...
+      extension?: string; // '.txt', '.jpg', ... , regardless of case
+    }
+    const fileProps: FileModalProps = undefined;
+    // JamOS.openFileModal(fileProps);
     setFilePath("~/Text2.txt");
   };
   const saveFile = (e) => {

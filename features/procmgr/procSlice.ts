@@ -35,24 +35,47 @@ export const procSlice = createSlice({
         throw new Error("Same id process found error. Requested id : " + actionId + ', Existing ids : '+ state.procs.map(proc=>proc.id).join(', '));
       }
       
+      //if is a child proc
+      const parentId = action.payload.parent;
+      if(parentId){
+        const parentProc = state.procs.find(proc=>proc.id===parentId);
+        if(!parentProc){
+          // Tried to add child proc of non-existing parent.
+          throw new Error(`Tried to add child proc of non-existing parent. Parent:${parentId}, Child(this):${actionId}`)
+        }
+        parentProc.children = parentProc.children ? [...parentProc.children, actionId] : [actionId];
+      }
+
+      //then finally add self
       state.procs.push(action.payload);
     },
 
     killProc:(state, action:PayloadAction<string>)=>{
+      const _killProc = (id:string)=>{
+        if(!id){
+          // a child might be killed already
+          return;
+        }
+        const found = state.procs.find(proc=>proc.id===id);
+        if(!found){
+          return;
+        }
+        //kill children recursively
+        found.children?.forEach(childProcId=>{
+          _killProc(childProcId);
+        })
+        state.procs = state.procs.filter(proc=>proc.id!==id);
+      }
       const inputId = action.payload;
       const found = state.procs.find(proc=>proc.id===inputId);
       if(!found){
         return;
       }
-      const axis = parseInt(found.zIndex);
-      state.procs = state.procs.map(
-        proc=>{
-          if(parseInt(proc.zIndex) > axis){
-            proc.zIndex = ''+(parseInt(proc.zIndex)-1);
-          }
-          return proc;
-        }
-      ).filter(proc=>proc.id !== inputId);
+
+      _killProc(inputId);
+      //squeez index
+      state.procs = [...state.procs].sort((l,r)=>parseInt(l.zIndex)-parseInt(r.zIndex)).map((proc, i)=>({...proc, zIndex:''+i}));
+
     },
     killAllProcs:(state, action:PayloadAction<string>)=>{
       if(action.payload){
@@ -107,33 +130,47 @@ export const procSlice = createSlice({
     },
     
     setActiveWindow:(state, action:PayloadAction<string>)=>{
-      const proc = state.procs.find(proc=>proc.id===action.payload)
-      if(!proc){
-        throw new Error(`setActiveWindow. could not find procId : ${action.payload}`);
-      }
-      const axis = parseInt(proc.zIndex);
-      state.procs.forEach(proc=>{
-        const idx = parseInt(proc.zIndex);
-        if(idx < axis){
-          proc.zIndex = ''+(idx+1);
+
+      //set children active recursively
+      const _setActiveWindow = (id:string)=>{
+        const proc = state.procs.find(proc=>proc.id===id)
+        if(!proc){
+          return;
         }
-      })
-      proc.zIndex = '0';
+        const axis = parseInt(proc.zIndex);
+        state.procs.forEach(proc=>{
+          const idx = parseInt(proc.zIndex);
+          if(idx < axis){
+            proc.zIndex = ''+(idx+1);
+          }
+        })
+        proc.zIndex = '0';
+        proc.children?.forEach(child=>{_setActiveWindow(child)})
+      }
+      _setActiveWindow(action.payload);
     },
     
     unMinimize:(state, action:PayloadAction<string>)=>{
-      const proc = state.procs.find(proc=>proc.id===action.payload);
-      if(!proc){
-        return;
+      const _unMinimize = (id:string)=>{
+        const proc = state.procs.find(proc=>proc.id===id);
+        if(!proc){
+          return;
+        }
+        proc.isMinimized = false;
+        proc.children?.forEach(child=>{_unMinimize(child);})
       }
-      proc.isMinimized = false;
+      _unMinimize(action.payload);
     },
     minimize:(state, action:PayloadAction<string>)=>{
-      const proc = state.procs.find(proc=>proc.id===action.payload);
-      if(!proc){
-        return;
+      const _minimize = (id:string)=>{
+        const proc = state.procs.find(proc=>proc.id===id);
+        if(!proc){
+          return;
+        }
+        proc.isMinimized = true;
+        proc.children?.forEach(child=>{_minimize(child);})
       }
-      proc.isMinimized = true;
+      _minimize(action.payload);
     },
 
     toggleMinimize:(state, action:PayloadAction<string>)=>{
@@ -239,9 +276,12 @@ export const procSlice = createSlice({
 export const selectIsToolbarOpen = (state:AppState)=>state.proc.openToolbar;
 export const selectIsDockOpen = (state:AppState)=>state.proc.openDock;
 
-export const selectProcessById = createSelector([state=>state.procs, (state, procId:string)=>procId], (procs,procId)=>{
-  return procs.find(proc=>proc.id===procId);
-})
+// export const selectProcessById = createSelector([state=>state.procs, (state, procId:string)=>procId], (procs,procId)=>{
+//   return procs.find(proc=>proc.id===procId);
+// })
+export const selectProcessById = (id:string)=>(state:AppState)=>{
+  return state.proc.procs.find(proc=>proc.id===id);
+}
 
 export const selectProcesses = (state:AppState)=>state.proc.procs;
 export const selectProcInIndexOrder = (state:AppState)=>[...state.proc.procs].sort((l,r)=>{
@@ -277,7 +317,31 @@ export const selectGroupedProcs = (state:AppState)=>{
 export const selectIsMinimized = (procId:String)=>(state:AppState)=>{
   return state.proc.procs.find(proc=>proc.id===procId)?.isMinimized
 }
+export const selectFront = (state:AppState):Process=>{
+  return state.proc.procs.find(proc=>proc.zIndex==='0')
+}
 
+function topParent (state:AppState, proc:Process):Process{
+  let retval :Process = undefined;
+  const findParent = (_proc:Process)=>{
+    const parentFound =state.proc.procs.find(_p=>_p.id===_proc?.parent);
+    if(parentFound){
+      retval = parentFound;
+      // return findParent(retval);
+    } else {
+      // return retval;
+    }
+  }
+  findParent(proc);
+  return retval;
+}
+export const selectFrontsParent = (state:AppState):Process=>{
+  const front = state.proc.procs.find(proc=>proc.zIndex==='0');
+  if(front?.name==='Terminal' && front?.id==='3'){
+    // debugger;
+  }
+  return topParent(state, front);
+}
 
 export default procSlice.reducer;
 export const { addProc, killProc, killAllProcs, increaseIndices, setActiveWindow,setProcProps, minimize, unMinimize,toggleMinimize,toggleMaximize,setToolbarItem, openToolbar, closeToolbar, toggleToolbar, openDock, closeDock,toggleDock,pushToLast, loadProcFromString} = procSlice.actions

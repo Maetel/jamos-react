@@ -8,8 +8,8 @@ import { ThemeColors } from "../features/settings/Themes";
 import { ToolbarControl } from "../grounds/Toolbar";
 import { clamp, randomId } from "../scripts/utils";
 import styles from "../styles/Window.module.css";
-import DialogueWindow, { DialogueProps } from "./DialogueWindow";
 
+const translucentBackground = "55";
 const minHeight = 240;
 const minWidth = 300;
 let pos1 = 0,
@@ -32,6 +32,13 @@ export default function Window(props) {
 
   const procmgr = JamOS.procmgr();
   const proc: Process = { ...props.proc };
+  const {
+    disableBackground,
+    disableDrag,
+    disableMinBtn,
+    disableCloseBtn,
+    disableMaxBtn,
+  } = proc;
   // proc["disableMinBtn"] = true;
   const btnMaxClass = proc["disableMaxBtn"] ? styles.disabled : "";
   const btnMinClass = proc["disableMinBtn"] ? styles.disabled : "";
@@ -150,6 +157,10 @@ export default function Window(props) {
     //   procmgr.set(proc.id, { name: proc.name });
     // }
     procmgr.set(proc.id, { name: proc.name ?? "Application" });
+
+    {
+      console.log(proc.name, ": disableBackground:", disableBackground);
+    }
   }, []);
   const rectReadable: Rect = get("rect");
   // console.log("rectReadable:", rectReadable);
@@ -158,8 +169,6 @@ export default function Window(props) {
   /*
         'Cannot update a component (`Toolbar`) while rendering a different component (`Toolbar`). To locate the bad setState() call inside `Toolbar`'
         */
-  const [dial, setDial] = useState(null);
-  const [dialValue, setDialValue] = useState(null);
   useEffect(() => {
     ToolbarControl.RegisterBuilder(proc.id).register(
       proc.name,
@@ -171,41 +180,6 @@ export default function Window(props) {
       { separator: true, order: -1 }
     );
   }, []);
-
-  const closeDial = () => {
-    setDial(null);
-  };
-
-  //////////////////////////////////// dialogue
-  const initialDial: DialogueProps = {
-    type: "buttons",
-    cancel: closeDial,
-    setValue: setDialValue,
-    title: "Dialogue",
-    descs: ["desc1", "desc2"],
-    buttons: ["Okay", "cancel"],
-    callbacks: [
-      (params) => {
-        console.log("Okay");
-        return true;
-      },
-      (params) => {
-        console.log("Cancel");
-        return false;
-      },
-    ],
-  };
-
-  useEffect(() => {
-    // console.log("Set inital dial");
-    // setDial({ ...initialDial });
-  }, []);
-
-  //handle value input from dialogue
-  useEffect(() => {
-    //pass
-    console.log("Change on dialogue value. dialValue : ", dialValue);
-  }, [dialValue]);
 
   //////////////////////////////////// drag events
   function dragMouseDown(e: any) {
@@ -293,15 +267,18 @@ export default function Window(props) {
 
   const [navHovered, setNavHovered] = useState(false);
   const buildNavStyle = () => {
-    return {
-      color: _colors["2"],
-      backgroundColor: _colors["1"],
-    };
+    const retval = {};
+    retval["color"] = _colors["2"];
+    retval["backgroundColor"] = _colors["1"];
+    if (proc.disableDrag) {
+      retval["cursor"] = "auto";
+    }
+    return retval;
   };
   const buildMaxBtnStyle = () => {
     const retval = { backgroundColor: _colors["okay"] };
     if (proc.disableMaxBtn) {
-      // retval["disabled"] = true;
+      retval.backgroundColor = retval.backgroundColor + translucentBackground;
     }
     return retval;
   };
@@ -337,9 +314,21 @@ export default function Window(props) {
   };
 
   const navElemStyle = buildNavStyle();
-  const closeBtnStyle = { backgroundColor: _colors["error"] };
-  const minBtnStyle = { backgroundColor: _colors["warn"] };
-  const maxBtnStyle = buildMaxBtnStyle();
+  const closeBtnStyle = {
+    backgroundColor: disableCloseBtn
+      ? _colors["error"] + translucentBackground
+      : _colors["error"],
+  };
+  const minBtnStyle = {
+    backgroundColor: disableMinBtn
+      ? _colors["warn"] + translucentBackground
+      : _colors["warn"],
+  };
+  const maxBtnStyle = {
+    backgroundColor: disableMaxBtn
+      ? _colors["okay"] + translucentBackground
+      : _colors["okay"],
+  };
 
   const togglegrabbable = () => {
     //watches before transition, so toggle opposite way
@@ -408,6 +397,20 @@ export default function Window(props) {
 
   return (
     <>
+      {disableBackground ? (
+        <div
+          className="disableBackground"
+          style={{
+            position: "absolute",
+            top: "0px",
+            left: "0px",
+            width: "100vw",
+            height: "100vh",
+            backgroundColor: _colors["2"] + "aa",
+            cursor: "not-allowed",
+          }}
+        ></div>
+      ) : undefined}
       <section
         className={`${styles["window-container"]}`}
         id={winId}
@@ -423,7 +426,7 @@ export default function Window(props) {
           id={navId}
           ref={_navElem}
           onMouseDown={(e) => {
-            if (!isMax) {
+            if (!isMax && !disableDrag) {
               dragMouseDown(e);
             }
           }}
@@ -470,7 +473,6 @@ export default function Window(props) {
           {(props as any).children}
         </div>
       </section>
-      {dial ? <DialogueWindow dial={dial}></DialogueWindow> : undefined}
     </>
   );
 }
