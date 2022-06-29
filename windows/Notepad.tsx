@@ -13,21 +13,19 @@ export default function Notepad(props) {
   const [textAreaValue, setTextAreaValue] = useState("");
   const setFile = (e) => {};
   const loadFile = (e) => {
-    //text
-    setFilePath("~/Sample text.txt");
+    //test
+    setFilePath("~/Text2.txt");
   };
-  const saveFile = (e) => {};
+  const saveFile = (e) => {
+    console.log("Save file @" + filePath + ", :", textAreaValue);
+    filemgr.updateFileData(filePath, "text", textAreaValue);
+  };
   useEffect(() => {
-    // for (let key in proc) {
-    //   console.log(`Proc[${key}] = ${proc[key]}`);
-    // }
-    // setTextAreaValue(proc["text"]);
-    console.log("Proc.text:", proc.text);
-    setTextAreaValue(proc.text);
+    if (proc.node) {
+      setFilePath(proc.node.path);
+    }
+    setTextAreaValue(proc.text ?? "");
   }, []);
-  useEffect(() => {
-    console.log("textAreaValue:", textAreaValue);
-  }, [textAreaValue]);
   useEffect(() => {
     const f: File = filemgr.fileValue(filePath);
     // console.log("f?.data['text']:", f?.data["text"]);

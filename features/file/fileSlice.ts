@@ -143,7 +143,7 @@ const fileSlice = createSlice({
         log(`Path must begin with '${initialHomePath}'`);
         return;
       }
-      if(!fileExists(_path)){
+      if(!findFile(state, _path)){
         log(`File does not exist @setFileData : ${_path}`)
         return;
       }
@@ -259,4 +259,4 @@ export const fileExists = (path:string)=>!!fileValue(path)
 ////////////////////////
 
 export default fileSlice.reducer;
-export const { mkdir, addFile, rm, rmdir, loadFilesFromString } = fileSlice.actions;
+export const { mkdir, addFile, rm, rmdir, loadFilesFromString,setFileData } = fileSlice.actions;
