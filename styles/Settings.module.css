@@ -33,6 +33,7 @@
   width: 100%;
   display: flex;
   position: relative;
+  text-align: center;
 }
 .head {
   font-size: 1.3rem;
