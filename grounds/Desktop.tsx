@@ -21,30 +21,24 @@ export default function Desktop(props) {
   const init = () => {
     procmgr.add("terminal");
     // procmgr.add("testwindow");
-    filemgr.mkdir("~/1/2/3");
+    filemgr.mkdir("~/deep/deeeeeep/directory");
     const f: File[] = [
-      filemgr.makeFile("~/Terminal", "terminal", {
-        iconPath: "/imgs/terminal.svg",
-      }),
-      // filemgr.makeFile("~/Logger", "logger", "/imgs/logger.svg"),
-      filemgr.makeFile("~/System Info", "systeminfo", {
-        iconPath: "/imgs/chart.svg",
-      }),
-      filemgr.makeFile("~/Settings", "settings", {
-        iconPath: "/imgs/settings.svg",
-      }),
-      filemgr.makeFile("~/Postman", "postman", {
-        iconPath: "/imgs/postman.svg",
-      }),
-      filemgr.makeFile("~/Atelier", "atelier"),
       filemgr.makeFile("~/AppStore", "appstore"),
-      filemgr.makeFile("~/Tester", "testwindow"),
-      filemgr.makeFile("~/Text1.txt", "text", {
+      // filemgr.makeFile("~/Logger", "logger"),
+      // filemgr.makeFile("~/Terminal", "terminal"),
+      // filemgr.makeFile("~/System Info", "systeminfo"),
+      // filemgr.makeFile("~/Settings", "settings"),
+      // filemgr.makeFile("~/Postman", "postman"),
+      // filemgr.makeFile("~/Atelier", "atelier"),
+      // filemgr.makeFile("~/Tester", "testwindow"),
+      // filemgr.makeFile("~/Styler", "styler"),
+
+      filemgr.makeFile("~/Sample text1.txt", "text", {
         data: { text: "This is a sample text1." },
       }),
-      filemgr.makeFile("~/Text2.txt", "text", {
-        data: { text: "This is a sample text2." },
-      }),
+      // filemgr.makeFile("~/Text2.txt", "text", {
+      //   data: { text: "This is a sample text2." },
+      // }),
       filemgr.makeFile("~/Portfolio/Clips/1. Intro", "browser", {
         iconPath: "/imgs/jamos.png",
         exeCmd: "browser https://www.youtube.com/embed/8CfT8yN5tgw",
@@ -54,7 +48,6 @@ export default function Desktop(props) {
         exeCmd:
           "browser https://v1.embednotion.com/embed/9091c7d511f941b387d3064690d4d2dd",
       }),
-      filemgr.makeFile("~/Styler", "styler", { iconPath: "/imgs/styler.svg" }),
     ];
     filemgr.addFiles(f);
     procmgr.openToolbar();

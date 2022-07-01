@@ -22,7 +22,8 @@ export default function Notepad(props) {
     }
     const fileProps: FileModalProps = undefined;
     // JamOS.openFileModal(fileProps);
-    setFilePath("~/Text2.txt");
+    console.warn("Todo : update loadFile() with modal");
+    setFilePath("~/Sample text1.txt");
   };
   const saveFile = (e) => {
     if (filePath.length) {
