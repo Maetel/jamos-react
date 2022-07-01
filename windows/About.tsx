@@ -52,11 +52,21 @@ export default function About(props) {
         //if closed too early
         return;
       }
-      bgTopElem.current.style.opacity = "0";
-      bgBottomElem.current.style.opacity = "0";
-      const children = textElem.current.children;
-      for (let i = 0; i < children.length; ++i) {
-        (children[i] as HTMLElement).style.color = "#222";
+      if (bgTopElem.current) {
+        bgTopElem.current.style.opacity = "0";
+      }
+      if (bgBottomElem.current) {
+        bgBottomElem.current.style.opacity = "0";
+      }
+
+      if (textElem.current) {
+        const children = textElem.current.children;
+        for (let i = 0; i < children.length; ++i) {
+          if (!children[i]) {
+            break;
+          }
+          (children[i] as HTMLElement).style.color = "#222";
+        }
       }
     }, 1500);
   }, []);
