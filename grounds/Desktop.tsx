@@ -36,6 +36,7 @@ export default function Desktop(props) {
       filemgr.makeFile("~/Postman", "postman", {
         iconPath: "/imgs/postman.svg",
       }),
+      filemgr.makeFile("~/Atelier", "atelier"),
       filemgr.makeFile("~/Tester", "testwindow"),
       filemgr.makeFile("~/Text1.txt", "text", {
         data: { text: "This is a sample text1." },

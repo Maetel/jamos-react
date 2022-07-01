@@ -16,6 +16,7 @@ import Settings from "../windows/Settings";
 import AppStore from "../windows/AppStore";
 import JamOS from "../features/JamOS/JamOS";
 import Postman from "../windows/Postman";
+import Atelier from "../windows/Atelier";
 
 const winCmdMap: { [key: string]: (props) => JSX.Element } = {
   testwindow: TestWindow,
@@ -30,6 +31,7 @@ const winCmdMap: { [key: string]: (props) => JSX.Element } = {
   settings: Settings,
   appstore: AppStore,
   postman: Postman,
+  atelier: Atelier,
 };
 
 export default function Windows(props) {
