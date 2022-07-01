@@ -21,8 +21,9 @@ export default function SimpleAbout(props) {
     width: "30%",
     height: "10%",
   };
-  proc.disableDrag = proc.disableDrag ?? true;
+  // proc.disableDrag = proc.disableDrag ?? true;
   proc.disableBackground = true;
+  // proc.hideNav = true;
 
   const desc = abouts.desc;
 

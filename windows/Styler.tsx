@@ -51,6 +51,7 @@ export default function Styler(props) {
 
   const proc: Process = { ...props.proc };
   proc.name = proc.name ?? "Styler";
+  proc.hideNav = true;
   proc["rect"] = {
     width: 400,
     height: 210 + themes.length * 33,

@@ -1,14 +1,17 @@
 import Window from "../components/Window";
 import JamOS from "../features/JamOS/JamOS";
+import { closeToolbar } from "../features/procmgr/procSlice";
 import SetMgr, { settingDescription } from "../features/settings/SetMgr";
 import styles from "../styles/Settings.module.css";
 
 export default function Settings(props) {
   const setmgr = JamOS.setmgr();
   const settings = setmgr.getAllReadable();
+  const colors = JamOS.theme().colors;
 
   const proc = { ...props.proc };
   proc.name = proc.name ?? "Settings";
+  proc.hideNav = true;
   let viewId = 1;
 
   const buildView = (settings) => {
@@ -98,7 +101,10 @@ export default function Settings(props) {
                           alt={`${settingDescription[setting.key]} being ${
                             setting.value
                           }`}
-                          className={`${styles["toggle-icon"]} ${styles.green}`}
+                          className={`${styles["toggle-icon"]}`}
+                          style={{
+                            backgroundColor: colors.okay,
+                          }}
                         />
                       ) : (
                         <img
@@ -106,7 +112,10 @@ export default function Settings(props) {
                           alt={`${settingDescription[setting.key]} not ${
                             setting.value
                           }`}
-                          className={`${styles["toggle-icon"]} ${styles.yellow}`}
+                          className={`${styles["toggle-icon"]}`}
+                          style={{
+                            backgroundColor: colors.warn,
+                          }}
                         />
                       )}
                     </div>

@@ -44,7 +44,7 @@ export default function Window(props) {
   const btnMinClass = proc["disableMinBtn"] ? styles.disabled : "";
   const btnCloseClass = proc["disableCloseBtn"] ? styles.disabled : "";
 
-  proc.name = proc.name ?? "Application";
+  proc.name = proc.name ?? (proc.hideNav ? "" : "Application");
   const get = (prop) => procmgr.getReadable(proc.id, prop);
   // const get = (prop) => procmgr.get(proc.id, prop);
 
@@ -270,8 +270,13 @@ export default function Window(props) {
     const retval = {};
     retval["color"] = _colors["2"];
     retval["backgroundColor"] = _colors["1"];
-    if (proc.disableDrag) {
+    if (proc.disableDrag || proc.hideNav) {
       retval["cursor"] = "auto";
+    }
+    if (proc.hideNav) {
+      // retval["display"] = "none";
+      retval["color"] = _colors["1"];
+      retval["backgroundColor"] = "transparent";
     }
     return retval;
   };
@@ -395,6 +400,84 @@ export default function Window(props) {
     // console.log("On mouse down");
   };
 
+  const Header = (props) => {
+    return (
+      <div
+        className={`${styles["window-container-header"]} ${styles.grabbable}`}
+        id={navId}
+        ref={_navElem}
+        onMouseDown={(e) => {
+          if (!isMax && !disableDrag) {
+            dragMouseDown(e);
+          }
+        }}
+        style={navElemStyle}
+      >
+        <span className={styles["window-title"]}>
+          {proc.hideNav ? "" : proc.name}
+        </span>
+      </div>
+    );
+  };
+
+  const NestedBody = (props) => {
+    return (
+      <div
+        className={styles["content-container"]}
+        onClick={(e) => {
+          proc.onFocus?.();
+        }}
+        style={{
+          position: proc.hideNav ? "absolute" : "relative",
+          top: 0,
+          height: proc.hideNav ? "100%" : "calc(100% - 30px)",
+        }}
+      >
+        {(props as any).children}
+      </div>
+    );
+  };
+
+  const Buttons = (props) => {
+    const bg = proc.hideNav ? _colors["1"] : _colors["2"];
+    return (
+      <ul
+        className={styles["button-container"]}
+        style={{
+          backgroundColor: navHovered ? bg : "transparent",
+          display: proc.hideNavButtons ? "none" : "flex",
+        }}
+        onMouseEnter={(e) => {
+          // navElemStyle["backgroundColor"] = _colors["3"];
+          setNavHovered(true);
+        }}
+        onMouseLeave={(e) => {
+          setNavHovered(false);
+          // navElemStyle["backgroundColor"] = "transparent";
+        }}
+      >
+        <li
+          className={`${styles["btn-close"]} ${styles["btn"]} ${btnCloseClass}`}
+          // onClick={onCloseBtn}
+          style={closeBtnStyle}
+        />
+        <li
+          className={`${styles["btn-minimize"]} ${styles["btn"]} ${btnMinClass}`}
+          style={minBtnStyle}
+          // onClick={onMinimizeBtn}
+        />
+        <li
+          className={`${styles["btn-maximize"]} ${styles["btn"]} ${btnMaxClass}`}
+          // onClick={toggleWindowMaximize}
+          style={maxBtnStyle}
+        />
+      </ul>
+    );
+  };
+
+  const elems = proc.hideNav
+    ? [Header, NestedBody, Buttons]
+    : [NestedBody, Header, Buttons];
   return (
     <>
       {disableBackground ? (
@@ -406,7 +489,7 @@ export default function Window(props) {
             left: "0px",
             width: "100vw",
             height: "100vh",
-            backgroundColor: _colors["2"] + "aa",
+            backgroundColor: _colors["2"] + "77",
             cursor: "not-allowed",
           }}
         ></div>
@@ -422,6 +505,19 @@ export default function Window(props) {
         ref={_winElem}
       >
         <div
+          className={styles["content-container"]}
+          onClick={(e) => {
+            proc.onFocus?.();
+          }}
+          style={{
+            // position: proc.hideNav ? "absolute" : "relative",
+            top: proc.hideNav ? 0 : 30,
+            height: proc.hideNav ? "100%" : "calc(100% - 30px)",
+          }}
+        >
+          {(props as any).children}
+        </div>
+        <div
           className={`${styles["window-container-header"]} ${styles.grabbable}`}
           id={navId}
           ref={_navElem}
@@ -429,49 +525,15 @@ export default function Window(props) {
             if (!isMax && !disableDrag) {
               dragMouseDown(e);
             }
+            proc.onFocus?.();
           }}
           style={navElemStyle}
         >
-          <ul
-            className={styles["button-container"]}
-            style={{
-              backgroundColor: navHovered ? _colors["2"] : "transparent",
-            }}
-            onMouseEnter={(e) => {
-              // navElemStyle["backgroundColor"] = _colors["3"];
-              setNavHovered(true);
-            }}
-            onMouseLeave={(e) => {
-              setNavHovered(false);
-              // navElemStyle["backgroundColor"] = "transparent";
-            }}
-          >
-            <li
-              className={`${styles["btn-close"]} ${styles["btn"]} ${btnCloseClass}`}
-              // onClick={onCloseBtn}
-              style={closeBtnStyle}
-            />
-            <li
-              className={`${styles["btn-minimize"]} ${styles["btn"]} ${btnMinClass}`}
-              style={minBtnStyle}
-              // onClick={onMinimizeBtn}
-            />
-            <li
-              className={`${styles["btn-maximize"]} ${styles["btn"]} ${btnMaxClass}`}
-              // onClick={toggleWindowMaximize}
-              style={maxBtnStyle}
-            />
-          </ul>
-          <span className={styles["window-title"]}>{proc.name}</span>
+          <span className={styles["window-title"]}>
+            {proc.hideNav ? "" : proc.name}
+          </span>
         </div>
-        <div
-          className={styles["content-container"]}
-          onClick={(e) => {
-            proc.onFocus?.();
-          }}
-        >
-          {(props as any).children}
-        </div>
+        <Buttons></Buttons>
       </section>
     </>
   );

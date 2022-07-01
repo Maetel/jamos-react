@@ -130,6 +130,11 @@ export const procSlice = createSlice({
     },
     
     setActiveWindow:(state, action:PayloadAction<string>)=>{
+      //return if already at front
+      if(state.procs.find(proc=>proc.id===action.payload)?.zIndex==='0'){
+        return;
+      }
+
 
       //set children active recursively
       const _setActiveWindow = (id:string)=>{

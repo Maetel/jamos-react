@@ -297,10 +297,16 @@ function CollapsibleMenu(props) {
     return retval;
   };
   const buildTitleStyle = () => {
-    return {
+    const retval = {
       color: colors[isActive ? "1" : "2"],
-      backgroundColor: `${colors[isActive ? "2" : "1"]}aa`,
+      // backgroundColor: `${colors[isActive ? "2" : "1"]}aa`,
+      backgroundColor: "transparent",
     };
+    if (isActive) {
+      retval.backgroundColor = colors["2"];
+    }
+    // console.log("Build title style. retval:", retval);
+    return retval;
   };
   const itemsStyle = buildItemsStyle();
   const titleStyle = buildTitleStyle();
@@ -351,9 +357,9 @@ export default function Toolbar(props) {
   const [hovered, setHovered] = useState(false);
   const [clicked, setClicked] = useState(null);
   const openByMgr = procmgr.isToolbarOpen();
-  const show: boolean = isEdge || hovered || clicked !== null;
-  const className = show || openByMgr ? styles.active : "";
-  const bgClassName = show && !openByMgr ? styles.active : "";
+  const show: () => boolean = () => isEdge || hovered || clicked !== null;
+  const toolbarActive = () => (show() || openByMgr ? styles.active : "");
+  const toolbarBgActive = () => (show() && !openByMgr ? styles.active : "");
   const colors = JamOS.theme().colors;
 
   const front = JamOS.procmgr().front();
@@ -452,7 +458,7 @@ export default function Toolbar(props) {
   return (
     <>
       <div
-        className={`${styles.container} ${className}`}
+        className={`${styles.container} ${toolbarActive()}`}
         style={containerStyle}
         onMouseEnter={(e) => {
           setHovered(true);
@@ -492,7 +498,10 @@ export default function Toolbar(props) {
           <ToolbarClock></ToolbarClock>
         </span>
       </div>
-      <div className={`${styles.bg} ${bgClassName}`} onClick={uncollapse}></div>
+      <div
+        className={`${styles.bg} ${toolbarBgActive()}`}
+        onClick={uncollapse}
+      ></div>
     </>
   );
 }

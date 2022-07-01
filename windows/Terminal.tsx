@@ -17,6 +17,7 @@ import Commands from "../scripts/CommandParser";
 import officialThemes, { themeExists } from "../features/settings/Themes";
 import { ToolbarControl } from "../grounds/Toolbar";
 import JamOS from "../features/JamOS/JamOS";
+import Process from "../features/procmgr/ProcTypes";
 
 const viewMap = {
   PromptTextView: PromptTextView,
@@ -34,8 +35,10 @@ export default function Terminal(props) {
   const procmgr = JamOS.procmgr();
   const filemgr = JamOS.filemgr();
   const setmgr = JamOS.setmgr();
-  const proc = { ...props.proc };
+  const proc: Process = { ...props.proc };
   proc.name = proc.name ?? `Terminal`;
+  // proc.hideNav = true;
+  // proc.hideNavButtons = true;
   const focusOnInput = () => {
     inputElem.current.focus();
   };

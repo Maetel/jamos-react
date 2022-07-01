@@ -21,6 +21,8 @@ export default interface Process {
   parent?:string, //in case this is a child process
 
   //window options
+  hideNav?:boolean,
+  hideNavButtons?:boolean,
   disableBackground?:boolean,
   translucentBackgroundOnDisable?:boolean,
   disableDrag?:boolean,
