@@ -4,10 +4,35 @@ import { random } from "../scripts/utils";
 import styles from "../styles/Atelier.module.css";
 
 export default function Atelier(props) {
-  const contElem = useRef(null),
-    canvasElem = useRef(null),
-    ccElem = useRef(null);
+  const contElem = useRef<HTMLDivElement>(null),
+    canvasElem = useRef<HTMLCanvasElement>(null),
+    ccElem = useRef<HTMLDivElement>(null);
   const [ctx, setCtx] = useState(null);
+  const [drawMode, setDrawMode] = useState("firework");
+  const [drawing, setDrawing] = useState(false);
+
+  useEffect(() => {
+    setCtx(() => {
+      console.log("Set ctx");
+      return canvasElem.current.getContext("2d");
+    });
+    const resizeObserver = new ResizeObserver((entries) => {
+      for (let entry of entries) {
+        // console.log(entry.contentBoxSize);
+        const size = entry.contentBoxSize[0];
+        if (size && canvasElem.current) {
+          canvasElem.current.width = size.inlineSize;
+          canvasElem.current.height = size.blockSize;
+          // console.log(`w:${size.inlineSize} h:${size.blockSize}`);
+        }
+      }
+    });
+    resizeObserver.observe(ccElem.current);
+    return () => {
+      // chrome implicitly unobserves when not referenced
+      // resizeObserver.unobserve(ccElem.current as HTMLElement);
+    };
+  }, []);
 
   const proc = { ...props.proc };
   proc.name = proc.name ?? "Atelier";
@@ -159,15 +184,17 @@ export default function Atelier(props) {
     if (!ccElem.current) {
       return;
     }
-    canvasElem.current.width = ccElem.current.offsetWidth;
-    canvasElem.current.height = ccElem.current.offsetHeight;
+    (canvasElem.current as HTMLElement).addEventListener("onload", (e) => {
+      console.log(
+        "Set canvas size : ",
+        ccElem.current.offsetWidth,
+        ", ",
+        ccElem.current.offsetHeight
+      );
+      canvasElem.current.width = (ccElem.current as HTMLElement).offsetWidth;
+      canvasElem.current.height = ccElem.current.offsetHeight;
+    });
   };
-  useEffect(() => {
-    setCtx(canvasElem.current.getContext("2d"));
-    setCanvasSize();
-  }, []);
-  const [drawMode, setDrawMode] = useState("firework");
-  const [drawing, setDrawing] = useState(false);
 
   return (
     <Window {...props} proc={proc}>
@@ -184,6 +211,7 @@ export default function Atelier(props) {
           <button
             onClick={() => {
               setDrawMode("firework");
+              console.log("firework");
             }}
             className={`${styles.btn} ${styles.firework}`}
           >
@@ -193,6 +221,7 @@ export default function Atelier(props) {
             onClick={() => {
               setDrawMode("buildingforest");
               setupBuildingforest();
+              console.log("buildingforest");
             }}
             className={`${styles.btn} ${styles.buildingforest}`}
           >
@@ -204,12 +233,15 @@ export default function Atelier(props) {
             className={`${styles["the-canvas"]}`}
             onMouseMove={(e) => {
               handleMove(e);
+              console.log("move");
             }}
             onMouseDown={(e) => {
               setDrawing(true);
+              console.log("md");
             }}
             onMouseUp={(e) => {
               setDrawing(false);
+              console.log("mu");
             }}
             ref={canvasElem}
           />
