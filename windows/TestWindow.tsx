@@ -62,6 +62,13 @@ export default function TestWindow(props) {
         >
           Load
         </button>
+        <button
+          onClick={(e) => {
+            procmgr.add("testwindow", { parent: proc.id });
+          }}
+        >
+          Child window
+        </button>
       </div>
     </Window>
   );

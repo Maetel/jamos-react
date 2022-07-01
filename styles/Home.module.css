@@ -8,3 +8,29 @@
   width:  100%;
   height: 100%;
 }
+
+@media screen and (max-width: 768px) {
+  .container::after{
+    content:
+    "JamOS does not support phone and tablet PC yet.";
+    position:absolute;
+    font-size:3.8vw;
+    color:#333;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    width:100%;
+    text-align: center;
+    background-color: #dbdbdbaa;
+    height:100%;
+    display:flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .main {
+    position: fixed;
+    width:  100%;
+    height: 100%;
+    /* z-index: -1; */
+  } 
+}

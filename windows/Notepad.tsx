@@ -11,14 +11,26 @@ export default function Notepad(props) {
   proc.name = proc.name || "Notepad";
   const [filePath, setFilePath] = useState("");
   const [textAreaValue, setTextAreaValue] = useState("");
+
   const setFile = (e) => {};
   const loadFile = (e) => {
     //test
+    interface FileModalProps {
+      hint?: string; //file or dir path, okay to be undefined
+      type?: string; // ex) 'dir', 'text', ...
+      extension?: string; // '.txt', '.jpg', ... , regardless of case
+    }
+    const fileProps: FileModalProps = undefined;
+    // JamOS.openFileModal(fileProps);
     setFilePath("~/Text2.txt");
   };
   const saveFile = (e) => {
-    console.log("Save file @" + filePath + ", :", textAreaValue);
-    filemgr.updateFileData(filePath, "text", textAreaValue);
+    if (filePath.length) {
+      console.log("Save file @" + filePath + ", :", textAreaValue);
+      filemgr.updateFileData(filePath, "text", textAreaValue);
+    } else {
+      console.error("Filepath not designated path:", filePath);
+    }
   };
   useEffect(() => {
     if (proc.node) {

@@ -8,8 +8,8 @@ import { ThemeColors } from "../features/settings/Themes";
 import { ToolbarControl } from "../grounds/Toolbar";
 import { clamp, randomId } from "../scripts/utils";
 import styles from "../styles/Window.module.css";
-import Dialogue from "./Dialogue";
 
+const translucentBackground = "55";
 const minHeight = 240;
 const minWidth = 300;
 let pos1 = 0,
@@ -17,81 +17,6 @@ let pos1 = 0,
   pos3 = 0,
   pos4 = 0;
 let maximizeTransition = "0.3s";
-
-interface DialogueProps {
-  type: string; // 'buttons' | '
-  cancel: () => void;
-  rect?: Rect;
-  title?: string;
-  descs?: string[];
-  elem?: JSX.Element;
-  buttons?: string[];
-  callbacks?: ((params) => boolean)[];
-}
-
-function DialogueWindow(props) {
-  const dial: DialogueProps = props.dial;
-  const rect = dial.rect ?? {
-    top: "25%",
-    left: "25%",
-    width: "50%",
-    height: "50%",
-  };
-  const colors: ThemeColors = JamOS.theme().colors;
-
-  const [style, setStyle] = useState((dial?.rect ?? rect) as {});
-
-  const handleKey = (e) => {
-    if (!dial.callbacks && dial.callbacks.length > 0) {
-      return;
-    }
-    // e.preventDefault();
-    switch (e.key) {
-      case "Escape":
-        console.log("Dialogue escape");
-        dial.cancel();
-        // dial.callbacks.at(dial.callbacks.length - 1);
-        break;
-      case "Enter":
-        dial.callbacks.at(0);
-        console.log("Dialogue enter");
-        break;
-      default:
-        break;
-    }
-  };
-  useEffect(() => {
-    window.addEventListener("keydown", handleKey);
-    return () => {
-      window.removeEventListener("keydown", handleKey);
-    };
-  }, [dial]);
-  useEffect(() => {
-    const buildStyle = () => {
-      const initialRect = dial?.rect ?? rect;
-      let retval: {} = { ...initialRect };
-      retval["color"] = colors["1"];
-      retval["backgroundColor"] = colors["2"];
-      retval["boxShadow"] = colors.boxShadow;
-      return retval;
-    };
-    const st = buildStyle();
-    // setStyle(() => st);
-  }, [colors, rect]);
-  return dial ? (
-    <div className={styles.dialogueWindow} style={style}>
-      <div
-        className={styles.dialNav}
-        style={{ backgroundColor: colors["1"], color: colors["2"] }}
-      >
-        <button
-          className={styles.dialCloseBtn}
-          style={{ backgroundColor: colors.error }}
-        ></button>
-      </div>
-    </div>
-  ) : undefined;
-}
 
 export default function Window(props) {
   let _winElem = useRef(null);
@@ -107,6 +32,13 @@ export default function Window(props) {
 
   const procmgr = JamOS.procmgr();
   const proc: Process = { ...props.proc };
+  const {
+    disableBackground,
+    disableDrag,
+    disableMinBtn,
+    disableCloseBtn,
+    disableMaxBtn,
+  } = proc;
   // proc["disableMinBtn"] = true;
   const btnMaxClass = proc["disableMaxBtn"] ? styles.disabled : "";
   const btnMinClass = proc["disableMinBtn"] ? styles.disabled : "";
@@ -225,6 +157,10 @@ export default function Window(props) {
     //   procmgr.set(proc.id, { name: proc.name });
     // }
     procmgr.set(proc.id, { name: proc.name ?? "Application" });
+
+    {
+      // console.log(proc.name, ": disableBackground:", disableBackground);
+    }
   }, []);
   const rectReadable: Rect = get("rect");
   // console.log("rectReadable:", rectReadable);
@@ -233,7 +169,6 @@ export default function Window(props) {
   /*
         'Cannot update a component (`Toolbar`) while rendering a different component (`Toolbar`). To locate the bad setState() call inside `Toolbar`'
         */
-
   useEffect(() => {
     ToolbarControl.RegisterBuilder(proc.id).register(
       proc.name,
@@ -245,29 +180,6 @@ export default function Window(props) {
       { separator: true, order: -1 }
     );
   }, []);
-
-  const closeDial = () => {
-    setDial(null);
-  };
-  //////////////////////////////////// dialogue
-  const initialDial: DialogueProps = {
-    type: "buttons",
-    cancel: closeDial,
-    title: "Dialogue",
-    descs: ["desc1", "desc2"],
-    buttons: ["Okay", "cancel"],
-    callbacks: [
-      (params) => {
-        console.log("Okay");
-        return true;
-      },
-      (params) => {
-        console.log("Cancel");
-        return false;
-      },
-    ],
-  };
-  const [dial, setDial] = useState({ ...initialDial });
 
   //////////////////////////////////// drag events
   function dragMouseDown(e: any) {
@@ -355,15 +267,18 @@ export default function Window(props) {
 
   const [navHovered, setNavHovered] = useState(false);
   const buildNavStyle = () => {
-    return {
-      color: _colors["2"],
-      backgroundColor: _colors["1"],
-    };
+    const retval = {};
+    retval["color"] = _colors["2"];
+    retval["backgroundColor"] = _colors["1"];
+    if (proc.disableDrag) {
+      retval["cursor"] = "auto";
+    }
+    return retval;
   };
   const buildMaxBtnStyle = () => {
     const retval = { backgroundColor: _colors["okay"] };
     if (proc.disableMaxBtn) {
-      // retval["disabled"] = true;
+      retval.backgroundColor = retval.backgroundColor + translucentBackground;
     }
     return retval;
   };
@@ -399,9 +314,21 @@ export default function Window(props) {
   };
 
   const navElemStyle = buildNavStyle();
-  const closeBtnStyle = { backgroundColor: _colors["error"] };
-  const minBtnStyle = { backgroundColor: _colors["warn"] };
-  const maxBtnStyle = buildMaxBtnStyle();
+  const closeBtnStyle = {
+    backgroundColor: disableCloseBtn
+      ? _colors["error"] + translucentBackground
+      : _colors["error"],
+  };
+  const minBtnStyle = {
+    backgroundColor: disableMinBtn
+      ? _colors["warn"] + translucentBackground
+      : _colors["warn"],
+  };
+  const maxBtnStyle = {
+    backgroundColor: disableMaxBtn
+      ? _colors["okay"] + translucentBackground
+      : _colors["okay"],
+  };
 
   const togglegrabbable = () => {
     //watches before transition, so toggle opposite way
@@ -470,6 +397,20 @@ export default function Window(props) {
 
   return (
     <>
+      {disableBackground ? (
+        <div
+          className="disableBackground"
+          style={{
+            position: "absolute",
+            top: "0px",
+            left: "0px",
+            width: "100vw",
+            height: "100vh",
+            backgroundColor: _colors["2"] + "aa",
+            cursor: "not-allowed",
+          }}
+        ></div>
+      ) : undefined}
       <section
         className={`${styles["window-container"]}`}
         id={winId}
@@ -485,7 +426,7 @@ export default function Window(props) {
           id={navId}
           ref={_navElem}
           onMouseDown={(e) => {
-            if (!isMax) {
+            if (!isMax && !disableDrag) {
               dragMouseDown(e);
             }
           }}
@@ -532,7 +473,6 @@ export default function Window(props) {
           {(props as any).children}
         </div>
       </section>
-      {/* {dial ? <Window {...dial}></Window> : undefined} */}
     </>
   );
 }

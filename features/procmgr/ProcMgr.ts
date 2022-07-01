@@ -19,6 +19,8 @@ import {
   openToolbar,
   processesValue,
   pushToLast,
+  selectFront,
+  selectFrontsParent,
   selectGroupedProcs,
   selectIsDockOpen,
   selectIsMinimized,
@@ -26,6 +28,7 @@ import {
   selectProcessById,
   selectProcesses,
   selectProcInIndexOrder,
+  selectProcProp,
   setActiveWindow,
   setProcProps,
   setToolbarItem,
@@ -141,8 +144,14 @@ public psValue(){
     return this;
   }
 
+  public frontsParent(){
+    throw new Error("Not implemented");
+    
+    return useAppSelector(selectFrontsParent);
+  }
+
   public front(){
-    return useAppSelector(selectProcesses)?.find(proc=>proc.zIndex==='0');
+    return useAppSelector(selectFront);
   }
   public isFront(procId:string):boolean{
     return this.front()?.id === procId;
@@ -160,7 +169,8 @@ public psValue(){
   }
   
   public findReadable(procId:string) {
-    return this.procs.find(proc=>proc.id===procId);
+    // return this.procs.find(proc=>proc.id===procId);
+    return useAppSelector(selectProcessById(procId));
   }
 
   public toggleMaximize(procId:string) {
@@ -176,13 +186,9 @@ public psValue(){
     store.dispatch(setProcProps({id:procId, props:props}));
   }
 
-  public get (procId:string, prop:string){
+  public getReadable (procId:string, prop:string){
     // return this.find(procId)[prop];
-    return this.find?.[prop];
-  }
-
-  public getReadable ( procId:string, prop:string){
-    return this.findReadable( procId)?.[prop];
+    return useAppSelector(selectProcProp(procId, prop))
   }
 
   public getToolbarItems ( procId:string):ToolbarItem[] {
