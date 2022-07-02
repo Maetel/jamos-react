@@ -14,7 +14,7 @@ export class ModalCallbacks {
     this.callbacks[procId] = cb;
   }
   static exe(procId: string, params?) {
-    console.log("ModalCallbacks.exe with ", procId, ", params : ", params);
+    // console.log("ModalCallbacks.exe with ", procId, ", params : ", params);
     return this.callbacks[procId]?.(params);
   }
 }
@@ -29,7 +29,7 @@ export interface ModalProps {
 export default function Modal(props) {
   const proc: Process = { ...props.proc };
   const modal: ModalProps = proc.modal;
-  proc.rect = {
+  proc.rect = proc.rect ?? {
     position: "absolute",
     top: "50%",
     left: "50%",
@@ -63,20 +63,16 @@ export default function Modal(props) {
     });
 
     //focus on load
-    if (0) {
-      const btns = document.querySelectorAll(`.${styles.btn}`);
-      if (btns.length > 0) {
-        (btns[0] as HTMLElement)?.focus();
-      }
-    }
+    // const btns = document.querySelectorAll(`.${styles.btn}`);
+    // if (btns.length > 0) {
+    //   (btns[0] as HTMLElement)?.focus();
+    // }
   }, []);
 
   const updateModalResult = (val: string) => {
     procmgr.set(modal.parent, { modalRetval: val });
   };
-
-  const [focusIdx, setFocusIdx] = useState(null);
-  useEffect(() => {}, [focusIdx]);
+  const [focusIdx, setFocusIdx] = useState(modal.buttons ? 0 : null);
 
   const handleKeydown = (e) => {
     // 'Enter' : left button
@@ -85,9 +81,11 @@ export default function Modal(props) {
     // e.preventDefault();
     const keyMap = {
       Enter: () => {
-        // setRes(modal.callbacks.at(0)?.());
-        res = modal.buttons?.at(focusIdx);
-        console.log("Modal focusIdx:", focusIdx, ", res : ", res);
+        const idx = procmgr.getValue(proc.id, "focusIdx");
+        if (idx === undefined) {
+          return;
+        }
+        const res = modal.buttons?.at(idx);
         updateModalResult(res);
         closeThis();
       },
@@ -103,59 +101,26 @@ export default function Modal(props) {
     keyMap[e.key]?.();
   };
 
-  const setFocus = (i: number, prev?: number) => {
-    const btn = modal.buttons?.at(i);
-    if (!btn) {
-      return;
-    }
-    const el: HTMLElement = document.querySelector(`.${styles.btn}.btn${i}`);
-    if (!el) {
-      console.log("setFocus() Button element : ", btn, " not found");
-      return;
-    }
-    el.classList.add("focus");
-    el.focus();
-
-    if (prev !== undefined) {
-      const prevEl: HTMLElement = document.querySelector(
-        `.${styles.btn}.btn${prev}`
-      );
-      if (prevEl) {
-        prevEl.classList.remove("focus");
-      }
-    }
-  };
-  useEffect(() => {
-    setFocusIdx(0);
-  }, []);
   const len = modal.buttons?.length - 1 ?? 1;
   // useEffect(() => {
   //   setFocus(clamp(focusIdx, 0, len));
   // }, [focusIdx]);
+
+  useEffect(() => {
+    procmgr.set(proc.id, { focusIdx: focusIdx });
+  }, [focusIdx]);
 
   const focusLeft = () => {
     setFocusIdx((idx) => {
       if (idx === null) {
         return 0;
       }
-      console.log(
-        "focusLeft Idx : ",
-        idx,
-        ", retval : ",
-        clamp(idx - 1, 0, len)
-      );
       return clamp(idx - 1, 0, len);
     });
   };
 
   const focusRight = () => {
     setFocusIdx((idx) => {
-      console.log(
-        "focusRight Idx : ",
-        idx,
-        ", retval : ",
-        clamp(idx + 1, 0, len)
-      );
       if (idx === null) {
         return 0;
       }
@@ -164,26 +129,16 @@ export default function Modal(props) {
   };
 
   useEffect(() => {
-    //parent must exists
-    if (!proc.parent) {
-      throw new Error("A modal must be opened by a parent process");
-    }
+    (
+      document.querySelector(
+        `.${styles.buttons} .${styles.btn}.btn0`
+      ) as HTMLElement
+    )?.focus();
 
     setTimeout(() => {
       //wait a bit before addEventListener
       window.addEventListener("keydown", handleKeydown);
-    }, 500);
-
-    // setTimeout(() => {
-    //   if (document.activeElement instanceof HTMLElement) {
-    //     document.activeElement.blur();
-    //   }
-    // }, 500);
-    // setTimeout(() => {
-    //   if (modalElem.current) {
-    //     modalElem.current.classList.add("active");
-    //   }
-    // }, 1);
+    }, 300);
 
     return () => {
       window.removeEventListener("keydown", handleKeydown);
@@ -191,22 +146,22 @@ export default function Modal(props) {
   }, []);
 
   const closeThis = () => {
-    console.log("Close this");
     procmgr.kill(proc.id);
   };
 
   const buildButtonStyle = (idx: number) => {
     const retval = {
       color: colors["2"],
-      backgroundColor: colors["1"],
+      backgroundColor: colors["1"] + "99",
+      border: `1px solid ${colors["3"]}99`,
     };
     const isFocused = focusIdx === idx;
     if (isFocused) {
-      retval["boxShadow"] = `1px 1px 5px ${colors["3"]}`;
+      retval["boxShadow"] = `1px 1px 4px ${colors["3"]}`;
       retval["transform"] = "translate(-4px, -4px)";
       retval["border"] = `1px solid ${colors["3"]}`;
-      retval["color"] = colors["1"];
-      retval["backgroundColor"] = colors["2"];
+      retval["color"] = colors["2"];
+      retval["backgroundColor"] = colors["1"];
     }
     return retval;
   };

@@ -186,6 +186,10 @@ public psValue(){
     store.dispatch(setProcProps({id:procId, props:props}));
   }
 
+  public getValue (procId:string, prop:string){
+    return store.getState().proc.procs.find(proc=>proc.id===procId)?.[prop];
+  }
+
   public getReadable (procId:string, prop:string){
     // return this.find(procId)[prop];
     return useAppSelector(selectProcProp(procId, prop))

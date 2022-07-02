@@ -2,15 +2,16 @@
   position:relative;
   width:100%;
   height:100%;
+  
 }
 
 .contents {
   position:absolute;
-  top:5%;
+  top:30px;
   left:5%;
 
   width:90%;
-  height:90%;
+  height:calc(100% - 60px);
   /* height:80%; */
   display:flex;
   flex-direction: column;
@@ -46,10 +47,13 @@
   
 }
 .btn:focus, .btn:hover {
-  transform:translate(-3px, -3px);
+  /* transform:translate(-3px, -3px); */
 }
 
 .btn:active {
-  transform:translate(0px, 0px);
-  transition:0.05s;
+  /* transform:translate(0px, 0px); */
+  /* transition:0.05s; */
+}
+.btn:focus {
+  
 }
