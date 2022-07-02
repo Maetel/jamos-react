@@ -72,6 +72,7 @@ export default function Window(props) {
       if (rect) {
         for (let key in rect) {
           retval[key] = rect[key];
+          // console.log(`rect[${key}]=${rect[key]}`);
         }
       }
       const calcInitLeft = (count: number) => {
@@ -139,6 +140,9 @@ export default function Window(props) {
           "width",
           "height",
           "aspectRatio",
+          "minWidth",
+          "minHeight",
+          "transform",
         ];
         if (_l.includes(key)) {
           nuRect[key] = style[key];

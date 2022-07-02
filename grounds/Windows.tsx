@@ -18,6 +18,7 @@ import JamOS from "../features/JamOS/JamOS";
 import Postman from "../windows/Postman";
 import Atelier from "../windows/Atelier";
 import SimpleAbout from "../windows/SimpleAbout";
+import Modal from "../components/Modal";
 
 const winCmdMap: { [key: string]: (props) => JSX.Element } = {
   testwindow: TestWindow,
@@ -34,6 +35,7 @@ const winCmdMap: { [key: string]: (props) => JSX.Element } = {
   postman: Postman,
   atelier: Atelier,
   simpleabout: SimpleAbout,
+  modal: Modal,
 };
 
 export default function Windows(props) {

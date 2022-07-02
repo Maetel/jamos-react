@@ -17,8 +17,11 @@ export default interface Process {
   toolbar:ToolbarItem[],
   node?:Node,
 
-  children?:string[] // automatically added in procSlice.addProc reducer
+  children?:string[], // automatically added in procSlice.addProc reducer
   parent?:string, //in case this is a child process
+
+  //value input from modal (child) window
+  modalRetval?:string,
 
   //window options
   hideNav?:boolean,
@@ -59,9 +62,10 @@ export const ProcessCommands = [
   "settings",
   "styler",
   "systeminfo",
-
+  
   //for child window
   'simpleabout',
+  "modal",
 
   //daemon/app
   "broom", "savebread", "loadbread", "resetbread",
@@ -85,6 +89,7 @@ export const ProcessCommandsIcons:{} = {
   "settings":"/imgs/settings.svg",
   "styler":"/imgs/styler.svg",
   "systeminfo":"/imgs/chart.svg",
+  "modal":"/imgs/circlequestion.svg",
 };
 
 export interface Rect {

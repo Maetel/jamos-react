@@ -18,6 +18,8 @@ import officialThemes, { themeExists } from "../features/settings/Themes";
 import { ToolbarControl } from "../grounds/Toolbar";
 import JamOS from "../features/JamOS/JamOS";
 import Process from "../features/procmgr/ProcTypes";
+import { ModalCallback, ModalCallbacks, ModalProps } from "../components/Modal";
+import { dirExists } from "../features/file/fileSlice";
 
 const viewMap = {
   PromptTextView: PromptTextView,
@@ -44,6 +46,14 @@ export default function Terminal(props) {
   };
   proc.onFocus = focusOnInput;
   const otherProcs = procmgr.procs;
+  const modalRetval = procmgr.getReadable(proc.id, "modalRetval");
+
+  let onModalChange: (val: string) => void = (val) => {
+    console.log("On modal change value in terminal : ", modalRetval);
+  };
+  useEffect(() => {
+    ModalCallbacks.exe(proc.id, modalRetval);
+  }, [modalRetval]);
 
   /////////////////////////
   const isToolbarOpen = procmgr.isToolbarOpen();
@@ -464,6 +474,15 @@ export default function Terminal(props) {
       }
     }
     switch (cmd) {
+      case "modal":
+        const modal: ModalProps = {
+          parent: proc.id,
+          title: "Save file?",
+          descs: ["Save file?", " You cannot undo this action."],
+          buttons: ["Save", "Don't save", "Cancel"],
+        };
+        procmgr.add("modal", { parent: proc.id, modal: modal });
+        break;
       //   case "atelier":
       // case "markdown":
       // case "broom":
@@ -660,7 +679,33 @@ export default function Terminal(props) {
           addError("No directory! " + mergedFilePath.path);
           return;
         }
-        filemgr.rmdir(mergedFilePath.path);
+
+        const rmdirModal: ModalProps = {
+          parent: proc.id,
+          title: "Remove directory?",
+          descs: [
+            `Remove directory '${mergedFilePath.path}'?`,
+            " You cannot undo this action.",
+          ],
+          buttons: ["Remove", "Cancel"],
+        };
+        procmgr.add("modal", { parent: proc.id, modal: rmdirModal });
+
+        const rmdirModalCallback: ModalCallback = (val) => {
+          console.log("Registered onModalChange, val : ", val);
+          if (val === "Remove") {
+            filemgr.rmdir(mergedFilePath.path);
+            if (!dirExists(mergedFilePath.path)) {
+              addSuccess("rmdir " + mergedFilePath.path);
+            } else {
+              addError("Failed rmdir " + mergedFilePath.path);
+            }
+          } else {
+            addWarn("Canceled rmdir " + mergedFilePath.path);
+          }
+        };
+        ModalCallbacks.register(proc.id, rmdirModalCallback);
+
         // const info = filesInDirectory(filemgr.findDirValue(mergedFilePath));
         // focusout();
         // procmgr.openModal({
