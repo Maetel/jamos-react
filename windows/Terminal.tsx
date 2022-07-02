@@ -845,14 +845,13 @@ export default function Terminal(props) {
           addWarn("cat : path required");
           return;
         }
-        const textpath = Path.join(pwd.path, dest);
-        const f = filemgr.fileValue(textpath.path);
+        const f = filemgr.fileValue(mergedFilePath.path);
         if (!f) {
           addError(`File : '${f.node.path}' does not exist `);
           return;
         }
         if (f.node.type !== "text") {
-          addError(`${textpath.path} is not a text file!`);
+          addError(`${mergedFilePath.path} is not a text file!`);
           return;
         }
         addText((f.data as any)?.text);
@@ -1022,15 +1021,28 @@ export default function Terminal(props) {
           }
 
           if (dirCount + fileCount === 1) {
-            if (dirCount === 1) {
-              tobeset = `${vals.at(0)} ${detachPwd(startsWithsDir.at(0))}/`;
-              return;
-            }
-            if (fileCount === 1) {
-              tobeset = `${vals.at(0)} ${detachPwd(startsWithsFiles.at(0))}`;
-              return;
+            if (0) {
+              if (dirCount === 1) {
+                tobeset = `${vals.at(0)} ${detachPwd(startsWithsDir.at(0))}/`;
+                return;
+              }
+              if (fileCount === 1) {
+                tobeset = `${vals.at(0)} ${detachPwd(startsWithsFiles.at(0))}`;
+                return;
+              }
+            } else {
+              if (dirCount === 1) {
+                vals.at(1).split("/").slice(0).join();
+                tobeset = `${vals.at(0)} ${detachPwd(startsWithsDir.at(0))}/`;
+                return;
+              }
+              if (fileCount === 1) {
+                tobeset = `${vals.at(0)} ${detachPwd(startsWithsFiles.at(0))}`;
+                return;
+              }
             }
           }
+
           // return directory of shortest first if multiple matches, else file shortest path
           if (dirCount + fileCount > 1) {
             if (dirCount > 0) {
