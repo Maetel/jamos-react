@@ -145,19 +145,19 @@ public psValue(){
     return this;
   }
 
-  public openConfirmSave(procId:string, onSave:()=>any, onDontSave:()=>any,  args?: {title?:string,descs?:string[], buttons?:string[], onCancel?:()=>any}){
+  public openConfirmSave(procId:string, onSave:()=>any, onDontSave?:()=>any,  args?: {title?:string,descs?:string[], buttons?:string[], onCancel?:()=>any}){
     let modalProps :ModalProps = {
       parent:procId,
       title:args?.title??'Save?',
       descs:args?.descs??['This action cannot be undone.'],
-      buttons:args?.buttons??['Save', "Don't save", 'Cancel']
+      buttons:args?.buttons?? (onDontSave?['Save', "Don't save", 'Cancel']:['Save', 'Cancel'])
     };
     this.add('modal', {parent:procId, modal:modalProps});
     ModalCallbacks.register(procId, (val)=>{
       if(val==='Save'){
         onSave();
       } else if (val === "Don't save"){
-        onDontSave();
+        onDontSave?.();
       } else {
         args?.onCancel?.();
       }

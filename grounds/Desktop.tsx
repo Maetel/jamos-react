@@ -52,6 +52,7 @@ export default function Desktop(props) {
     filemgr.addFiles(f);
     procmgr.openToolbar();
     procmgr.openDock();
+    JamOS.setNotif("Welcome to JamOS", "system");
     setTimeout(() => {
       procmgr.closeToolbar();
       procmgr.closeDock();

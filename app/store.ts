@@ -4,6 +4,7 @@ import procReducer from '../features/procmgr/procSlice';
 import logReducer from '../features/log/logSlice';
 import fileReducer from '../features/file/fileSlice';
 import settingsReducer from '../features/settings/settingsSlice';
+import osReducer from '../features/JamOS/osSlice';
 
 export function makeStore() {
   return configureStore({
@@ -12,6 +13,7 @@ export function makeStore() {
       log: logReducer,
       file: fileReducer,
       settings: settingsReducer,
+      os: osReducer,
     },
   })
 }

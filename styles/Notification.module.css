@@ -1,0 +1,25 @@
+.container {
+  position:absolute;
+  bottom:5%;
+  right:5%;
+  box-sizing: border-box;
+  padding:8px 14px;
+  border-radius:14px;
+  opacity: 0;
+  transform:translateY(-8px);
+  transition:0.4s;
+  min-width: 40px;
+  min-height:20px;
+  display:flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.active{
+  opacity: 0.98;
+  transform:translateY(0px);
+}
+
+.notif {
+  font-size:1.8rem;
+}

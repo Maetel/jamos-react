@@ -1,7 +1,10 @@
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
+import store from "../../app/store";
 import FileMgr from "../file/FileMgr";
 import ProcMgr from "../procmgr/ProcMgr";
 import SetMgr from "../settings/SetMgr";
 import { Theme } from "../settings/Themes";
+import { Notif, selectNotifDuration, selectNotifs, setNotification } from "./osSlice";
 
 export interface SerializedData {
   proc?:string,
@@ -12,10 +15,24 @@ export interface SerializedData {
 
 
 export default class JamOS {
+  
   public static procmgr() {return ProcMgr.getInstance()};
   public static filemgr() {return FileMgr.getInstance()};
   public static setmgr() {return SetMgr.getInstance()};
   public static theme():Theme { return SetMgr.getInstance().themeReadable();}
+  public static get notifs() {
+    return useAppSelector(selectNotifs);
+  }
+  public static get notifDuration() {
+    return useAppSelector(selectNotifDuration);
+  }
+  public static setNotif(msg:string, type?:'log'|'warn'|'error'|'system'){
+    const notif:Notif = {
+      msg:msg, type:(type??'log')
+    };
+    store.dispatch(setNotification(notif))
+    // useAppDispatch(setNotification(notif));
+  }
 
   public static stringify():string{
     const retval:SerializedData = {

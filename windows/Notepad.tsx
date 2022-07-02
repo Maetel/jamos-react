@@ -28,7 +28,9 @@ export default function Notepad(props) {
   const saveFile = (e) => {
     if (filePath.length) {
       console.log("Save file @" + filePath + ", :", textAreaValue);
-      filemgr.updateFileData(filePath, "text", textAreaValue);
+      JamOS.procmgr().openConfirmSave(proc.id, () => {
+        filemgr.updateFileData(filePath, "text", textAreaValue);
+      });
     } else {
       console.error("Filepath not designated path:", filePath);
     }

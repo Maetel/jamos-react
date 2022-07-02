@@ -711,14 +711,26 @@ export default function Terminal(props) {
                 filemgr.rmdir(mergedFilePath.path);
                 if (!dirExists(mergedFilePath.path)) {
                   addSuccess("rmdir " + mergedFilePath.path);
+                  JamOS.setNotif(
+                    "Removed directory : " + mergedFilePath.path,
+                    "system"
+                  );
                 } else {
                   addError("Failed rmdir " + mergedFilePath.path);
+                  JamOS.setNotif(
+                    "Failed rmdir : " + mergedFilePath.path,
+                    "system"
+                  );
                 }
                 inputElem.current.focus();
               },
               () => {
                 //on "Cancel"
                 addWarn("Canceled rmdir " + mergedFilePath.path);
+                JamOS.setNotif(
+                  "Canceled rmdir : " + mergedFilePath.path,
+                  "warn"
+                );
                 inputElem.current.focus();
               },
             ],

@@ -6,6 +6,7 @@ import Windows from "../grounds/Windows";
 import Toolbar from "../grounds/Toolbar";
 import Dock from "../grounds/Dock";
 import { useState } from "react";
+import Notification from "../grounds/Notification";
 
 const Home: NextPage = () => {
   return (
@@ -16,6 +17,7 @@ const Home: NextPage = () => {
         <Dock></Dock>
         <Desktop></Desktop>
         <Windows></Windows>
+        <Notification></Notification>
       </main>
     </div>
   );
