@@ -1,5 +1,6 @@
 import { useAppSelector } from "../../app/hooks";
 import store from "../../app/store";
+import { ModalCallbacks, ModalProps } from "../../components/Modal";
 import { ToolbarControl } from "../../grounds/Toolbar";
 import Path, { addError } from "../../scripts/Path";
 import {  ToolbarItem } from "../../scripts/ToolbarTypes";
@@ -142,6 +143,62 @@ public psValue(){
     store.dispatch(addProc(proc));
 
     return this;
+  }
+
+  public openConfirmSave(procId:string, onSave:()=>any, onDontSave:()=>any,  args?: {title?:string,descs?:string[], buttons?:string[], onCancel?:()=>any}){
+    let modalProps :ModalProps = {
+      parent:procId,
+      title:args?.title??'Save?',
+      descs:args?.descs??['This action cannot be undone.'],
+      buttons:args?.buttons??['Save', "Don't save", 'Cancel']
+    };
+    this.add('modal', {parent:procId, modal:modalProps});
+    ModalCallbacks.register(procId, (val)=>{
+      if(val==='Save'){
+        onSave();
+      } else if (val === "Don't save"){
+        onDontSave();
+      } else {
+        args?.onCancel?.();
+      }
+    });
+  }
+
+  public openConfirm(procId:string, onConfirm:()=>void,  args?: {title?:string,descs?:string[], buttons?:string[], onCancel?:()=>any}){
+    let modalProps :ModalProps = {
+      parent:procId,
+      title:args?.title??'Confirm?',
+      descs:args?.descs??[],
+      buttons:args?.buttons??['Okay', 'Cancel']
+    };
+    this.add('modal', {parent:procId, modal:modalProps});
+    ModalCallbacks.register(procId, (val)=>{
+      if(val==='Okay'){
+        onConfirm();
+      } else {
+        args?.onCancel?.();
+      }
+    });
+  }
+
+  public openModal(procId:string, args?: {title?:string,descs?:string[], buttons?:string[], callbacks?:(()=>void)[]}){
+    let modalProps :ModalProps = {parent:procId};
+    if(args){
+      modalProps = {...modalProps, ...args};
+    }
+    this.add('modal', {parent:procId, modal:modalProps});
+
+    const callbackMap:{[key:string]:()=>void} = {};
+    if(args?.buttons){
+      args.buttons.forEach((btn,i)=>{
+        if(args?.callbacks?.at(i)){
+          callbackMap[btn] = args.callbacks.at(i);
+        }
+      })
+    }
+    ModalCallbacks.register(procId, (val)=>{
+      callbackMap[val]?.();
+    })
   }
 
   public frontsParent(){

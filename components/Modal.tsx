@@ -37,7 +37,7 @@ export default function Modal(props) {
     height: "300px",
     transform: "translate(-200px, -150px)",
   };
-  proc.name = proc.name ?? modal.title ?? "Confirm";
+  proc.name = proc.name ?? modal.title ?? "";
   proc.disableBackground = true;
   // proc.disableDrag = false;
   proc.hideNav = true;
@@ -91,8 +91,10 @@ export default function Modal(props) {
       },
       Escape: () => {
         // setRes(modal.buttons?.at((modal.buttons?.length ?? 0) - 1));
-        res = modal.buttons?.at(modal.buttons?.length - 1);
-        updateModalResult(res);
+        if (modal.buttons) {
+          res = modal.buttons?.at(modal.buttons?.length - 1);
+          updateModalResult(res);
+        }
         closeThis();
       },
       ArrowLeft: focusLeft,
@@ -171,7 +173,7 @@ export default function Modal(props) {
       <div className={`${styles.container}`} style={{ color: colors["1"] }}>
         {/* <div className={`${styles.background}`} onClick={closeThis} /> */}
         <div className={`${styles.contents}`}>
-          <div className={`${styles.title}`}>{modal.title}</div>
+          <div className={`${styles.title}`}>{modal.title ?? ""}</div>
           {props.children ? (
             props.children
           ) : (

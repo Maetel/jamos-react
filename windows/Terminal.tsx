@@ -81,7 +81,7 @@ export default function Terminal(props) {
       });
   };
   /////////// init setup
-  const inputElem = useRef(null);
+  const inputElem = useRef<HTMLTextAreaElement>(null);
   useEffect(() => {
     focusOnInput();
     registerToolbarCallback();
@@ -474,15 +474,6 @@ export default function Terminal(props) {
       }
     }
     switch (cmd) {
-      case "modal":
-        const modal: ModalProps = {
-          parent: proc.id,
-          title: "Save file?",
-          descs: ["Save file?", " You cannot undo this action."],
-          buttons: ["Save", "Don't save", "Cancel"],
-        };
-        procmgr.add("modal", { parent: proc.id, modal: modal });
-        break;
       //   case "atelier":
       // case "markdown":
       // case "broom":
@@ -680,31 +671,59 @@ export default function Terminal(props) {
           return;
         }
 
-        const rmdirModal: ModalProps = {
-          parent: proc.id,
-          title: "Remove directory?",
-          descs: [
-            `Remove directory '${mergedFilePath.path}'?`,
-            " You cannot undo this action.",
-          ],
-          buttons: ["Remove", "Cancel"],
-        };
-        procmgr.add("modal", { parent: proc.id, modal: rmdirModal });
+        if (0) {
+          const rmdirModal: ModalProps = {
+            parent: proc.id,
+            title: "Remove directory?",
+            descs: [
+              `Remove directory '${mergedFilePath.path}'?`,
+              " You cannot undo this action.",
+            ],
+            buttons: ["Remove", "Cancel"],
+          };
+          procmgr.add("modal", { parent: proc.id, modal: rmdirModal });
 
-        const rmdirModalCallback: ModalCallback = (val) => {
-          console.log("Registered onModalChange, val : ", val);
-          if (val === "Remove") {
-            filemgr.rmdir(mergedFilePath.path);
-            if (!dirExists(mergedFilePath.path)) {
-              addSuccess("rmdir " + mergedFilePath.path);
+          const rmdirModalCallback: ModalCallback = (val) => {
+            console.log("Registered onModalChange, val : ", val);
+            if (val === "Remove") {
+              filemgr.rmdir(mergedFilePath.path);
+              if (!dirExists(mergedFilePath.path)) {
+                addSuccess("rmdir " + mergedFilePath.path);
+              } else {
+                addError("Failed rmdir " + mergedFilePath.path);
+              }
             } else {
-              addError("Failed rmdir " + mergedFilePath.path);
+              addWarn("Canceled rmdir " + mergedFilePath.path);
             }
-          } else {
-            addWarn("Canceled rmdir " + mergedFilePath.path);
-          }
-        };
-        ModalCallbacks.register(proc.id, rmdirModalCallback);
+          };
+          ModalCallbacks.register(proc.id, rmdirModalCallback);
+        } else {
+          procmgr.openModal(proc.id, {
+            title: "Remove directory?",
+            descs: [
+              `Remove directory '${mergedFilePath.path}'?`,
+              " You cannot undo this action.",
+            ],
+            buttons: ["Remove", "Cancel"],
+            callbacks: [
+              () => {
+                //on "Remove"
+                filemgr.rmdir(mergedFilePath.path);
+                if (!dirExists(mergedFilePath.path)) {
+                  addSuccess("rmdir " + mergedFilePath.path);
+                } else {
+                  addError("Failed rmdir " + mergedFilePath.path);
+                }
+                inputElem.current.focus();
+              },
+              () => {
+                //on "Cancel"
+                addWarn("Canceled rmdir " + mergedFilePath.path);
+                inputElem.current.focus();
+              },
+            ],
+          });
+        }
 
         // const info = filesInDirectory(filemgr.findDirValue(mergedFilePath));
         // focusout();
