@@ -6,17 +6,17 @@ import officialThemes, { defaultTheme, ThemeColors } from "./Themes";
 
 export interface SettingsState {
   theme:string,
+  muteAllOptions:boolean,
   saveOnExit:boolean,
   askOnExit:boolean,
-  muteAllOptions:boolean,
   [key:string]:any;
 }
 
 const initialState :SettingsState = {
   theme:"Forest",
+  muteAllOptions:!true,
   saveOnExit:true,
   askOnExit:false,
-  muteAllOptions:true,
 }
 
 const settingsSlice = createSlice({

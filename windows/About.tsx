@@ -21,7 +21,7 @@ export default function About(props) {
   const msgElem = useRef(null);
   const [clicked, setClicked] = useState(false);
   const msg = clicked ? "Copied!" : "Click to copy";
-  const colors = JamOS.theme().colors;
+  const colors = JamOS.theme.colors;
   const color1 = colors["1"];
   const color2 = colors["2"];
 

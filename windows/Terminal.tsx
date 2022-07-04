@@ -34,9 +34,9 @@ interface PromptItem {
 }
 
 export default function Terminal(props) {
-  const procmgr = JamOS.procmgr();
-  const filemgr = JamOS.filemgr();
-  const setmgr = JamOS.setmgr();
+  const procmgr = JamOS.procmgr;
+  const filemgr = JamOS.filemgr;
+  const setmgr = JamOS.setmgr;
   const proc: Process = { ...props.proc };
   proc.name = proc.name ?? `Terminal`;
   // proc.hideNav = true;

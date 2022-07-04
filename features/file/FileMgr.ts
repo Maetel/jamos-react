@@ -37,9 +37,6 @@ export default class FileMgr {
   }
 
   public nodesReadable(dirPath:string):Node[]{
-    if(!dirExists(dirPath)){
-      return undefined;
-    }
     return useAppSelector(selectNodesInDir(dirPath));
   }
 

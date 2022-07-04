@@ -15,7 +15,7 @@ export default function Styler(props) {
         "About",
         () => {
           // ProcMgr.getInstance().kill(proc.id);
-          JamOS.procmgr().add("simpleabout", {
+          JamOS.procmgr.add("simpleabout", {
             aboutProps: {
               title: "About Styler",
               desc: "Change theme as your taste!",
@@ -43,9 +43,9 @@ export default function Styler(props) {
     registerToolbarCallback();
   }, []);
 
-  const setmgr = JamOS.setmgr();
+  const setmgr = JamOS.setmgr;
   const [prevTheme, setPrevTheme] = useState(setmgr.themeValue().name);
-  const clicked = JamOS.theme().name;
+  const clicked = JamOS.theme.name;
   const themes = officialThemes;
   const [intro, setIntro] = useState("Click to Apply!");
 

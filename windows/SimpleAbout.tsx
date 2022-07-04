@@ -36,12 +36,12 @@ export default function SimpleAbout(props) {
   //   proc[key] = abouts[key];
   // }
 
-  const _front = JamOS.procmgr().front();
+  const _front = JamOS.procmgr.front();
   const isFront = _front.id === proc.id;
 
   const handleEscape = (e) => {
     if (e.key === "Escape" && isFront) {
-      JamOS.procmgr().kill(proc.id);
+      JamOS.procmgr.kill(proc.id);
     }
   };
   useEffect(() => {

@@ -35,9 +35,9 @@ export default function FinderIcon(props) {
     setElems();
   }, []);
 
-  const procmgr = JamOS.procmgr();
+  const procmgr = JamOS.procmgr;
   const nodepath: string = props.node.path;
-  const node: Node = JamOS.filemgr().nodeReadable(nodepath);
+  const node: Node = JamOS.filemgr.nodeReadable(nodepath);
   const onClick: (Event) => void =
     props.onClick ??
     function (node: Node) {
@@ -55,7 +55,7 @@ export default function FinderIcon(props) {
     borderRadius: width / 2,
   };
   const [hovered, setHovered] = useState(false);
-  const colors = JamOS.theme().colors;
+  const colors = JamOS.theme.colors;
   const color1 = colors["1"];
   const color2 = colors["2"];
   const color3 = colors["3"];

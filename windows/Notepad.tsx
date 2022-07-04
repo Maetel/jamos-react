@@ -6,7 +6,7 @@ import Process from "../features/procmgr/ProcTypes";
 import styles from "../styles/Notepad.module.css";
 
 export default function Notepad(props) {
-  const filemgr = JamOS.filemgr();
+  const filemgr = JamOS.filemgr;
   const proc: Process = { ...props.proc };
   proc.name = proc.name || "Notepad";
   const [filePath, setFilePath] = useState("");
@@ -28,7 +28,7 @@ export default function Notepad(props) {
   const saveFile = (e) => {
     if (filePath.length) {
       console.log("Save file @" + filePath + ", :", textAreaValue);
-      JamOS.procmgr().openConfirmSave(proc.id, () => {
+      JamOS.procmgr.openConfirmSave(proc.id, () => {
         filemgr.updateFileData(filePath, "text", textAreaValue);
       });
     } else {

@@ -19,7 +19,7 @@ export default function DockIcon(props) {
   const src = getProcessCommandsIcon(type);
 
   let contElem = useRef(null);
-  const procmgr = JamOS.procmgr();
+  const procmgr = JamOS.procmgr;
 
   // if (!node) {
   //   Log.warn("No such file : " + nodepath);
@@ -32,7 +32,7 @@ export default function DockIcon(props) {
     borderRadius: width / 2,
   };
   const [hovered, setHovered] = useState(false);
-  const colors = JamOS.theme().colors;
+  const colors = JamOS.theme.colors;
   const color1 = colors["1"];
   const color2 = colors["2"];
   const color3 = colors["3"];

@@ -30,7 +30,7 @@ export default function Window(props) {
     navElem = document.querySelector(`#${navId}`) as HTMLElement;
   };
 
-  const procmgr = JamOS.procmgr();
+  const procmgr = JamOS.procmgr;
   const proc: Process = { ...props.proc };
   const {
     disableBackground,
@@ -49,7 +49,7 @@ export default function Window(props) {
   // const get = (prop) => procmgr.get(proc.id, prop);
 
   ////////////////// rect / style / theme
-  const _colors = JamOS.theme().colors;
+  const _colors = JamOS.theme.colors;
   const buildStyle = (rect: Rect) => {
     const retval = {};
     // console.log(`Buildstyle from id:${id}, rect : ${JSON.stringify(rect)}`);

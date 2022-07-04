@@ -42,8 +42,8 @@ export default function Modal(props) {
   // proc.disableDrag = false;
   proc.hideNav = true;
 
-  const colors = JamOS.theme().colors;
-  const procmgr = JamOS.procmgr();
+  const colors = JamOS.theme.colors;
+  const procmgr = JamOS.procmgr;
   const modalElem = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

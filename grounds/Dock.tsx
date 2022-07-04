@@ -13,13 +13,13 @@ const DockIconSeparator: DockIconProp = {
 
 export default function Dock(props) {
   const debugMode = !true;
-  const procmgr = JamOS.procmgr();
+  const procmgr = JamOS.procmgr;
   const [isEdge, setIsEdge] = useState(false);
   const [hovered, setHovered] = useState(false);
   const fixed = procmgr.isDockOpen();
   const show: boolean = isEdge || hovered || fixed || debugMode;
   const className = show ? styles.active : "";
-  const colors = JamOS.theme().colors;
+  const colors = JamOS.theme.colors;
   const groups = procmgr.groupedProcs();
   const [items, setItems] = useState([]);
 

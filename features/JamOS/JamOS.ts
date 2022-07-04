@@ -16,10 +16,10 @@ export interface SerializedData {
 
 export default class JamOS {
   
-  public static procmgr() {return ProcMgr.getInstance()};
-  public static filemgr() {return FileMgr.getInstance()};
-  public static setmgr() {return SetMgr.getInstance()};
-  public static theme():Theme { return SetMgr.getInstance().themeReadable();}
+  public static get procmgr() {return ProcMgr.getInstance()};
+  public static get filemgr() {return FileMgr.getInstance()};
+  public static get setmgr() {return SetMgr.getInstance()};
+  public static get theme():Theme { return SetMgr.getInstance().themeReadable();}
   public static get notifs() {
     return useAppSelector(selectNotifs);
   }

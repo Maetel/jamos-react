@@ -5,8 +5,8 @@ import JamOS from "../features/JamOS/JamOS";
 import Process from "../features/procmgr/ProcTypes";
 
 export default function TestWindow(props) {
-  const procmgr = JamOS.procmgr();
-  const filemgr = JamOS.filemgr();
+  const procmgr = JamOS.procmgr;
+  const filemgr = JamOS.filemgr;
   const proc: Process = { ...props.proc };
   proc.name = proc.name ?? "Test Window";
 

@@ -21,7 +21,7 @@ export default function Browser(props) {
   const refreshPage = (e) => {};
   const contentLoaded = (e) => {
     setIsLoading(false);
-    JamOS.procmgr().toggleMaximize(proc.id);
+    JamOS.procmgr.toggleMaximize(proc.id);
   };
   const [isLoading, setIsLoading] = useState(true);
   const barHeight = "40px";

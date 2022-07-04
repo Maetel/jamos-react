@@ -39,6 +39,9 @@ export default interface Process {
 }
 
 export const ProcessCommands = [
+  //system
+  'bootloader',
+
   //test purpose
   "testwindow",
 

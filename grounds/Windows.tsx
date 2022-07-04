@@ -19,6 +19,7 @@ import Postman from "../windows/Postman";
 import Atelier from "../windows/Atelier";
 import SimpleAbout from "../windows/SimpleAbout";
 import Modal from "../components/Modal";
+import BootLoader from "./BootLoader";
 
 const winCmdMap: { [key: string]: (props) => JSX.Element } = {
   testwindow: TestWindow,
@@ -36,10 +37,11 @@ const winCmdMap: { [key: string]: (props) => JSX.Element } = {
   atelier: Atelier,
   simpleabout: SimpleAbout,
   modal: Modal,
+  bootloader: BootLoader,
 };
 
 export default function Windows(props) {
-  const procmgr = JamOS.procmgr();
+  const procmgr = JamOS.procmgr;
   const processes = procmgr.procsInOrder;
 
   return (

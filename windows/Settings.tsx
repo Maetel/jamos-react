@@ -5,9 +5,9 @@ import SetMgr, { settingDescription } from "../features/settings/SetMgr";
 import styles from "../styles/Settings.module.css";
 
 export default function Settings(props) {
-  const setmgr = JamOS.setmgr();
+  const setmgr = JamOS.setmgr;
   const settings = setmgr.getAllReadable();
-  const colors = JamOS.theme().colors;
+  const colors = JamOS.theme.colors;
 
   const proc = { ...props.proc };
   proc.name = proc.name ?? "Settings";
@@ -51,6 +51,7 @@ export default function Settings(props) {
               className={`${styles.btn} ${styles.save}`}
               onClick={() => {
                 saveBread();
+                JamOS.setNotif("Saved", "system");
               }}
             >
               Save
@@ -59,6 +60,7 @@ export default function Settings(props) {
               className={`${styles.btn} ${styles.load}`}
               onClick={() => {
                 loadBread();
+                JamOS.setNotif("Loaded", "system");
               }}
             >
               Load

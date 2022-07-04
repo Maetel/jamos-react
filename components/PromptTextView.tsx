@@ -26,7 +26,7 @@ const styles = {
 export default function PromptTextView(props) {
   const TextElem = (props) => {
     const text = props.text;
-    const theme = JamOS.theme();
+    const theme = JamOS.theme;
     const _colors = theme.colors;
     const textColor = () => {
       let retval = _colors["1"];

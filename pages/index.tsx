@@ -5,10 +5,15 @@ import Desktop from "../grounds/Desktop";
 import Windows from "../grounds/Windows";
 import Toolbar from "../grounds/Toolbar";
 import Dock from "../grounds/Dock";
-import { useState } from "react";
 import Notification from "../grounds/Notification";
+import { useEffect } from "react";
+import JamOS from "../features/JamOS/JamOS";
 
 const Home: NextPage = () => {
+  useEffect(() => {
+    JamOS.procmgr.add("bootloader");
+  }, []);
+
   return (
     <div className={styles.container}>
       <Meta></Meta>

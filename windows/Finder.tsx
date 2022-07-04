@@ -49,8 +49,8 @@ export default function Finder(props) {
     );
   }, [currentPath]);
 
-  const procmgr = JamOS.procmgr();
-  const filemgr = JamOS.filemgr();
+  const procmgr = JamOS.procmgr;
+  const filemgr = JamOS.filemgr;
 
   ////////////// browse back and forth
   const nodes = filemgr.nodesReadable(currentPath);

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useEffect } from "react";
 import FinderIcon from "../components/FinderIcon";
 import { File } from "../features/file/FileTypes";
@@ -6,110 +6,13 @@ import { File } from "../features/file/FileTypes";
 import styles from "../styles/Desktop.module.css";
 import JamOS from "../features/JamOS/JamOS";
 
-let initted = false;
 const backgroundImg = "/imgs/wall2.jpg";
 const broomImg = "/imgs/broom.svg";
 
 export default function Desktop(props) {
-  const procmgr = JamOS.procmgr();
-  const filemgr = JamOS.filemgr();
-  const setmgr = JamOS.setmgr();
-  const saveOnExit = setmgr.getReadable("saveOnExit");
-  const askOnExit = setmgr.getReadable("askOnExit");
-  const muteOptions = setmgr.getReadable("muteAllOptions");
+  const homeNodes = JamOS.filemgr.nodesReadable("~");
 
-  const init = () => {
-    procmgr.add("terminal");
-    // procmgr.add("testwindow");
-    filemgr.mkdir("~/deep/deeeeeep/directory");
-    const f: File[] = [
-      filemgr.makeFile("~/AppStore", "appstore"),
-      // filemgr.makeFile("~/Logger", "logger"),
-      // filemgr.makeFile("~/Terminal", "terminal"),
-      // filemgr.makeFile("~/System Info", "systeminfo"),
-      // filemgr.makeFile("~/Settings", "settings"),
-      // filemgr.makeFile("~/Postman", "postman"),
-      // filemgr.makeFile("~/Atelier", "atelier"),
-      // filemgr.makeFile("~/Tester", "testwindow"),
-      // filemgr.makeFile("~/Styler", "styler"),
-
-      filemgr.makeFile("~/Sample text1.txt", "text", {
-        data: { text: "This is a sample text1." },
-      }),
-      // filemgr.makeFile("~/Text2.txt", "text", {
-      //   data: { text: "This is a sample text2." },
-      // }),
-      filemgr.makeFile("~/Portfolio/Clips/1. Intro", "browser", {
-        iconPath: "/imgs/jamos.png",
-        exeCmd: "browser https://www.youtube.com/embed/8CfT8yN5tgw",
-      }),
-      filemgr.makeFile("~/Portfolio/Career description", "browser", {
-        iconPath: "/imgs/career.svg",
-        exeCmd:
-          "browser https://v1.embednotion.com/embed/9091c7d511f941b387d3064690d4d2dd",
-      }),
-    ];
-    filemgr.addFiles(f);
-    procmgr.openToolbar();
-    procmgr.openDock();
-    JamOS.setNotif("Welcome to JamOS", "system");
-    setTimeout(() => {
-      procmgr.closeToolbar();
-      procmgr.closeDock();
-    }, 1500);
-  };
-
-  useEffect(() => {
-    if (muteOptions) {
-      if (!initted) {
-        init();
-        initted = true;
-      }
-      return;
-    }
-    const d = JamOS.loadData("breadData");
-    if (d && true) {
-      JamOS.loadFromString(d);
-    } else {
-      if (!initted) {
-        init();
-        initted = true;
-      }
-    }
-  }, []);
-
-  let beforeUnloadFunc;
-  useEffect(() => {
-    if (muteOptions) {
-      return;
-    }
-
-    console.log(
-      `Update option. saveOnExit:${saveOnExit}, askOnExit:${askOnExit}`
-    );
-    const f = (e) => {
-      if (saveOnExit) {
-        JamOS.saveData("breadData", JamOS.stringify());
-        console.log("Save on exit");
-        debugger;
-      }
-      if (askOnExit) {
-        e.preventDefault();
-        e.returnValue = "";
-        console.log("Ask on exit");
-      }
-    };
-    if (beforeUnloadFunc) {
-      window.removeEventListener("beforeunload", beforeUnloadFunc);
-    } else {
-    }
-    beforeUnloadFunc = f;
-    window.addEventListener("beforeunload", f);
-  }, [saveOnExit, askOnExit, muteOptions]);
-
-  const homeNodes = JamOS.filemgr().nodesReadable("~");
-
-  const _colors = JamOS.theme().colors;
+  const _colors = JamOS.theme.colors;
 
   return (
     <div id="desktop" className={styles.container}>

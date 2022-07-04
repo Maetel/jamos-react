@@ -6,12 +6,12 @@ import styles from "../styles/AppStoreIcon.module.css";
 
 export default function AppStoreIcon(props) {
   const file: File = props.file;
-  const filemgr = JamOS.filemgr();
+  const filemgr = JamOS.filemgr;
   let updateExists = () => {
     return filemgr.fileExists(file.node.path);
   };
   const [exists, setExists] = useState(updateExists());
-  const _colors = JamOS.theme().colors;
+  const _colors = JamOS.theme.colors;
 
   const onClick = (e) => {
     if (filemgr.fileExists(file.node.path)) {

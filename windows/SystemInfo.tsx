@@ -7,10 +7,10 @@ import Process from "../features/procmgr/ProcTypes";
 import styles from "../styles/SystemInfo.module.css";
 
 export default function SystemInfo(props) {
-  const procmgr = JamOS.procmgr();
+  const procmgr = JamOS.procmgr;
   const proc: Process = { ...props.proc };
   proc.name = proc.name ?? "System Info";
-  const colors = JamOS.theme().colors;
+  const colors = JamOS.theme.colors;
 
   const procs = procmgr.procs;
 

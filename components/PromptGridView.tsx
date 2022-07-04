@@ -10,7 +10,7 @@ export interface PromptFileViewGroup {
 }
 
 export default function PromptGridView(props) {
-  const theme = JamOS.theme();
+  const theme = JamOS.theme;
   const _colors = theme.colors;
   const buildColor = (type, color?: string, bgColor?: string) => {
     const retval = {
@@ -54,7 +54,7 @@ export default function PromptGridView(props) {
                         // console.log("Cmds/j : ", group.cmds, ", ", j);
                         // console.log("Cmd : ", group.cmds?.at(j));
                         if (group.cmds?.at(j)) {
-                          JamOS.procmgr().exeCmd(group.cmds.at(j));
+                          JamOS.procmgr.exeCmd(group.cmds.at(j));
                         }
                       }}
                       style={{

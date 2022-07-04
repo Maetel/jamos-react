@@ -112,7 +112,7 @@ public psValue(){
         break;
         case "styler":
           const style = _cmds.slice(1).join(" ");
-          JamOS.setmgr().setTheme(style);
+          JamOS.setmgr.setTheme(style);
         // this.add(cmd, { style: style, ...args });
         break;
       default:

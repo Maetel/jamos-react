@@ -9,7 +9,7 @@ export default function Notification(props) {
   const [lastNotifIdx, setLastNotifIdx] = useState<number>(null);
   const [lastNotif, setLastNotif] = useState<Notif>(null);
   const [show, setShow] = useState(false);
-  const colors = JamOS.theme().colors;
+  const colors = JamOS.theme.colors;
   const buildNotifStyle = (type) => {
     switch (type) {
       case "warn":
