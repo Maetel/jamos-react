@@ -180,29 +180,31 @@ export default function Terminal(props) {
       // 0. this?
       // 1. id
       // 2. name
-      // 3. type = windowed || deamon
+      // 3. type = window | deamon | system
       // 4. window z index
-      // 5. if based on file, file path
+      // 5. icon path
+      // 6. if based on file, file path
       const retval = [
         p.id === proc.id ? ">" : "",
         p.id,
         p.name,
-        p.isDaemon ? "daemon" : "window",
-        p.zIndex,
-        "",
+        p.type,
+        p.type === "window" ? p.zIndex : "-",
+        p.icon,
+        p.node?.path ?? "-",
       ];
 
-      if (p.node) {
-        retval[5] = p.node.path;
-      }
+      // if (p.node) {
+      //   retval[5] = p.node.path;
+      // }
       return retval;
     });
     const psData: TableData = {
       desc: "- Process List",
       // firstColumnColor: _colors["okay"],
-      heads: ["This", "ID", "Name", "Type", "Index", "File path"],
+      heads: ["This", "ID", "Name", "Type", "Index", "Icon", "File path"],
       rows: data,
-      weights: [2, 1, 4, 4, 2, 5],
+      weights: [2, 2, 5, 2, 2, 5, 5],
     };
     const processItem: PromptItem = {
       comp: "PromptTableView",
@@ -606,15 +608,14 @@ export default function Terminal(props) {
           addWarn("No process id found : " + merged);
           break;
         }
+        const name = procToKill.name;
         if (procToKill.type === "system") {
           addError(
-            "System process cannot be killed : " +
-              procToKill.type +
-              " is system process."
+            `System process cannot be killed : [${name}] is system process`
           );
         }
         procmgr.kill(merged);
-        addSuccess(`Process killed : [${merged}] ${name}`);
+        addSuccess(`Process id ${merged} killed : ${name}`);
         break;
       case "killall":
         procmgr.killAll(proc.id);

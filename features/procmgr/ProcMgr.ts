@@ -225,6 +225,12 @@ public psValue(){
     ModalCallbacks.register(procId, (val)=>{
       callbackMap[val]?.();
     })
+
+    if(args?.buttons?.length !== args?.callbacks?.length){
+      console.warn("openModal : button and callback count do not match. ")
+      console.warn(' - args?.buttons?.length : ',args?.buttons?.length)
+      console.warn(' - args?.callbacks?.length : ',args?.callbacks?.length);
+    }
   }
 
   public frontsParent(){
