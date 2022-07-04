@@ -19,7 +19,7 @@ import Postman from "../windows/Postman";
 import Atelier from "../windows/Atelier";
 import SimpleAbout from "../windows/SimpleAbout";
 import Modal from "../components/Modal";
-import BootLoader from "./BootLoader";
+import System from "./System";
 
 const winCmdMap: { [key: string]: (props) => JSX.Element } = {
   testwindow: TestWindow,
@@ -37,7 +37,7 @@ const winCmdMap: { [key: string]: (props) => JSX.Element } = {
   atelier: Atelier,
   simpleabout: SimpleAbout,
   modal: Modal,
-  bootloader: BootLoader,
+  system: System,
 };
 
 export default function Windows(props) {

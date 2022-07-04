@@ -54,11 +54,6 @@ export default function AppStore(props) {
     },
     {
       id: fetchAndIncrementId(),
-      file: makeFile("~/Broom", "broom"),
-      show: true,
-    },
-    {
-      id: fetchAndIncrementId(),
       file: makeFile("~/Postman", "postman"),
       show: true,
     },

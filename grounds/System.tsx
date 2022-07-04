@@ -1,7 +1,8 @@
 import JamOS from "../features/JamOS/JamOS";
 import { File } from "../features/file/FileTypes";
 import { useEffect, useState } from "react";
-import Window from "../components/Window";
+import Process from "../features/procmgr/ProcTypes";
+import Daemon from "../components/Daemon";
 
 let initted = false;
 let loadOnce = false;
@@ -10,17 +11,8 @@ export class BootMgr {
   public static reinit() {}
 }
 
-export default function BootLoader(props) {
-  const proc = { ...props.proc };
-  proc.name = "BootLoader";
-  proc.rect = {
-    top: 0,
-    left: 0,
-    width: 0,
-    height: 0,
-    minWidth: 0,
-    minHeight: 0,
-  };
+export default function System(props) {
+  const proc: Process = { ...props.proc };
 
   const procmgr = JamOS.procmgr;
   const filemgr = JamOS.filemgr;
@@ -28,7 +20,6 @@ export default function BootLoader(props) {
   const saveOnExit = setmgr.getReadable("saveOnExit");
   const askOnExit = setmgr.getReadable("askOnExit");
   const muteOptions = setmgr.getReadable("muteAllOptions");
-  const reinit = BootMgr.reinit();
 
   const init = () => {
     procmgr.add("terminal");
@@ -71,8 +62,6 @@ export default function BootLoader(props) {
     }, 1500);
   };
 
-  useEffect(() => {}, []);
-
   useEffect(() => {
     if (muteOptions) {
       if (!initted) {
@@ -82,7 +71,8 @@ export default function BootLoader(props) {
       return;
     }
     const d = JamOS.loadData("breadData");
-    if (d && !true) {
+    const initAnywaysForDebug = !true;
+    if (d && initAnywaysForDebug) {
       JamOS.loadFromString(d);
       JamOS.setNotif("Loading finished!");
     } else {
@@ -132,17 +122,22 @@ export default function BootLoader(props) {
       f = (e) => {};
     }
     if (beforeUnloadFunc) {
-      console.log("Option changed. beforeUnloadFunc:", beforeUnloadFunc);
+      // console.log("Option changed. beforeUnloadFunc:", beforeUnloadFunc);
       window.removeEventListener("beforeunload", beforeUnloadFunc);
     } else {
     }
     {
-      console.log("Set before :", f);
+      // console.log("Set before :", f);
       setBefore(() => f);
     }
     // beforeUnloadFunc = f;
     window.addEventListener("beforeunload", f);
+
+    if (0) {
+      console.log("Save on option change");
+      JamOS.saveData("breadData", JamOS.stringify());
+    }
   }, [saveOnExit, askOnExit, muteOptions]);
 
-  return <Window {...props} proc={proc}></Window>;
+  return <Daemon {...props} proc={proc}></Daemon>;
 }

@@ -11,7 +11,7 @@ import JamOS from "../features/JamOS/JamOS";
 
 const Home: NextPage = () => {
   useEffect(() => {
-    JamOS.procmgr.add("bootloader");
+    JamOS.procmgr.bootload();
   }, []);
 
   return (

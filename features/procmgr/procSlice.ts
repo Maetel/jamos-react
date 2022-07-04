@@ -4,7 +4,7 @@ import store from '../../app/store';
 import {  ToolbarItem, ToolbarItemId } from '../../scripts/ToolbarTypes';
 
 
-import Process, { ProcessCommands, Rect } from "./ProcTypes";
+import Process, { ProcessCommands, Rect, runOnce, TotalCommands } from "./ProcTypes";
 
 
 export interface ProcState {
@@ -19,14 +19,43 @@ const initialState: ProcState = {
   openDock:false,
 }
 
+//set children active recursively
+const _setActiveWindow = (state, id:string)=>{
+  const proc = state.procs.find(proc=>proc.id===id)
+  if(!proc){
+    return;
+  }
+  const axis = parseInt(proc.zIndex);
+  state.procs.forEach(proc=>{
+    const idx = parseInt(proc.zIndex);
+    if(idx < axis){
+      proc.zIndex = ''+(idx+1);
+    }
+  })
+  proc.zIndex = '0';
+  proc.children?.forEach(child=>{_setActiveWindow(state, child)})
+}
+
 export const procSlice = createSlice({
   name:'proc',
   initialState,
   reducers:{
     addProc:(state, action:PayloadAction<Process>)=>{
-      if(!ProcessCommands.includes(action.payload.comp)){
+      if(!TotalCommands.includes(action.payload.comp)){
         console.error('no such app : ',action.payload.comp)
         return;
+      }
+
+      //filter run-onces
+      {
+        const comp = action.payload.comp;
+        if(runOnce.includes(comp)){
+          const alreadyRunning = state.procs.find(proc=>proc.comp===comp);
+          if(alreadyRunning){
+            _setActiveWindow(state, alreadyRunning.id)
+            return;
+          }
+        }
       }
 
       const actionId = action.payload.id;
@@ -35,6 +64,8 @@ export const procSlice = createSlice({
         throw new Error("Same id process found error. Requested id : " + actionId + ', Existing ids : '+ state.procs.map(proc=>proc.id).join(', '));
       }
       
+      
+
       //if is a child proc
       const parentId = action.payload.parent;
       if(parentId){
@@ -64,15 +95,17 @@ export const procSlice = createSlice({
         found.children?.forEach(childProcId=>{
           _killProc(childProcId);
         })
+
         state.procs = state.procs.filter(proc=>proc.id!==id);
       }
       const inputId = action.payload;
       const found = state.procs.find(proc=>proc.id===inputId);
-      if(!found){
+      if(!found || found.comp==='system'){
         return;
       }
 
       _killProc(inputId);
+
       //squeez index
       state.procs = [...state.procs].sort((l,r)=>parseInt(l.zIndex)-parseInt(r.zIndex)).map((proc, i)=>({...proc, zIndex:''+i}));
 
@@ -81,7 +114,8 @@ export const procSlice = createSlice({
       if(action.payload){
         // console.warn(`Process [${action.payload}] called kill all processes.`)
       }
-      state.procs = [];
+      //kill all excluding system
+      state.procs = state.procs.filter(proc=>proc.comp==='system');
     },
 
     increaseIndices:(state, action:PayloadAction<null>)=>{
@@ -134,25 +168,7 @@ export const procSlice = createSlice({
       if(state.procs.find(proc=>proc.id===action.payload)?.zIndex==='0'){
         return;
       }
-
-
-      //set children active recursively
-      const _setActiveWindow = (id:string)=>{
-        const proc = state.procs.find(proc=>proc.id===id)
-        if(!proc){
-          return;
-        }
-        const axis = parseInt(proc.zIndex);
-        state.procs.forEach(proc=>{
-          const idx = parseInt(proc.zIndex);
-          if(idx < axis){
-            proc.zIndex = ''+(idx+1);
-          }
-        })
-        proc.zIndex = '0';
-        proc.children?.forEach(child=>{_setActiveWindow(child)})
-      }
-      _setActiveWindow(action.payload);
+      _setActiveWindow(state,action.payload);
     },
     
     unMinimize:(state, action:PayloadAction<string>)=>{
@@ -301,7 +317,6 @@ export const processesValue = ():Process[]=>{
   return [...store.getState().proc.procs];
 }
 export const selectGroupedProcs = (state:AppState)=>{
-
   const procs:Process[] = state.proc.procs;
     const grouped:{[key:string]:Process[]} = procs.reduce((prev,proc)=>{
       if(!prev[proc.comp]) {
@@ -315,10 +330,30 @@ export const selectGroupedProcs = (state:AppState)=>{
     for(let key in grouped){
       grouped[key].sort((l,r)=>{return parseInt(l.zIndex) - parseInt(r.zIndex)})
     }
-
     return grouped;
-
 }
+export const selectGroupedProcsForDock = (state:AppState)=>{
+  const procs:Process[] = state.proc.procs;
+    const grouped:{[key:string]:Process[]} = procs.reduce((prev,proc)=>{
+      if(proc.hideOnDock){
+        // console.log("hideOnDock:",proc.comp);
+        return prev;
+      }
+      if(!prev[proc.comp]) {
+        prev[proc.comp] = [];
+      }
+      prev[proc.comp].push(proc)
+      return prev;
+    },{});
+
+    //sort
+    for(let key in grouped){
+      grouped[key].sort((l,r)=>{return parseInt(l.zIndex) - parseInt(r.zIndex)})
+    }
+    // console.log("selectGroupedProcsForDock, grouped:",grouped);
+    return grouped;
+}
+
 export const selectIsMinimized = (procId:String)=>(state:AppState)=>{
   return state.proc.procs.find(proc=>proc.id===procId)?.isMinimized
 }

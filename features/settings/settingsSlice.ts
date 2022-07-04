@@ -20,7 +20,7 @@ const initialState :SettingsState = {
 }
 
 const settingsSlice = createSlice({
-  name:'log',
+  name:'settings',
   initialState,
   reducers:{
    

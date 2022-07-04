@@ -23,6 +23,7 @@ import {
   selectFront,
   selectFrontsParent,
   selectGroupedProcs,
+  selectGroupedProcsForDock,
   selectIsDockOpen,
   selectIsMinimized,
   selectIsToolbarOpen,
@@ -39,7 +40,7 @@ import {
   toggleToolbar,
   unMinimize,
 } from "./procSlice";
-import Process, { ProcessCommands } from "./ProcTypes";
+import Process, { ProcessCommand, ProcessCommands, _ProcessCommands } from "./ProcTypes";
 
 
 export default class ProcMgr{
@@ -120,6 +121,24 @@ public psValue(){
     }
   }
 
+  public bootload(){
+    this._prepareNewWindow();
+    const proc:Process ={
+      id:'system',
+      comp:'system',
+      name:'JamOS System Manager', //okay to be undefined
+      zIndex:'0',
+      toolbar:[],
+      hideOnDock:true,
+    }
+    const byDefault:ProcessCommand = _ProcessCommands.find(proc=>proc.comp==='system');
+    byDefault.icon = byDefault.icon ?? "/imgs/icon-default.svg";
+    byDefault.runOnce = byDefault.runOnce ?? false;
+    byDefault.type = byDefault.type ?? 'window';
+    Object.assign(proc, byDefault)
+    store.dispatch(addProc(proc));
+  }
+
   public add(procType:string, args:{}={}){
 
     if(!ProcessCommands.includes(procType)){
@@ -139,6 +158,13 @@ public psValue(){
       toolbar:[],
       ...args //override by args
     }
+
+    //by default
+    const byDefault:ProcessCommand = _ProcessCommands.find(proc=>proc.comp===procType);
+    byDefault.icon = byDefault.icon ?? "/imgs/icon-default.svg";
+    byDefault.runOnce = byDefault.runOnce ?? false;
+    byDefault.type = byDefault.type ?? 'window';
+    Object.assign(proc, byDefault)
     
     store.dispatch(addProc(proc));
 
@@ -304,6 +330,9 @@ public psValue(){
 
   public groupedProcs():{[key:string]:Process[]}{
     return useAppSelector(selectGroupedProcs);
+  }
+  public groupedProcsForDock():{[key:string]:Process[]}{
+    return useAppSelector(selectGroupedProcsForDock);
   }
 
   public stringify():string{

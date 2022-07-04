@@ -20,7 +20,8 @@ export default function Dock(props) {
   const show: boolean = isEdge || hovered || fixed || debugMode;
   const className = show ? styles.active : "";
   const colors = JamOS.theme.colors;
-  const groups = procmgr.groupedProcs();
+  // const groups = procmgr.groupedProcs();
+  const groups = procmgr.groupedProcsForDock();
   const [items, setItems] = useState([]);
 
   const initialItems: DockIconProp[] = [
@@ -66,19 +67,11 @@ export default function Dock(props) {
     let keys = 0;
     for (let key in groups) {
       // console.log(` - ${key} : ${groups[key].length}`);
+      // console.log(` - groups[${key}]=`, groups[key].at(0)?.comp);
       keys++;
     }
     const setInitialItems = keys === 0;
 
-    // setItems(initialItems);
-    /////// build groups
-    // for (let key in groups) {
-    //   console.log("groups.key : ", key);
-    // }
-    // setItems((items: DockIconProp[]) => {
-    //   //
-    // return;
-    // console.log("1");
     setItems((items: DockIconProp[]) => {
       if (setInitialItems) {
         return [...initialItems];
@@ -137,7 +130,6 @@ export default function Dock(props) {
 
       return items;
     });
-    return;
   }, [groups]);
 
   const buildContainerStyle = () => {

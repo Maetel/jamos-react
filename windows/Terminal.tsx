@@ -601,13 +601,19 @@ export default function Terminal(props) {
       //   addText("Fetched data : " + JSON.stringify(res));
       //   break;
       case "kill":
-        if (!procmgr.psValue().some((proc) => proc.id === merged)) {
+        const procToKill = procmgr.psValue().find((proc) => proc.id === merged);
+        if (!procToKill) {
           addWarn("No process id found : " + merged);
           break;
         }
+        if (procToKill.type === "system") {
+          addError(
+            "System process cannot be killed : " +
+              procToKill.type +
+              " is system process."
+          );
+        }
         procmgr.kill(merged);
-        const name =
-          otherProcs.find((_proc) => _proc.id === merged)?.name ?? "";
         addSuccess(`Process killed : [${merged}] ${name}`);
         break;
       case "killall":
