@@ -154,7 +154,7 @@ public psValue(){
       comp:procType,
       name:args['name'], //okay to be undefined
       zIndex:'0',
-      resize:'both',
+      // resize:'both',
       toolbar:[],
       ...args //override by args
     }

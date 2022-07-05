@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { useState } from "react";
 import { File } from "../features/file/FileTypes";
 import JamOS from "../features/JamOS/JamOS";
@@ -28,14 +29,14 @@ export default function AppStoreIcon(props) {
       <div className={`${styles.item}`} onClick={onClick}>
         <span className={`${styles["icon-container"]}`}>
           {exists ? (
-            <img
+            <Image
               src="/imgs/circlecheck.svg"
               alt="App installed on desktop"
               className={`${styles.icon}`}
               style={{ backgroundColor: `${_colors["okay"]}aa` }}
             />
           ) : (
-            <img
+            <Image
               src="/imgs/circledash.svg"
               alt="App not installed"
               className={`${styles.icon}`}
@@ -44,8 +45,8 @@ export default function AppStoreIcon(props) {
           )}
         </span>
 
-        <div className={`${styles["img-container"]}`}>
-          <img
+        <div className={`${styles["Image-container"]}`}>
+          <Image
             className={`${styles.icon}`}
             src={file.node.iconPath}
             alt={file.node.path}

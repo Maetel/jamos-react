@@ -36,6 +36,7 @@ export default interface Process {
   disableMaxBtn?:boolean,
   isMinimized?:boolean,
   isMaximized?:boolean,
+  resize? : 'both' | 'none',
 
   [key:string]:any
 }
@@ -64,13 +65,13 @@ export const _ProcessCommands:ProcessCommand[] = [
   {comp:"system", icon:"/imgs/bootloader.svg", runOnce:true, type:'system'},
   {comp:"dir", icon:"/imgs/dir.svg", type:'system'},
   {comp:"text", icon:"/imgs/text.svg", type:'system'},
-
   
-  {comp:"notepad", icon:"/imgs/notepad.svg"},
   {comp:"testwindow"},
-  {comp:"viewer", },
+  {comp:"viewer", icon:"/imgs/viewer.svg"},
   {comp:"editor", },
   {comp:"browser",},
+  {comp:"viewer"},
+  {comp:"notepad", icon:"/imgs/notepad.svg"},
   {comp:"terminal", icon:"/imgs/terminal.svg"},
   {comp:"logger", icon:"/imgs/logger.svg", runOnce:true},
   {comp:"finder", icon:"/imgs/finder.svg"},

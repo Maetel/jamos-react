@@ -27,6 +27,7 @@ export default function System(props) {
     filemgr.mkdir("~/deep/deeeeeep/directory");
     const f: File[] = [
       filemgr.makeFile("~/AppStore", "appstore"),
+      filemgr.makeFile("~/Viewer", "viewer"),
       // filemgr.makeFile("~/Logger", "logger"),
       // filemgr.makeFile("~/Terminal", "terminal"),
       // filemgr.makeFile("~/System Info", "systeminfo"),
@@ -35,6 +36,10 @@ export default function System(props) {
       // filemgr.makeFile("~/Atelier", "atelier"),
       // filemgr.makeFile("~/Tester", "testwindow"),
       // filemgr.makeFile("~/Styler", "styler"),
+
+      filemgr.makeFile("~/Profile.jpg", "image", {
+        data: { src: "/imgs/profile.jpg" },
+      }),
 
       filemgr.makeFile("~/Sample text1.txt", "text", {
         data: { text: "This is a sample text1." },

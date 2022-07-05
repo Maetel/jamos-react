@@ -11,6 +11,7 @@
   border-radius: 10px;
   transition: 0.2s;
   user-select: none;
+  cursor: pointer;
 }
 
 .highlight {
@@ -44,7 +45,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  cursor: pointer;
+  border-radius: "5px";
 }
 
 .desc {

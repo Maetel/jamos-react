@@ -1,3 +1,4 @@
+import Image from "next/image";
 import React from "react";
 import { useEffect, useRef, useState } from "react";
 import JamOS from "../features/JamOS/JamOS";
@@ -190,7 +191,7 @@ export default function Window(props) {
     // const el = e.currentTarget.parentElement;
     const el = _winElem.current;
     if (!el) {
-      Log.error("el eempty");
+      Log.error("el empty");
       return;
     }
     if ((e.target as HTMLElement).classList.contains(styles.btn)) {
@@ -414,9 +415,20 @@ export default function Window(props) {
           if (!isMax && !disableDrag) {
             dragMouseDown(e);
           }
+          proc.onFocus?.();
         }}
         style={navElemStyle}
       >
+        {props.src && (
+          <Image
+            // height={30}
+            // width={100}
+            layout="fill"
+            src={props.src}
+            objectFit="cover"
+            // style={{ position: "absolute", top: 0, left: 0 }}
+          ></Image>
+        )}
         <span className={styles["window-title"]}>
           {proc.hideNav ? "" : proc.name}
         </span>
@@ -482,6 +494,9 @@ export default function Window(props) {
   const elems = proc.hideNav
     ? [Header, NestedBody, Buttons]
     : [NestedBody, Header, Buttons];
+  // const contentBgSrc = "/imgs/paper2.webp";
+  // const contentBgSrc = "/imgs/neon1.jpg";
+  const contentBgSrc = undefined;
   return (
     <>
       {disableBackground ? (
@@ -519,24 +534,18 @@ export default function Window(props) {
             height: proc.hideNav ? "100%" : "calc(100% - 30px)",
           }}
         >
+          {contentBgSrc && (
+            <Image
+              // height={30}
+              // width={800}
+              layout="fill"
+              src={contentBgSrc}
+              style={{ position: "absolute", top: 0, left: 0 }}
+            ></Image>
+          )}
           {(props as any).children}
         </div>
-        <div
-          className={`${styles["window-container-header"]} ${styles.grabbable}`}
-          id={navId}
-          ref={_navElem}
-          onMouseDown={(e) => {
-            if (!isMax && !disableDrag) {
-              dragMouseDown(e);
-            }
-            proc.onFocus?.();
-          }}
-          style={navElemStyle}
-        >
-          <span className={styles["window-title"]}>
-            {proc.hideNav ? "" : proc.name}
-          </span>
-        </div>
+        <Header></Header>
         <Buttons></Buttons>
       </section>
     </>

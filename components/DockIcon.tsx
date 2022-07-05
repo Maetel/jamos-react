@@ -63,15 +63,8 @@ export default function DockIcon(props) {
         <Image
           src={src}
           alt={`Dock icon of ${type}`}
-          style={{
-            display: "inline-block",
-            borderRadius: "5px",
-            // width: "70%",
-            // height: "70%",
-            /* background-color: #dbdbdb; */
-            objectFit: "contain",
-            objectPosition: "center center",
-          }}
+          objectFit="contain"
+          objectPosition={"center center"}
           width={"70%"}
           height={"70%"}
         ></Image>

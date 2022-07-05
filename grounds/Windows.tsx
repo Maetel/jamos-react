@@ -20,6 +20,7 @@ import Atelier from "../windows/Atelier";
 import SimpleAbout from "../windows/SimpleAbout";
 import Modal from "../components/Modal";
 import System from "./System";
+import Viewer from "../windows/Viewer";
 
 const winCmdMap: { [key: string]: (props) => JSX.Element } = {
   testwindow: TestWindow,
@@ -38,6 +39,7 @@ const winCmdMap: { [key: string]: (props) => JSX.Element } = {
   simpleabout: SimpleAbout,
   modal: Modal,
   system: System,
+  viewer: Viewer,
 };
 
 export default function Windows(props) {

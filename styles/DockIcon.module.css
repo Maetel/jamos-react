@@ -47,6 +47,9 @@
   cursor: pointer;
   padding:6px;
 }
+.imgContainer {
+  border-radius: "5px",
+}
 
 .desc {
   word-break: break-all;
