@@ -9,6 +9,7 @@ export default function TestWindow(props) {
   const filemgr = JamOS.filemgr;
   const proc: Process = { ...props.proc };
   proc.name = proc.name ?? "Test Window";
+  proc.resize = proc.resize ?? "both";
 
   const DirView = (dir: Dir, key = 0) => {
     return (

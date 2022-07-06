@@ -61,7 +61,9 @@ export default function System(props) {
     ];
 
     {
-      for (let i = 0; i < 10; ++i) {
+      //add random images
+      const imageCount = 50;
+      for (let i = 0; i < imageCount; ++i) {
         f.push(
           filemgr.makeFile(`~/Images/random image${i + 1}.jpg`, "image", {
             data: { src: `https://picsum.photos/seed/${randomId()}/500` },

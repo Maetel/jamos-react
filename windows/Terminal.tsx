@@ -39,6 +39,7 @@ export default function Terminal(props) {
   const setmgr = JamOS.setmgr;
   const proc: Process = { ...props.proc };
   proc.name = proc.name ?? `Terminal`;
+  proc.resize = proc.resize ?? "both";
   // proc.hideNav = true;
   // proc.hideNavButtons = true;
   const focusOnInput = () => {

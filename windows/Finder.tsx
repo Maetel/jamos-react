@@ -13,6 +13,7 @@ export default function Finder(props) {
     forwardBtn = useRef(null);
   const proc = { ...props.proc };
   proc.name = proc.name ?? "Finder";
+  proc.resize = proc.resize ?? "both";
 
   const [currentPath, setCurrentPath] = useState(props.proc.path);
   const [pathList, setPathList] = useState([props.proc.path]);
@@ -40,13 +41,11 @@ export default function Finder(props) {
   });
 
   useEffect(() => {
-    ToolbarControl.RegisterBuilder(proc.id).register(
-      "Finder",
-      "New directory",
-      () => {
+    ToolbarControl.RegisterBuilder(proc.id)
+      .unregisterAll()
+      .register("Finder", "New directory", () => {
         filemgr.mkdir(Path.join(currentPath, "New directory").path);
-      }
-    );
+      });
   }, [currentPath]);
 
   const procmgr = JamOS.procmgr;

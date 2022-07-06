@@ -15,7 +15,7 @@ export interface OSState {
 
 const initialState :OSState = {
   notifs:[],
-  notifDuration:2000,
+  notifDuration:4000,
 }
 
 const osSlice = createSlice({

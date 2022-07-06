@@ -91,6 +91,10 @@ export class RegisterBuilder {
     ToolbarControl.getInstance().register(data, cb);
     return this;
   }
+  public unregisterAll() {
+    ToolbarControl.getInstance().unregister(this.procId);
+    return this;
+  }
 }
 export class ToolbarControl {
   public static RegisterBuilder(procId: string): RegisterBuilder {
@@ -171,7 +175,7 @@ export class ToolbarControl {
         deleteCount++;
       }
     }
-    Log.log(`Toolbar unregister id[${procId}] of ${deleteCount} toolbar items`);
+    // Log.log(`Toolbar unregister id[${procId}] of ${deleteCount} toolbar items`);
   }
   public unregisterItem(item: ToolbarItem) {
     for (let key in ToolbarControl.callbacks) {

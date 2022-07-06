@@ -211,6 +211,9 @@ public psValue(){
     let modalProps :ModalProps = {parent:procId};
     if(args){
       modalProps = {...modalProps, ...args};
+      if(modalProps['callbacks']){
+        delete modalProps['callbacks'];
+      }
     }
     this.add('modal', {parent:procId, modal:modalProps});
 

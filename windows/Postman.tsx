@@ -8,6 +8,7 @@ import { getStorage, setStorage } from "../scripts/utils";
 export default function Postman(props) {
   const proc = { ...props.proc };
   proc.name = proc.name ?? "Postman";
+  proc.resize = proc.resize ?? "both";
   const _post = async (cmd: string, val1, val2) => {
     const res = await axios
       .post(cmd, {
