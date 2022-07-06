@@ -231,7 +231,7 @@ export const selectDir = (path:string)=>((state:AppState)=>{
 
 
 export const selectFile = (path:string)=>((state:AppState)=>{
-  return dfsDir(state.file.root, path)?.files.filter(file=>Path.areSame(file.node.path, path)).at(0);
+  return dfsDir(state.file.root, new Path(path).parent)?.files.filter(file=>Path.areSame(file.node.path, path))?.at(0);
 })
 export const selectFileData = (path:string, dataKey?:string)=>((state:AppState)=>{
   const f = dfsDir(state.file.root, path)?.files.filter(file=>Path.areSame(file.node.path, path)).at(0);

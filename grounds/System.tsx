@@ -3,6 +3,7 @@ import { File } from "../features/file/FileTypes";
 import { useEffect, useState } from "react";
 import Process from "../features/procmgr/ProcTypes";
 import Daemon from "../components/Daemon";
+import { randomId } from "../scripts/utils";
 
 let initted = false;
 let loadOnce = false;
@@ -25,6 +26,7 @@ export default function System(props) {
     procmgr.add("terminal");
     // procmgr.add("testwindow");
     filemgr.mkdir("~/deep/deeeeeep/directory");
+
     const f: File[] = [
       filemgr.makeFile("~/AppStore", "appstore"),
       filemgr.makeFile("~/Viewer", "viewer"),
@@ -57,6 +59,17 @@ export default function System(props) {
           "browser https://v1.embednotion.com/embed/9091c7d511f941b387d3064690d4d2dd",
       }),
     ];
+
+    {
+      for (let i = 0; i < 10; ++i) {
+        f.push(
+          filemgr.makeFile(`~/Images/random image${i + 1}.jpg`, "image", {
+            data: { src: `https://picsum.photos/seed/${randomId()}/500` },
+          })
+        );
+      }
+    }
+
     filemgr.addFiles(f);
     procmgr.openToolbar();
     procmgr.openDock();

@@ -9,6 +9,7 @@ import { ThemeColors } from "../features/settings/Themes";
 import { ToolbarControl } from "../grounds/Toolbar";
 import { clamp, randomId } from "../scripts/utils";
 import styles from "../styles/Window.module.css";
+import ShimmerImage from "./ShimmerImage";
 
 const translucentBackground = "55";
 const minHeight = 240;
@@ -420,14 +421,14 @@ export default function Window(props) {
         style={navElemStyle}
       >
         {props.src && (
-          <Image
+          <ShimmerImage
             // height={30}
             // width={100}
             layout="fill"
             src={props.src}
             objectFit="cover"
             // style={{ position: "absolute", top: 0, left: 0 }}
-          ></Image>
+          ></ShimmerImage>
         )}
         <span className={styles["window-title"]}>
           {proc.hideNav ? "" : proc.name}
@@ -535,13 +536,13 @@ export default function Window(props) {
           }}
         >
           {contentBgSrc && (
-            <Image
+            <ShimmerImage
               // height={30}
               // width={800}
               layout="fill"
               src={contentBgSrc}
               style={{ position: "absolute", top: 0, left: 0 }}
-            ></Image>
+            ></ShimmerImage>
           )}
           {(props as any).children}
         </div>

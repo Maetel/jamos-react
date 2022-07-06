@@ -27,7 +27,7 @@
   position: absolute;
   top: 0px;
   left: 0px;
-  transform: translate(-50%, -50%);
+  /* transform: translate(-50%, -50%); */
   width: 30px;
   height: 30px;
   color: #333;
@@ -49,4 +49,10 @@
 .name {
   text-align: center;
   font-size: 1.3rem;
+}
+
+.image-container {
+  display:flex;
+  align-items: center;
+  justify-content: center;
 }

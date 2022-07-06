@@ -1,43 +1,29 @@
 import Image from "next/image";
-import { useEffect, useState } from "react";
-import { Node } from "../features/file/FileTypes";
+import { useEffect, useRef, useState } from "react";
+import { File, Node } from "../features/file/FileTypes";
 import JamOS from "../features/JamOS/JamOS";
 import Path from "../scripts/Path";
 import { randomId } from "../scripts/utils";
 import styles from "../styles/FinderIcon.module.css";
+import Loading from "./Loading";
+import ShimmerImage from "./ShimmerImage";
 
 const abbreviate = (path: string) => {
   const max = 15;
   return path.slice(0, max) + (path.length > max ? "..." : "");
 };
 
-const windowIconStyle = {
-  display: "inline-block",
-  borderRadius: "5px",
-  width: "70%",
-  height: "70%",
-  /* background-color: #dbdbdb; */
-  objectFit: "contain",
-  objectPosition: "center center",
-};
-
 export default function FinderIcon(props) {
-  let contElem: HTMLElement, highElem: HTMLElement, descElem: HTMLElement;
-  let contElemId = randomId(),
-    highElemId = randomId(),
-    descElemId = randomId();
-  const setElems = () => {
-    contElem = document.querySelector(`#${contElemId}`);
-    highElem = document.querySelector(`#${highElemId}`);
-    descElem = document.querySelector(`#${descElemId}`);
-  };
-  useEffect(() => {
-    setElems();
-  }, []);
+  let contElem = useRef(null),
+    highElem = useRef(null),
+    descElem = useRef(null);
 
   const procmgr = JamOS.procmgr;
   const nodepath: string = props.node.path;
   const node: Node = JamOS.filemgr.nodeReadable(nodepath);
+  const file: File = JamOS.filemgr.fileReadable(nodepath);
+  const [loading, setLoading] = useState(!false);
+  // const node: Node = file?.node;
   const onClick: (Event) => void =
     props.onClick ??
     function (node: Node) {
@@ -47,7 +33,13 @@ export default function FinderIcon(props) {
   //   Log.warn("No such file : " + nodepath);
   //   return;
   // }
-  const src: string = node.iconPath;
+  const setSrc = () => {
+    if (node.type === "image") {
+      return file?.data["src"] ?? node.iconPath;
+    }
+    return node.iconPath;
+  };
+  const src: string = setSrc();
   const width = 90;
   const imgContainerStyle = {
     width: width,
@@ -62,54 +54,87 @@ export default function FinderIcon(props) {
 
   const callHover = (e, hoverIn) => {
     setHovered(hoverIn);
-    if (!contElem) {
-      setElems();
-    }
-    contElem.style.overflow = hoverIn ? "show" : "hidden";
+    contElem.current.style.overflow = hoverIn ? "show" : "hidden";
   };
 
   const filename = new Path(node.path).last;
   const dispFilename = hovered ? filename : abbreviate(filename);
 
-  return node ? (
-    <div
-      className={styles.container}
-      id={contElemId}
-      onClick={(e) => {
-        onClick(node);
-      }}
-      onMouseOver={(e) => {
-        callHover(e, true);
-      }}
-      onMouseOut={(e) => {
-        callHover(e, false);
-      }}
-      style={{ color: color1 }}
-    >
-      <span
-        className={styles.highlight}
-        id={highElemId}
-        style={{
-          background: `linear-gradient(135deg, ${color1} 25%, ${color2} 60%, ${color3})`,
-        }}
-      />
-      <div className={styles.imgContainer} style={imgContainerStyle}>
-        <Image
-          src={src}
-          alt={`${node.type} icon of ${node.path}`}
-          objectFit="contain"
-          objectPosition={"center center"}
-          width={"70%"}
-          height={"70%"}
-        ></Image>
-      </div>
+  return (
+    node && (
       <div
-        className={styles.desc}
-        id={descElemId}
-        style={{ backgroundColor: `${color2}cc` }}
+        className={styles.container}
+        ref={contElem}
+        onClick={(e) => {
+          onClick(node);
+        }}
+        onMouseOver={(e) => {
+          callHover(e, true);
+        }}
+        onMouseOut={(e) => {
+          callHover(e, false);
+        }}
+        style={{ color: color1 }}
       >
-        {dispFilename}
+        <span
+          className={styles.highlight}
+          ref={highElem}
+          style={{
+            background: `linear-gradient(135deg, ${color1} 25%, ${color2} 60%, ${color3})`,
+          }}
+        />
+        <div className={styles.imgContainer} style={imgContainerStyle}>
+          {/* <ShimerImage
+            src={src}
+            alt={`${node.type} icon of ${node.path}`}
+            onLoad={(e) => {
+              // console.log("e:", e);
+              setLoading(!true);
+            }}
+            onLoadingComplete={(e) => {
+              setLoading(false);
+            }}
+            objectFit="contain"
+            objectPosition={"center center"}
+            placeholder="blur"
+            blurDataURL={`data:image/svg+xml;base64,${toBase64(
+              shimmer("100%", "100%")
+            )}`}
+            width={"70%"}
+            height={"70%"}
+          ></ShimmerImage> */}
+          <ShimmerImage
+            src={src}
+            alt={`${node.type} icon of ${node.path}`}
+            onLoad={(e) => {
+              // console.log("e:", e);
+              setLoading(!true);
+            }}
+            onLoadingComplete={(e) => {
+              setLoading(false);
+            }}
+            objectFit="contain"
+            objectPosition={"center center"}
+            width={"70%"}
+            height={"70%"}
+          ></ShimmerImage>
+          {false && (
+            <Loading
+              width="70%"
+              height="70%"
+              barHeight="0"
+              borderRadius="1rem"
+            ></Loading>
+          )}
+        </div>
+        <div
+          className={styles.desc}
+          ref={descElem}
+          style={{ backgroundColor: `${color2}cc` }}
+        >
+          {dispFilename}
+        </div>
       </div>
-    </div>
-  ) : undefined;
+    )
+  );
 }

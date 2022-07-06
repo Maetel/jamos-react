@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import JamOS from "../features/JamOS/JamOS";
 import { getProcessCommandsIcon } from "../features/procmgr/ProcTypes";
 import styles from "../styles/DockIcon.module.css";
+import ShimmerImage from "./ShimmerImage";
 
 export interface DockIconProp {
   type: string;
@@ -60,14 +61,14 @@ export default function DockIcon(props) {
         }}
       />
       <div className={styles.imgContainer} style={imgContainerStyle}>
-        <Image
+        <ShimmerImage
           src={src}
           alt={`Dock icon of ${type}`}
           objectFit="contain"
           objectPosition={"center center"}
           width={"70%"}
           height={"70%"}
-        ></Image>
+        ></ShimmerImage>
       </div>
       {isOpen ? (
         <div

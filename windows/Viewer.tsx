@@ -1,8 +1,8 @@
-import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
-import Loading from "../components/Loading";
+import ShimmerImage from "../components/ShimmerImage";
 import Window from "../components/Window";
 import JamOS from "../features/JamOS/JamOS";
+import { ToolbarControl } from "../grounds/Toolbar";
 import Path from "../scripts/Path";
 import styles from "../styles/Viewer.module.css";
 
@@ -12,8 +12,9 @@ export default function Viewer(props) {
   const proc = { ...props.proc };
   proc.name = proc.name ?? "Image viewer";
   proc.resize = proc.resize ?? "none";
-  const initalNodePath = proc.node?.path ?? fallbackOnLoad;
+  const initialNodePath = proc.node?.path ?? fallbackOnLoad;
 
+  const isFront = JamOS.procmgr.isFront(proc.id);
   const colors = JamOS.theme.colors;
   const filemgr = JamOS.filemgr;
   const navButtonColors = {
@@ -21,14 +22,69 @@ export default function Viewer(props) {
     backgroundColor: `${colors["1"]}aa`,
   };
 
+  const setImageIdx = (idx) => {
+    JamOS.procmgr.set(proc.id, { imageIdx: idx });
+  };
+  const setNodePath = (path) => {
+    JamOS.procmgr.set(proc.id, { nodePath: path });
+  };
+
+  const handleKey = (e) => {
+    const isFront = JamOS.procmgr.getValue(proc.id, "zIndex") === "0";
+    if (!isFront) {
+      return;
+    }
+    const keyMap = {
+      ArrowLeft: toPrev,
+      ArrowRight: toNext,
+    };
+    keyMap[e.key]?.();
+  };
+
+  useEffect(() => {
+    ToolbarControl.RegisterBuilder(proc.id).register(
+      "Image viewer",
+      "Open",
+      () => {
+        JamOS.procmgr.openConfirm(proc.id, () => {}, {
+          title: "<To be updated>",
+          descs: ["Dummy modal for file dialoge. "],
+        });
+      }
+    );
+  }, []);
+
+  useEffect(() => {
+    console.log("Set intiial node path :", initialNodePath);
+    setNodePath(initialNodePath);
+    // const { imageIdx, imageCount } = getMeta(initialNodePath);
+    const { imageIdx, imageCount } = getMeta();
+    setImageIdx(imageIdx);
+    // console.log("imageIdx:", imageIdx, ", imageCount:", imageCount);
+
+    window.addEventListener("keydown", handleKey);
+    return () => {
+      window.removeEventListener("keydown", handleKey);
+    };
+  }, []);
+
   //states
-  const [loading, setLoading] = useState(false);
-  const [nodePath, setNodePath] = useState(initalNodePath ?? "");
-  const [path, setPath] = useState("");
+  // const [nodePath, setNodePath] = useState("");
+  // const [imageIdx, setImageIdx] = useState(null);
+  const nodePathReadable = JamOS.procmgr.getReadable(proc.id, "nodePath");
+  const imageIdxReadable = JamOS.procmgr.getReadable(proc.id, "imageIdx");
   const [alt, setAlt] = useState("");
   const [src, setSrc] = useState(fallbackOnLoad);
   const [pageNumber, setPageNumber] = useState("");
-  const _dir = filemgr.dirReadable(new Path(nodePath).parent);
+  const getMeta = (_nodePath?: string) => {
+    const _path = _nodePath ?? JamOS.procmgr.getValue(proc.id, "nodePath");
+    const images = filemgr
+      .dirValue(new Path(_path).parent)
+      ?.files.filter((file) => file.node.type === "image");
+    const imageIdx = images?.findIndex((f) => f.node.path === _path);
+    const imageCount = images?.length;
+    return { imageIdx, imageCount, images };
+  };
 
   //bindings
   const contElem = useRef<HTMLDivElement>(null);
@@ -39,87 +95,115 @@ export default function Viewer(props) {
   const onImageLoad = function (e) {
     const _w = e.naturalWidth;
     const _h = e.naturalHeight;
-    // console.log("Image nw / nh : ", _w, "/", _h);
-    let h = 80;
-    const viewH = innerHeight * (h / 100.0) - 30;
-    const viewW = viewH * (_w / _h);
-    let w = (viewW * 100.0) / innerWidth;
-    if (w > 80) {
-      //horizontal
-      // console.log("Is hor");
-      const w = 80;
-      const viewW = innerWidth * (w / 100.0);
-      const viewH = viewW * (_h / _w);
-      h = (viewH * 100.0) / innerHeight;
-      console.log("H : ", h);
-    }
-    let top, left, width, height;
-    top = `${Math.floor((100 - h) / 2.0)}%`;
-    left = `${Math.floor((100 - w) / 2.0)}%`;
-    width = `${w}%`;
-    height = `${h}%`;
 
-    const rect = {
-      top: top,
-      left: left,
-      width: width,
-      height: height,
-    };
-    console.log("Rect : ", rect);
-    JamOS.procmgr.set(proc.id, { rect: rect });
-    // setWindowRect(rect);
+    if (0) {
+      const rect = {
+        width: _w + 30,
+        height: _h,
+      };
+      JamOS.procmgr.set(proc.id, { rect: rect });
+    } else {
+      //fit to 80% of screen
+
+      // console.log("Image nw / nh : ", _w, "/", _h);
+      let h = 80;
+      const viewH = innerHeight * (h / 100.0) - 30;
+      const viewW = viewH * (_w / _h);
+      let w = (viewW * 100.0) / innerWidth;
+      if (w > 80) {
+        //horizontal
+        // console.log("Is hor");
+        const w = 80;
+        const viewW = innerWidth * (w / 100.0);
+        const viewH = viewW * (_h / _w);
+        h = (viewH * 100.0) / innerHeight;
+        console.log("H : ", h);
+      }
+      let top, left, width, height;
+      top = `${Math.floor((100 - h) / 2.0)}%`;
+      left = `${Math.floor((100 - w) / 2.0)}%`;
+      width = `${w}%`;
+      height = `${h}%`;
+
+      const rect = {
+        top: top,
+        left: left,
+        width: width,
+        height: height,
+      };
+      JamOS.procmgr.set(proc.id, { rect: rect });
+    }
   };
 
   const toNext = () => {
-    // const nextIdx =
-    //   thisIndex() >= dirWatcher.imgs.length - 1 ? 0 : thisIndex() + 1;
-    // setPath(dirWatcher.imgs.at(nextIdx));
-  };
-  const toPrev = () => {
-    // const prevIdx =
-    //   thisIndex() <= 0 ? dirWatcher.imgs.length - 1 : thisIndex() - 1;
-    // setPath(dirWatcher.imgs.at(prevIdx));
-  };
-
-  const setSrcPath = (path: string) => {
-    setNodePath(path ?? "");
-    setSrc(
-      path.length
-        ? filemgr.fileValue(nodePath)?.data?.["src"] ?? fallbackOnLoad
-        : fallbackOnLoad
-    );
-    if (path.length) {
-      navNext.current.style.setProperty("display", "normal");
-      navPrev.current.style.setProperty("display", "normal");
-    } else {
-      navNext.current.style.setProperty("display", "none");
-      navPrev.current.style.setProperty("display", "none");
+    const { imageIdx, imageCount } = getMeta();
+    let nextIdx = imageIdx + 1;
+    if (nextIdx >= imageCount) {
+      nextIdx = 0;
     }
+    const retval = typeof nextIdx === "number" ? nextIdx : undefined;
+    JamOS.procmgr.set(proc.id, { imageIdx: retval });
+  };
 
-    // setPageNo();
+  const toPrev = () => {
+    const { imageIdx, imageCount } = getMeta();
+    let prevIdx = imageIdx - 1;
+    if (prevIdx < 0) {
+      prevIdx = imageCount - 1;
+    }
+    const retval = typeof prevIdx === "number" ? prevIdx : undefined;
+    JamOS.procmgr.set(proc.id, { imageIdx: retval });
   };
 
   useEffect(() => {
-    setSrcPath(initalNodePath);
-  }, []);
+    const { imageIdx, imageCount, images } = getMeta();
+    const path = images.at(imageIdxReadable)?.node.path;
+    JamOS.procmgr.set(proc.id, { nodePath: path });
+  }, [imageIdxReadable]);
+
+  useEffect(() => {
+    const _setsrc = nodePathReadable?.length
+      ? filemgr.fileValue(nodePathReadable)?.data?.["src"] ?? fallbackOnLoad
+      : fallbackOnLoad;
+    setSrc(_setsrc);
+    if (nodePathReadable?.length) {
+      // console.log("nodePathReadable.length: true");
+      navNext.current.style.setProperty("display", "flex");
+      navPrev.current.style.setProperty("display", "flex");
+
+      const { imageIdx, imageCount } = getMeta();
+      JamOS.procmgr.set(proc.id, {
+        name:
+          "Image viewer - " +
+          nodePathReadable +
+          ` [${imageIdx + 1}/${imageCount}]`,
+      });
+    } else {
+      // console.log("nodePathReadable.length: false");
+      navNext.current.style.setProperty("display", "none");
+      navPrev.current.style.setProperty("display", "none");
+    }
+  }, [nodePathReadable]);
 
   return (
     <Window {...props} proc={proc}>
       <div className={`${styles.container}`} ref={contElem}>
         <div className={`${styles.imgWrapper}`}>
-          <Image
-            src={src}
-            alt={alt}
-            layout="fill"
-            className="image"
-            onLoad={(e) => {
-              setLoading(true);
-            }}
-            onLoadingComplete={(e) => {
-              onImageLoad(e);
-              setLoading(false);
-            }}
-          />
+          {src.length === 0 ? (
+            <div className="noImage">No image found!</div>
+          ) : (
+            <ShimmerImage
+              src={src}
+              alt={alt}
+              layout="fill"
+              className="image"
+              onLoadingComplete={(e) => {
+                // onLoad={(e) => {
+                onImageLoad(e);
+              }}
+            />
+          )}
+
           {/* {#if src.length === 0}
           <div className="no-image">No image found!</div>
         {/if} */}
@@ -128,7 +212,9 @@ export default function Viewer(props) {
           className={`${styles.nav} ${styles.next}`}
           style={navButtonColors}
           ref={navNext}
-          onClick={toNext}
+          onClick={() => {
+            toNext();
+          }}
         >
           {/* &gtcc; */}
           &#10919;
@@ -137,16 +223,17 @@ export default function Viewer(props) {
           className={`${styles.nav} ${styles.prev}`}
           style={navButtonColors}
           ref={navPrev}
-          onClick={toPrev}
+          onClick={() => {
+            toPrev();
+          }}
         >
           {/* &ltcc; */}
           &#10918;
         </div>
         <span className={`${styles.pathView}`} ref={pathViewElem}>
-          {nodePath}&nbsp;{pageNumber}
+          {nodePathReadable}&nbsp;{pageNumber}
         </span>
       </div>
-      {loading && <Loading></Loading>}
     </Window>
   );
 }

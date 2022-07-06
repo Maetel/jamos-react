@@ -4,6 +4,7 @@ import { File } from "../features/file/FileTypes";
 import JamOS from "../features/JamOS/JamOS";
 import Path from "../scripts/Path";
 import styles from "../styles/AppStoreIcon.module.css";
+import ShimmerImage from "./ShimmerImage";
 
 export default function AppStoreIcon(props) {
   const file: File = props.file;
@@ -27,16 +28,30 @@ export default function AppStoreIcon(props) {
   return (
     <div className={`${styles["item-container"]}`}>
       <div className={`${styles.item}`} onClick={onClick}>
+        <div className={`${styles["image-container"]}`}>
+          <ShimmerImage
+            width="100%"
+            height="100%"
+            className={`${styles.icon}`}
+            src={file.node.iconPath}
+            alt={file.node.path}
+          />
+        </div>
+        <div className={`${styles.name}`}>{new Path(file.node.path).last}</div>
         <span className={`${styles["icon-container"]}`}>
           {exists ? (
-            <Image
+            <ShimmerImage
+              width="100%"
+              height="100%"
               src="/imgs/circlecheck.svg"
               alt="App installed on desktop"
               className={`${styles.icon}`}
               style={{ backgroundColor: `${_colors["okay"]}aa` }}
             />
           ) : (
-            <Image
+            <ShimmerImage
+              width="100%"
+              height="100%"
               src="/imgs/circledash.svg"
               alt="App not installed"
               className={`${styles.icon}`}
@@ -44,15 +59,6 @@ export default function AppStoreIcon(props) {
             />
           )}
         </span>
-
-        <div className={`${styles["Image-container"]}`}>
-          <Image
-            className={`${styles.icon}`}
-            src={file.node.iconPath}
-            alt={file.node.path}
-          />
-        </div>
-        <div className={`${styles.name}`}>{new Path(file.node.path).last}</div>
       </div>
     </div>
   );
