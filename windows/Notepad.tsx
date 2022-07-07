@@ -4,13 +4,20 @@ import Window from "../components/Window";
 import JamOS from "../features/JamOS/JamOS";
 import Process from "../features/procmgr/ProcTypes";
 import styles from "../styles/Notepad.module.css";
+import { ToolbarControl } from "../grounds/Toolbar";
 
 export default function Notepad(props) {
   const filemgr = JamOS.filemgr;
   const proc: Process = { ...props.proc };
   proc.name = proc.name || "Notepad";
-  const [filePath, setFilePath] = useState("");
-  const [textAreaValue, setTextAreaValue] = useState("");
+  const filePath = JamOS.procmgr.getReadable(proc.id, "filePath");
+  const setFilePath = (path: string) => {
+    JamOS.procmgr.set(proc.id, { filePath: path });
+  };
+  const textAreaValue = JamOS.procmgr.getReadable(proc.id, "textAreaValue");
+  const setTextAreaValue = (val: string) => {
+    JamOS.procmgr.set(proc.id, { textAreaValue: val });
+  };
 
   const setFile = (e) => {};
   const loadFile = (e) => {
@@ -35,6 +42,89 @@ export default function Notepad(props) {
       console.error("Filepath not designated path:", filePath);
     }
   };
+
+  const onLoadDialogue = (params) => {
+    if (!params) {
+      return;
+    }
+    if (typeof params === "string") {
+      params = params.trim();
+      const f = filemgr.fileValue(params);
+      if (f && f.node.type === "text") {
+        setFilePath(params);
+      } else {
+        JamOS.setNotif(`'${params}' is not a text file.`, "error");
+      }
+    }
+  };
+  const onSaveDialogue = (params) => {
+    if (!params) {
+      return;
+    }
+    if (typeof params !== "string") {
+      return;
+    }
+    params = params.trim();
+    const filePath = JamOS.procmgr.getValue(proc.id, "filePath");
+    const textAreaValue = JamOS.procmgr.getValue(proc.id, "textAreaValue");
+    console.log(
+      `filePath:${filePath}, params:${params}, filePath === params : ${
+        filePath === params
+      }`
+    );
+    if (filePath === params) {
+      //overwrite self. don't ask
+      JamOS.filemgr.updateFileData(params, "text", textAreaValue);
+      return;
+    }
+    const f = filemgr.fileValue(params);
+    if (f) {
+      JamOS.setNotif(`'${params}' already exists.`, "warn");
+      JamOS.procmgr.openConfirm(
+        proc.id,
+        () => {
+          //on save
+          console.log(`saving to ${params} => ${textAreaValue}`);
+          JamOS.filemgr.updateFileData(params, "text", textAreaValue);
+        },
+        { buttons: ["Overwrite", "Cancel"] }
+      );
+    } else {
+      console.log("textAreaValue:", textAreaValue);
+      const f = JamOS.filemgr.makeFile(params, "text", {
+        data: { text: textAreaValue },
+      });
+      JamOS.filemgr.addFile(f);
+    }
+  };
+
+  useEffect(() => {
+    ToolbarControl.RegisterBuilder(proc.id)
+      .register("Notepad", "Open", () => {
+        JamOS.procmgr.openFileDialogue(proc.id, "Load", {
+          includes: ["text"],
+          onOkay: onLoadDialogue,
+        });
+      })
+      .register("Notepad", "Save", () => {
+        if (JamOS.filemgr.fileExists(filePath)) {
+          const val = JamOS.procmgr.getValue(proc.id, "textAreaValue") ?? "";
+          JamOS.filemgr.updateFileData(filePath, "text", val);
+        }
+      })
+      .register(
+        "Notepad",
+        "Save As",
+        () => {
+          JamOS.procmgr.openFileDialogue(proc.id, "Save", {
+            includes: ["text"],
+            onOkay: onSaveDialogue,
+          });
+        },
+        { separator: true }
+      );
+  }, []);
+
   useEffect(() => {
     if (proc.node) {
       setFilePath(proc.node.path);
@@ -52,7 +142,7 @@ export default function Notepad(props) {
   return (
     <Window {...props} proc={proc}>
       <div className={styles.container}>
-        <div className={styles.btns}>
+        <div className={styles.btns} style={{ display: "none" }}>
           <button title="Reload" className={styles.btn} onClick={setFile}>
             &darr;
           </button>

@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { FileDialProps } from "../components/FileDialogue";
 import FinderIcon from "../components/FinderIcon";
 import Window from "../components/Window";
 import { Node } from "../features/file/FileTypes";
@@ -14,10 +15,12 @@ export function FinderCore(props) {
   const proc: Process = props.proc;
   const callbackId = proc.callbackId;
   const blockExeFile = proc.blockExeFile;
-  const backBtn = useRef(null),
-    forwardBtn = useRef(null);
+  const backBtn = useRef(null);
   const [currentPath, setCurrentPath] = useState(proc.path);
   const [pathList, setPathList] = useState([proc.path]);
+  const fileDialProps: FileDialProps = proc.fileDialProps;
+  const incls = fileDialProps?.includes;
+  const excls = fileDialProps?.excludes;
   const onIconClick = (_node: Node) => {
     const nodeIsDir = () => _node.type === "dir";
     setCurrentPath((p) => {
@@ -79,11 +82,17 @@ export function FinderCore(props) {
       </div>
       <div className={styles.iconContainer}>
         {nodes.map((node, i) => {
-          return React.createElement(FinderIcon, {
-            node: node,
-            key: i,
-            onClick: onIconClick,
-          });
+          if (excls?.includes(node.type)) {
+            return;
+          }
+
+          if (!incls || incls?.includes(node.type) || node.type === "dir") {
+            return React.createElement(FinderIcon, {
+              node: node,
+              key: i,
+              onClick: onIconClick,
+            });
+          }
         })}
       </div>
     </div>

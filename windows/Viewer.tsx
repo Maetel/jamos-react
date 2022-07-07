@@ -46,9 +46,22 @@ export default function Viewer(props) {
       "Image viewer",
       "Open",
       () => {
-        JamOS.procmgr.openConfirm(proc.id, () => {}, {
-          title: "<To be updated>",
-          descs: ["Dummy modal for file dialoge. "],
+        JamOS.procmgr.openFileDialogue(proc.id, "Load", {
+          includes: ["image"],
+          onOkay: (params) => {
+            if (!params) {
+              return;
+            }
+            if (typeof params === "string") {
+              params = params.trim();
+              const f = filemgr.fileValue(params);
+              if (f && f.node.type === "image") {
+                setNodePath(params);
+              } else {
+                JamOS.setNotif(`'${params}' is not an image file.`, "error");
+              }
+            }
+          },
         });
       }
     );
@@ -182,7 +195,7 @@ export default function Viewer(props) {
       navNext.current.style.setProperty("display", "none");
       navPrev.current.style.setProperty("display", "none");
       JamOS.procmgr.set(proc.id, { rect: { width: 200, height: 200 } });
-      JamOS.setNotif("No image found", "error");
+      // JamOS.setNotif("No image found", "error");
     }
     JamOS.procmgr.set(proc.id, {
       name: windowName,

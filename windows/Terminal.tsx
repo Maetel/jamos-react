@@ -58,7 +58,7 @@ export default function Terminal(props) {
   }, [modalRetval]);
 
   useEffect(() => {
-    addText("get from file dial : " + fileDialRetval);
+    // addText("get from file dial : " + fileDialRetval);
   }, [fileDialRetval]);
 
   /////////////////////////
@@ -485,6 +485,7 @@ export default function Terminal(props) {
       //   case "atelier":
       // case "markdown":
       case "test":
+        break;
         procmgr.openFileDialogue(proc.id, "Save", {
           onExit: () => {
             if (inputElem.current) {
