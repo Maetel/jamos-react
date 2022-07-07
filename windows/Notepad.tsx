@@ -5,6 +5,7 @@ import JamOS from "../features/JamOS/JamOS";
 import Process from "../features/procmgr/ProcTypes";
 import styles from "../styles/Notepad.module.css";
 import { ToolbarControl } from "../grounds/Toolbar";
+import Path from "../scripts/Path";
 
 export default function Notepad(props) {
   const filemgr = JamOS.filemgr;
@@ -136,6 +137,9 @@ export default function Notepad(props) {
     // console.log("f?.data['text']:", f?.data["text"]);
     if (f) {
       setTextAreaValue(f?.data["text"] ?? "");
+      JamOS.procmgr.set(proc.id, {
+        name: `Notepad - ${new Path(filePath).last}`,
+      });
     }
   }, [filePath]);
 

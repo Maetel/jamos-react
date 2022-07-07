@@ -16,27 +16,31 @@ export function FinderCore(props) {
   const callbackId = proc.callbackId;
   const blockExeFile = proc.blockExeFile;
   const backBtn = useRef(null);
-  const [currentPath, setCurrentPath] = useState(proc.path);
+
+  useEffect(() => {
+    JamOS.procmgr.set(proc.id, { currentPath: proc.path });
+  }, []);
+  const currentPath = JamOS.procmgr.getReadable(proc.id, "currentPath");
+  const setCurrentPath = (path) => {
+    JamOS.procmgr.set(proc.id, { currentPath: path });
+  };
   const [pathList, setPathList] = useState([proc.path]);
   const fileDialProps: FileDialProps = proc.fileDialProps;
   const incls = fileDialProps?.includes;
   const excls = fileDialProps?.excludes;
   const onIconClick = (_node: Node) => {
     const nodeIsDir = () => _node.type === "dir";
-    setCurrentPath((p) => {
-      return nodeIsDir() ? _node.path : p;
-    });
+    setCurrentPath(nodeIsDir() ? _node.path : currentPath);
     setPathList((l) => {
       return nodeIsDir() ? [...l, _node.path] : l;
     });
     if (!nodeIsDir() && !blockExeFile) {
       procmgr.exeFile(new Path(_node.path));
     }
-    console.log("callbackId:", callbackId);
     CallbackStore.getById(callbackId)?.(_node);
   };
   const browseBack = (e) => {
-    setCurrentPath((p) => pathList.at(pathList.length - 2) ?? p);
+    setCurrentPath(pathList.at(pathList.length - 2) ?? currentPath);
     setPathList((l) => l.slice(0, -1));
   };
 

@@ -20,9 +20,9 @@
   align-items: center;
 }
 .pathContainer {
-  flex:7;
+  flex:8;
   display:flex;
-  justify-content: center;
+  /* justify-content: center; */
   align-items: center;
 }
 .pathIndicator {
@@ -30,13 +30,14 @@
   height:50%;
   /* flex:1; */
   font-size:1.3rem;
+  margin-right:10px;
 }
 .input {
   height:50%;
   /* flex:6; */
   border: none;
   outline: none;
-  width: 80%;
+  width: 70%;
   color: inherit;
   resize: none;
   

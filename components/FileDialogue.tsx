@@ -6,6 +6,7 @@ import Window from "./Window";
 import styles from "../styles/FileDialogue.module.css";
 import JamOS from "../features/JamOS/JamOS";
 import { Node } from "../features/file/FileTypes";
+import Path from "../scripts/Path";
 
 export interface FileDialProps {
   parent: string;
@@ -40,9 +41,10 @@ export default function FileDialogue(props) {
   const inputElem = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
+    //register FinderCore.onIconClick
     CallbackStore.registerById(proc.callbackId, (params) => {
       const node: Node = params;
-      procmgr.set(proc.id, { inputValue: node.path ?? "" });
+      procmgr.set(proc.id, { inputValue: new Path(node.path).last ?? "" });
       if (inputElem.current) {
         inputElem.current.focus();
         const len = inputElem.current.value?.length;
@@ -56,14 +58,22 @@ export default function FileDialogue(props) {
   }, []);
 
   const handleOkay = (e) => {
-    const val = procmgr.getValue(proc.id, "inputValue");
+    const curPath = procmgr.getValue(proc.id, "currentPath") ?? "";
+    const val = Path.join(
+      curPath,
+      procmgr.getValue(proc.id, "inputValue")
+    ).path;
     procmgr.set(proc.parent, { fileDial: val });
     CallbackStore.getById(fileDialProps.onOkayCallbackId)?.(val);
     CallbackStore.getById(fileDialProps.onExitCallbackId)?.(val);
     procmgr.kill(proc.id);
   };
   const handleCancel = (e) => {
-    const val = procmgr.getValue(proc.id, "inputValue");
+    const curPath = procmgr.getValue(proc.id, "currentPath") ?? "";
+    const val = Path.join(
+      curPath,
+      procmgr.getValue(proc.id, "inputValue")
+    ).path;
     CallbackStore.getById(fileDialProps.onCancelCallbackId)?.(val);
     CallbackStore.getById(fileDialProps.onExitCallbackId)?.(val);
     procmgr.kill(proc.id);
@@ -102,7 +112,13 @@ export default function FileDialogue(props) {
         >
           <div className={styles.cushion}></div>
           <span className={styles.pathContainer}>
-            <span className={styles.pathIndicator}>Path : </span>
+            <span className={styles.pathIndicator}>
+              {(fileDialProps.includes
+                ? fileDialProps.includes.map((ext) => `${ext}`).join(", ") +
+                  " file path :"
+                : "File path :"
+              ).trim()}
+            </span>
             <textarea
               ref={inputElem}
               className={styles.input}
