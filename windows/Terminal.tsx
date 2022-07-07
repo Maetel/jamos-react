@@ -48,6 +48,7 @@ export default function Terminal(props) {
   proc.onFocus = focusOnInput;
   const otherProcs = procmgr.procs;
   const modalRetval = procmgr.getReadable(proc.id, "modalRetval");
+  const fileDialRetval = procmgr.getReadable(proc.id, "fileDial");
 
   let onModalChange: (val: string) => void = (val) => {
     console.log("On modal change value in terminal : ", modalRetval);
@@ -55,6 +56,10 @@ export default function Terminal(props) {
   useEffect(() => {
     ModalCallbacks.exe(proc.id, modalRetval);
   }, [modalRetval]);
+
+  useEffect(() => {
+    addText("get from file dial : " + fileDialRetval);
+  }, [fileDialRetval]);
 
   /////////////////////////
   const isToolbarOpen = procmgr.isToolbarOpen();
@@ -479,7 +484,16 @@ export default function Terminal(props) {
     switch (cmd) {
       //   case "atelier":
       // case "markdown":
-      // case "broom":
+      case "test":
+        procmgr.openFileDialogue(proc.id, "Save", {
+          onExit: () => {
+            if (inputElem.current) {
+              inputElem.current.focus();
+            }
+          },
+          includes: ["image"],
+        });
+        break;
       case "postman":
       case "about":
       case "settings":

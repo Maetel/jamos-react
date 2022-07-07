@@ -21,6 +21,7 @@ import SimpleAbout from "../windows/SimpleAbout";
 import Modal from "../components/Modal";
 import System from "./System";
 import Viewer from "../windows/Viewer";
+import FileDialogue from "../components/FileDialogue";
 
 const winCmdMap: { [key: string]: (props) => JSX.Element } = {
   testwindow: TestWindow,
@@ -40,6 +41,7 @@ const winCmdMap: { [key: string]: (props) => JSX.Element } = {
   modal: Modal,
   system: System,
   viewer: Viewer,
+  filedialogue: FileDialogue,
 };
 
 export default function Windows(props) {

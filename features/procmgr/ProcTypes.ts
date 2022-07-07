@@ -66,6 +66,9 @@ export const _ProcessCommands:ProcessCommand[] = [
   {comp:"dir", icon:"/imgs/dir.svg", type:'system'},
   {comp:"text", icon:"/imgs/text.svg", type:'system'},
   
+  {comp:"modal", icon:"/imgs/circlequestion.svg"},
+  {comp:"filedialogue", icon:"/imgs/circlequestion.svg"},
+
   {comp:"testwindow"},
   {comp:"viewer", icon:"/imgs/viewer.svg"},
   {comp:"editor", },
@@ -83,7 +86,6 @@ export const _ProcessCommands:ProcessCommand[] = [
   {comp:"styler", icon:"/imgs/styler.svg", runOnce:true},
   {comp:"systeminfo", icon:"/imgs/systeminfo.svg", runOnce:true},
   {comp:'simpleabout', icon:"/imgs/circlequestion.svg"},
-  {comp:"modal", icon:"/imgs/circlequestion.svg"},
   {comp:'toolbar', icon:"/imgs/circlequestion.svg", type:'system'},
 ]
 export const ProcessCommands = _ProcessCommands.filter(cmd=>((cmd.type === 'window') || (cmd.type === undefined))).map(cmd=>cmd.comp);

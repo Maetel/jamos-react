@@ -38,9 +38,10 @@ export default function Modal(props) {
     transform: "translate(-200px, -150px)",
   };
   proc.name = proc.name ?? modal.title ?? "";
-  proc.disableBackground = true;
+  proc.disableBackground = proc.disableBackground ?? true;
   // proc.disableDrag = false;
-  proc.hideNav = true;
+  proc.hideNav = proc.hideNav ?? true;
+  console.log("proc.hideNav:", proc.hideNav);
 
   const colors = JamOS.theme.colors;
   const procmgr = JamOS.procmgr;
@@ -173,12 +174,14 @@ export default function Modal(props) {
       <div className={`${styles.container}`} style={{ color: colors["1"] }}>
         {/* <div className={`${styles.background}`} onClick={closeThis} /> */}
         <div className={`${styles.contents}`}>
-          <div className={`${styles.title}`}>{modal.title ?? ""}</div>
+          {proc.hideNav && (
+            <div className={`${styles.title}`}>{modal.title ?? ""}</div>
+          )}
           {props.children ? (
             props.children
           ) : (
             <div className={styles.descs}>
-              {modal.descs.map((desc, i) => {
+              {modal.descs?.map((desc, i) => {
                 return (
                   <div
                     style={{ color: colors["1"] }}
@@ -193,7 +196,7 @@ export default function Modal(props) {
           )}
 
           <div className={`${styles.buttons}`}>
-            {modal.buttons.map((btn, i) => (
+            {modal.buttons?.map((btn, i) => (
               <button
                 className={`${styles.btn} btn${i}`}
                 onClick={() => {

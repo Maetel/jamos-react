@@ -1,0 +1,72 @@
+.container {
+  width:100%;
+  /* height:100%; */
+}
+
+.collapsible {
+  position:relative;
+  background-color: #777;
+  color: white;
+  cursor: pointer;
+  width: 100%;
+  border: none;
+  text-align: left;
+  outline: none;
+}
+
+.openicon {
+  position:absolute;
+  top:50%;
+  left:20px;
+  transform: translateY(-50%);
+  display:inline-block;
+  width:16px;
+  height:16px;
+  border-radius: 8px;
+  overflow:hidden;
+}
+
+.collapsible.active .openicon{
+  translate:rotate(90deg);
+}
+
+.dirText {
+  margin-left: 20px;
+}
+
+.active,
+.collapsible:hover {
+  background-color: #555;
+}
+
+.content {
+  /* padding: 0 18px; */
+  display: none;
+  overflow: hidden;
+  background-color: #f1f1f1;
+}
+
+.list-container.dir {
+  /* display:none; */
+}
+.item {
+  position:relative;
+  /* height:2rem; */
+}
+
+.checkbox {
+  position:absolute;
+  display:inline-block;
+  top:50%;
+  right : 10px;
+  transform: translateY(-50%);
+  width:16px;
+  height:16px;
+  background:#dbdbdb;
+  border-radius: 2px;
+  overflow:hidden;
+}
+
+.checkbox:hover {
+  cursor:pointer;
+}

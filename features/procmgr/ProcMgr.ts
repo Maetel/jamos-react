@@ -1,10 +1,12 @@
 import { useAppSelector } from "../../app/hooks";
 import store from "../../app/store";
+import { FileDialProps } from "../../components/FileDialogue";
 import { ModalCallbacks, ModalProps } from "../../components/Modal";
 import { ToolbarControl } from "../../grounds/Toolbar";
 import Path, { addError } from "../../scripts/Path";
 import {  ToolbarItem } from "../../scripts/ToolbarTypes";
 import { dirValue, fileValue } from "../file/fileSlice";
+import CallbackStore from "../JamOS/Callbacks";
 import JamOS from "../JamOS/JamOS";
 
 import {
@@ -234,6 +236,46 @@ public psValue(){
       console.warn(' - args?.buttons?.length : ',args?.buttons?.length)
       console.warn(' - args?.callbacks?.length : ',args?.callbacks?.length);
     }
+  }
+
+  
+  // watch proc.fileDial for retval
+  public openFileDialogue(procId:string, type:'Save'|'Load', args?: {includes?:string[], excludes?:string[], onOkay?: (params?)=>void,
+    onCancel?: (params?)=>void,onExit?: (params?)=>void,}){
+
+    const onOkayCallbackId = `${procId}/FileDialogue/onOkay`;
+    const onCancelCallbackId = `${procId}/FileDialogue/onCancel`;
+    const onExitCallbackId = `${procId}/FileDialogue/onExit`;
+    if(args?.onOkay){
+      CallbackStore.registerById(onOkayCallbackId, args?.onOkay);
+    } else {
+      CallbackStore.unregisterById(onOkayCallbackId);
+    }
+    if(args?.onCancel){
+      CallbackStore.registerById(onCancelCallbackId, args?.onCancel);
+    } else {
+      CallbackStore.unregisterById(onCancelCallbackId);
+    }
+    if(args?.onExit){
+      CallbackStore.registerById(onExitCallbackId, args?.onExit);
+    } else {
+      CallbackStore.unregisterById(onExitCallbackId);
+    }
+
+    let fileDialProps :FileDialProps = {
+      parent:procId,
+      type:type,
+      onOkayCallbackId:onOkayCallbackId,
+      onCancelCallbackId:onCancelCallbackId,
+      onExitCallbackId:onExitCallbackId,
+    };
+    if(args?.includes){
+      fileDialProps.includes = args.includes;
+    }
+    if(args?.excludes){
+      fileDialProps.excludes = args.excludes;
+    }
+    this.add('filedialogue', {parent:procId, fileDialProps:fileDialProps});
   }
 
   public frontsParent(){
