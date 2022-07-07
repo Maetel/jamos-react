@@ -76,9 +76,12 @@ export default function Modal(props) {
   const [focusIdx, setFocusIdx] = useState(modal.buttons ? 0 : null);
 
   const handleKeydown = (e) => {
+    const isFront = JamOS.procmgr.getValue(proc.id, "zIndex") === "0";
+    if (!isFront) {
+      return;
+    }
     // 'Enter' : left button
     // 'ESC' : right button
-    let res = undefined;
     // e.preventDefault();
     const keyMap = {
       Enter: () => {
@@ -93,7 +96,7 @@ export default function Modal(props) {
       Escape: () => {
         // setRes(modal.buttons?.at((modal.buttons?.length ?? 0) - 1));
         if (modal.buttons) {
-          res = modal.buttons?.at(modal.buttons?.length - 1);
+          const res = modal.buttons?.at(modal.buttons?.length - 1);
           updateModalResult(res);
         }
         closeThis();

@@ -103,14 +103,16 @@ export default function Notepad(props) {
     ToolbarControl.RegisterBuilder(proc.id)
       .register("Notepad", "Open", () => {
         JamOS.procmgr.openFileDialogue(proc.id, "Load", {
+          name: "Open text file",
           includes: ["text"],
           onOkay: onLoadDialogue,
         });
       })
       .register("Notepad", "Save", () => {
-        if (JamOS.filemgr.fileExists(filePath)) {
+        const fp = JamOS.procmgr.getValue(proc.id, "filePath");
+        if (JamOS.filemgr.fileExists(fp)) {
           const val = JamOS.procmgr.getValue(proc.id, "textAreaValue") ?? "";
-          JamOS.filemgr.updateFileData(filePath, "text", val);
+          JamOS.filemgr.updateFileData(fp, "text", val);
         }
       })
       .register(
@@ -118,6 +120,7 @@ export default function Notepad(props) {
         "Save As",
         () => {
           JamOS.procmgr.openFileDialogue(proc.id, "Save", {
+            name: "Save as",
             includes: ["text"],
             onOkay: onSaveDialogue,
           });

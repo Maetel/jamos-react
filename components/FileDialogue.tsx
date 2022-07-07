@@ -58,9 +58,8 @@ export default function FileDialogue(props) {
   }, []);
 
   const handleOkay = (e) => {
-    const curPath = procmgr.getValue(proc.id, "currentPath") ?? "";
     const val = Path.join(
-      curPath,
+      procmgr.getValue(proc.id, "currentPath") ?? "",
       procmgr.getValue(proc.id, "inputValue")
     ).path;
     procmgr.set(proc.parent, { fileDial: val });
@@ -69,9 +68,8 @@ export default function FileDialogue(props) {
     procmgr.kill(proc.id);
   };
   const handleCancel = (e) => {
-    const curPath = procmgr.getValue(proc.id, "currentPath") ?? "";
     const val = Path.join(
-      curPath,
+      procmgr.getValue(proc.id, "currentPath") ?? "",
       procmgr.getValue(proc.id, "inputValue")
     ).path;
     CallbackStore.getById(fileDialProps.onCancelCallbackId)?.(val);
@@ -80,6 +78,10 @@ export default function FileDialogue(props) {
   };
 
   const handleKey = (e) => {
+    const isFront = JamOS.procmgr.getValue(proc.id, "zIndex") === "0";
+    if (!isFront) {
+      return;
+    }
     const keyMap = {
       Enter: handleOkay,
       Escape: handleCancel,

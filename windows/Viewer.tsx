@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import ShimmerImage from "../components/ShimmerImage";
 import Window from "../components/Window";
 import JamOS from "../features/JamOS/JamOS";
+import Process from "../features/procmgr/ProcTypes";
 import { ToolbarControl } from "../grounds/Toolbar";
 import Path from "../scripts/Path";
 import styles from "../styles/Viewer.module.css";
@@ -9,10 +10,11 @@ import styles from "../styles/Viewer.module.css";
 const fallbackOnLoad = "/imgs/imageerror.svg";
 
 export default function Viewer(props) {
-  const proc = { ...props.proc };
+  const proc: Process = { ...props.proc };
   proc.name = proc.name ?? "Image viewer";
   proc.resize = proc.resize ?? "none";
-  const initialNodePath = proc.node?.path ?? fallbackOnLoad;
+  const initialNodePath =
+    proc.node && proc.node.type === "image" ? proc.node.path : fallbackOnLoad;
 
   const isFront = JamOS.procmgr.isFront(proc.id);
   const colors = JamOS.theme.colors;
@@ -41,39 +43,38 @@ export default function Viewer(props) {
     keyMap[e.key]?.();
   };
 
+  const openLoadFileDialogue = () => {
+    JamOS.procmgr.openFileDialogue(proc.id, "Load", {
+      name: "Open image",
+      includes: ["image"],
+      onOkay: (params) => {
+        if (!params) {
+          return;
+        }
+        if (typeof params === "string") {
+          params = params.trim();
+          const f = filemgr.fileValue(params);
+          if (f && f.node.type === "image") {
+            setNodePath(params);
+          } else {
+            JamOS.setNotif(`'${params}' is not an image file.`, "error");
+          }
+        }
+      },
+    });
+  };
   useEffect(() => {
     ToolbarControl.RegisterBuilder(proc.id).register(
       "Image viewer",
       "Open",
-      () => {
-        JamOS.procmgr.openFileDialogue(proc.id, "Load", {
-          includes: ["image"],
-          onOkay: (params) => {
-            if (!params) {
-              return;
-            }
-            if (typeof params === "string") {
-              params = params.trim();
-              const f = filemgr.fileValue(params);
-              if (f && f.node.type === "image") {
-                setNodePath(params);
-              } else {
-                JamOS.setNotif(`'${params}' is not an image file.`, "error");
-              }
-            }
-          },
-        });
-      }
+      openLoadFileDialogue
     );
   }, []);
 
   useEffect(() => {
-    console.log("Set intiial node path :", initialNodePath);
     setNodePath(initialNodePath);
-    // const { imageIdx, imageCount } = getMeta(initialNodePath);
     const { imageIdx, imageCount } = getMeta();
     setImageIdx(imageIdx);
-    // console.log("imageIdx:", imageIdx, ", imageCount:", imageCount);
 
     window.addEventListener("keydown", handleKey);
     return () => {
@@ -84,6 +85,10 @@ export default function Viewer(props) {
   //states
   // const [nodePath, setNodePath] = useState("");
   // const [imageIdx, setImageIdx] = useState(null);
+  const isImage = () => {
+    const p = JamOS.procmgr.getReadable(proc.id, "nodePath");
+    return JamOS.filemgr.fileValue(p)?.node.type === "image";
+  };
   const nodePathReadable = JamOS.procmgr.getReadable(proc.id, "nodePath");
   const imageIdxReadable = JamOS.procmgr.getReadable(proc.id, "imageIdx");
   const [alt, setAlt] = useState("");
@@ -210,6 +215,9 @@ export default function Viewer(props) {
             <div className="noImage">No image found!</div>
           ) : (
             <ShimmerImage
+              onClick={() => {
+                openLoadFileDialogue();
+              }}
               src={src}
               alt={alt}
               layout="fill"

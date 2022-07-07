@@ -931,6 +931,10 @@ export default function Terminal(props) {
 
   let tobeset = cmdValue;
   const handleKeydown = (e) => {
+    const isFront = JamOS.procmgr.getValue(proc.id, "zIndex") === "0";
+    if (!isFront) {
+      return;
+    }
     const keyMap = {
       Enter: handleCommand,
       Tab: (e) => {

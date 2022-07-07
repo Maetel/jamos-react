@@ -113,9 +113,9 @@ public psValue(){
         const path = _cmds.slice(1).join(" ");
         this.add(cmd, { path: path, ...args });
         break;
-        case "styler":
-          const style = _cmds.slice(1).join(" ");
-          JamOS.setmgr.setTheme(style);
+      case "styler":
+        const style = _cmds.slice(1).join(" ");
+        JamOS.setmgr.setTheme(style);
         // this.add(cmd, { style: style, ...args });
         break;
       default:
@@ -240,7 +240,7 @@ public psValue(){
 
   
   // watch proc.fileDial for retval
-  public openFileDialogue(procId:string, type:'Save'|'Load', args?: {includes?:string[], excludes?:string[], onOkay?: (params?)=>void,
+  public openFileDialogue(procId:string, type:'Save'|'Load', args?: {name?:string, includes?:string[], excludes?:string[], onOkay?: (params?)=>void,
     onCancel?: (params?)=>void,onExit?: (params?)=>void,}){
 
     const onOkayCallbackId = `${procId}/FileDialogue/onOkay`;
@@ -269,13 +269,17 @@ public psValue(){
       onCancelCallbackId:onCancelCallbackId,
       onExitCallbackId:onExitCallbackId,
     };
-    if(args?.includes){
-      fileDialProps.includes = args.includes;
+    const merges = ['includes', 'excludes'];
+    merges.forEach(key=>{
+      if(args[key]){
+        fileDialProps[key] = args[key];
+      }
+    })
+    const retval = {parent:procId, fileDialProps:fileDialProps};
+    if(args?.name){
+      retval['name'] = args.name;
     }
-    if(args?.excludes){
-      fileDialProps.excludes = args.excludes;
-    }
-    this.add('filedialogue', {parent:procId, fileDialProps:fileDialProps});
+    this.add('filedialogue', retval);
   }
 
   public frontsParent(){
