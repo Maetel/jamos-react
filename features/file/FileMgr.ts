@@ -1,6 +1,6 @@
 import store from "../../app/store";
 import Path from "../../scripts/Path";
-import { addFile, dirExists, dirValue, fileExists, fileValue, loadFilesFromString, mkdir, rm, rmdir, selectDir, selectFile, selectFileData, selectNode, selectNodesInDir, setFileData } from "./fileSlice";
+import { addFile, dirExists, dirValue, fileExists, fileValue, loadFilesFromString, mkdir, mv, rm, rmdir, selectDir, selectFile, selectFileData, selectNode, selectNodesInDir, setFileData } from "./fileSlice";
 import { File, NodeControl } from "./FileTypes";
 import {useAppSelector} from '../../app/hooks'
 import type {Node} from './FileTypes'
@@ -136,5 +136,8 @@ export default class FileMgr {
 
   public fileDataValue(path:string, dataKey?:string){
     return dataKey ? fileValue(path)?.data[dataKey] : fileValue(path)?.data
+  }
+  public mv(from:string, to:string){
+    store.dispatch(mv({from:from, to:to}));
   }
 }

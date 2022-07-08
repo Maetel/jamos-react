@@ -5,43 +5,34 @@ import Process from "../features/procmgr/ProcTypes";
 import { useEffect, useRef, useState } from "react";
 import { ToolbarControl } from "../grounds/Toolbar";
 import { clamp } from "../scripts/utils";
-
-export type ModalCallback = (params?) => any;
-export class ModalCallbacks {
-  public static callbacks: { [key: string]: ModalCallback } = {};
-  constructor() {}
-  static register(procId: string, cb: ModalCallback) {
-    this.callbacks[procId] = cb;
-  }
-  static exe(procId: string, params?) {
-    // console.log("ModalCallbacks.exe with ", procId, ", params : ", params);
-    return this.callbacks[procId]?.(params);
-  }
-}
+import CallbackStore from "../features/JamOS/Callbacks";
 
 export interface ModalProps {
   parent: string;
   title?: string;
   descs?: string[];
   buttons?: string[];
+  callbackIds?: string[];
+
+  //for TextModal
+  placeholder?: string;
 }
 
+export type ModalCallbackChannel = ((params?: any) => any)[];
+
 export default function Modal(props) {
+  const callbackChannel: ModalCallbackChannel = props.callbackChannel ?? [];
   const proc: Process = { ...props.proc };
   const modal: ModalProps = proc.modal;
   proc.rect = proc.rect ?? {
-    position: "absolute",
-    top: "50%",
-    left: "50%",
     width: "400px",
     height: "300px",
-    transform: "translate(-200px, -150px)",
   };
   proc.name = proc.name ?? modal.title ?? "";
   proc.disableBackground = proc.disableBackground ?? true;
+  proc.closeOnBackgroundClick = proc.closeOnBackgroundClick ?? true;
   // proc.disableDrag = false;
   proc.hideNav = proc.hideNav ?? true;
-  console.log("proc.hideNav:", proc.hideNav);
 
   const colors = JamOS.theme.colors;
   const procmgr = JamOS.procmgr;
@@ -71,7 +62,29 @@ export default function Modal(props) {
   }, []);
 
   const updateModalResult = (val: string) => {
-    procmgr.set(modal.parent, { modalRetval: val });
+    // procmgr.set(modal.parent, { modalRetval: val });
+    const idx = modal?.buttons?.indexOf(val);
+    if (idx === undefined) {
+      return;
+    }
+
+    const cbId = modal.callbackIds?.at(idx);
+    props.updateModalResult?.(val);
+    const callback = CallbackStore.getById(cbId);
+    if (!callback) {
+      return;
+    }
+
+    {
+      //hook
+      const hook = callbackChannel?.at(idx);
+      if (hook) {
+        // console.log("Hooked by outer component.");
+        hook(callback);
+        return;
+      }
+    }
+    callback(val);
   };
   const [focusIdx, setFocusIdx] = useState(modal.buttons ? 0 : null);
 
@@ -180,9 +193,7 @@ export default function Modal(props) {
           {proc.hideNav && (
             <div className={`${styles.title}`}>{modal.title ?? ""}</div>
           )}
-          {props.children ? (
-            props.children
-          ) : (
+          {modal.descs && (
             <div className={styles.descs}>
               {modal.descs?.map((desc, i) => {
                 return (
@@ -197,6 +208,7 @@ export default function Modal(props) {
               })}
             </div>
           )}
+          {props.children}
 
           <div className={`${styles.buttons}`}>
             {modal.buttons?.map((btn, i) => (

@@ -16,15 +16,33 @@ export function FinderCore(props) {
   const callbackId = proc.callbackId;
   const blockExeFile = proc.blockExeFile;
   const backBtn = useRef(null);
+  // const initialPath = JamOS.filemgr.dirExists(proc.path) ? proc.path : proc.node.path;
+  const initialPath = proc.node.path;
+
+  const updateNode = () => {
+    const node: Node = JamOS.procmgr.getValue(proc.id, "node");
+    const curPath = JamOS.procmgr.getValue(proc.id, "currentPath");
+    const copied: Node = { ...node, path: curPath };
+    JamOS.procmgr.set(proc.id, { node: copied });
+  };
 
   useEffect(() => {
-    JamOS.procmgr.set(proc.id, { currentPath: proc.path });
+    //priority
+    let curPath = initialPath;
+    if (JamOS.filemgr.dirExists(curPath)) {
+      JamOS.procmgr.set(proc.id, { currentPath: curPath });
+      updateNode();
+      return;
+    } else {
+      throw new Error("");
+    }
   }, []);
   const currentPath = JamOS.procmgr.getReadable(proc.id, "currentPath");
   const setCurrentPath = (path) => {
     JamOS.procmgr.set(proc.id, { currentPath: path });
+    updateNode();
   };
-  const [pathList, setPathList] = useState([proc.path]);
+  const [pathList, setPathList] = useState([initialPath]);
   const fileDialProps: FileDialProps = proc.fileDialProps;
   const incls = fileDialProps?.includes;
   const excls = fileDialProps?.excludes;
@@ -51,6 +69,14 @@ export function FinderCore(props) {
   });
 
   useEffect(() => {
+    if (!currentPath) {
+      return;
+    }
+    if (!JamOS.filemgr.dirExists(currentPath)) {
+      JamOS.setNotif("Directory removed : " + currentPath, "error");
+      procmgr.kill(proc.id);
+    }
+
     ToolbarControl.RegisterBuilder(proc.id)
       .unregisterAll()
       .register("Finder", "New directory", () => {
@@ -95,6 +121,7 @@ export function FinderCore(props) {
               node: node,
               key: i,
               onClick: onIconClick,
+              owner: proc.id,
             });
           }
         })}

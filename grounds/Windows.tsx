@@ -23,6 +23,7 @@ import System from "./System";
 import Viewer from "../windows/Viewer";
 import FileDialogue from "../components/FileDialogue";
 import ContextMenu from "../components/ContextMenu";
+import TextModal from "../components/TextModal";
 
 const winCmdMap: { [key: string]: (props) => JSX.Element } = {
   testwindow: TestWindow,
@@ -44,6 +45,7 @@ const winCmdMap: { [key: string]: (props) => JSX.Element } = {
   viewer: Viewer,
   filedialogue: FileDialogue,
   contextmenu: ContextMenu,
+  textmodal: TextModal,
 };
 
 export default function Windows(props) {

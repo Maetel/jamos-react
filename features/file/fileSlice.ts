@@ -154,6 +154,38 @@ const fileSlice = createSlice({
     rm : (state,action:PayloadAction<string>)=>{
       _rm(state, action.payload);
     },
+    mv : (state,action:PayloadAction<{from:string,to:string}>)=>{
+      const from = action.payload.from.trim();
+      const to = action.payload.to.trim();
+      
+      //verify
+      {
+        if(!_verifyPath(from) || !_verifyPath(to)){
+          console.error(`Path provided is not correct. from:${from} to:${to}`)
+          return;
+        }
+        const toDirExists = findDir(state, to);
+        if(toDirExists){
+          console.error(`Directory ${to} exists`);
+          return;
+        }
+        const toFileExists = findFile(state, to);
+        if(toFileExists){
+          console.error(`File ${to} exists`);
+          return;
+        }
+      }
+      
+      const dirFound = findDir(state, from);
+      if(dirFound){
+        dirFound.node.path = to;;
+      }
+      
+      const fileFound = findFile(state, from);
+      if(fileFound){
+        fileFound.node.path = to;;
+      }
+    },
     rmdir : (state,action:PayloadAction<string>)=>{
       //delete recursively
       const path = action.payload;
@@ -259,4 +291,4 @@ export const fileExists = (path:string)=>!!fileValue(path)
 ////////////////////////
 
 export default fileSlice.reducer;
-export const { mkdir, addFile, rm, rmdir, loadFilesFromString,setFileData } = fileSlice.actions;
+export const { mkdir, addFile, rm, rmdir, loadFilesFromString, setFileData, mv } = fileSlice.actions;

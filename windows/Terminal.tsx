@@ -18,7 +18,6 @@ import officialThemes, { themeExists } from "../features/settings/Themes";
 import { ToolbarControl } from "../grounds/Toolbar";
 import JamOS from "../features/JamOS/JamOS";
 import Process from "../features/procmgr/ProcTypes";
-import { ModalCallback, ModalCallbacks, ModalProps } from "../components/Modal";
 import { dirExists } from "../features/file/fileSlice";
 
 const viewMap = {
@@ -47,15 +46,7 @@ export default function Terminal(props) {
   };
   proc.onFocus = focusOnInput;
   const otherProcs = procmgr.procs;
-  const modalRetval = procmgr.getReadable(proc.id, "modalRetval");
   const fileDialRetval = procmgr.getReadable(proc.id, "fileDial");
-
-  let onModalChange: (val: string) => void = (val) => {
-    console.log("On modal change value in terminal : ", modalRetval);
-  };
-  useEffect(() => {
-    ModalCallbacks.exe(proc.id, modalRetval);
-  }, [modalRetval]);
 
   useEffect(() => {
     // addText("get from file dial : " + fileDialRetval);
@@ -485,15 +476,7 @@ export default function Terminal(props) {
       //   case "atelier":
       // case "markdown":
       case "test":
-        break;
-        procmgr.openFileDialogue(proc.id, "Save", {
-          onExit: () => {
-            if (inputElem.current) {
-              inputElem.current.focus();
-            }
-          },
-          includes: ["image"],
-        });
+        // procmgr.openTextModal(proc.id, { title: "Terminal test" });
         break;
       case "postman":
       case "about":
@@ -694,109 +677,40 @@ export default function Terminal(props) {
           return;
         }
 
-        if (0) {
-          const rmdirModal: ModalProps = {
-            parent: proc.id,
-            title: "Remove directory?",
-            descs: [
-              `Remove directory '${mergedFilePath.path}'?`,
-              " You cannot undo this action.",
-            ],
-            buttons: ["Remove", "Cancel"],
-          };
-          procmgr.add("modal", { parent: proc.id, modal: rmdirModal });
-
-          const rmdirModalCallback: ModalCallback = (val) => {
-            console.log("Registered onModalChange, val : ", val);
-            if (val === "Remove") {
+        procmgr.openModal(proc.id, {
+          title: "Remove directory?",
+          descs: [
+            `Remove directory '${mergedFilePath.path}'?`,
+            " You cannot undo this action.",
+          ],
+          buttons: ["Remove", "Cancel"],
+          callbacks: [
+            () => {
+              //on "Remove"
               filemgr.rmdir(mergedFilePath.path);
               if (!dirExists(mergedFilePath.path)) {
                 addSuccess("rmdir " + mergedFilePath.path);
+                JamOS.setNotif(
+                  "Removed directory : " + mergedFilePath.path,
+                  "system"
+                );
               } else {
                 addError("Failed rmdir " + mergedFilePath.path);
-              }
-            } else {
-              addWarn("Canceled rmdir " + mergedFilePath.path);
-            }
-          };
-          ModalCallbacks.register(proc.id, rmdirModalCallback);
-        } else {
-          procmgr.openModal(proc.id, {
-            title: "Remove directory?",
-            descs: [
-              `Remove directory '${mergedFilePath.path}'?`,
-              " You cannot undo this action.",
-            ],
-            buttons: ["Remove", "Cancel"],
-            callbacks: [
-              () => {
-                //on "Remove"
-                filemgr.rmdir(mergedFilePath.path);
-                if (!dirExists(mergedFilePath.path)) {
-                  addSuccess("rmdir " + mergedFilePath.path);
-                  JamOS.setNotif(
-                    "Removed directory : " + mergedFilePath.path,
-                    "system"
-                  );
-                } else {
-                  addError("Failed rmdir " + mergedFilePath.path);
-                  JamOS.setNotif(
-                    "Failed rmdir : " + mergedFilePath.path,
-                    "system"
-                  );
-                }
-                inputElem.current.focus();
-              },
-              () => {
-                //on "Cancel"
-                addWarn("Canceled rmdir " + mergedFilePath.path);
                 JamOS.setNotif(
-                  "Canceled rmdir : " + mergedFilePath.path,
-                  "warn"
+                  "Failed rmdir : " + mergedFilePath.path,
+                  "system"
                 );
-                inputElem.current.focus();
-              },
-            ],
-          });
-        }
-
-        // const info = filesInDirectory(filemgr.findDirValue(mergedFilePath));
-        // focusout();
-        // procmgr.openModal({
-        //   title: "Remove directory",
-        //   descs: [
-        //     `Directory ${mergedFilePath.path} and its files will be removed,`,
-        //     `which contains ${info.totalDirs} directories and ${info.totalFiles} files.`,
-        //   ],
-        //   buttons: ["Remove", "Cancel"],
-        //   callbacks: [
-        //     () => {
-        //       // procmgr.modalResult = { result: "remove" };
-        //       if (filemgr.rmdir(mergedFilePath)) {
-        //         addText("Directory removed");
-        //       } else {
-        //         addWarn(
-        //           `Failed to remove directory. ${
-        //             mergedFilePath.isHome ? 'Directory was "home".' : ""
-        //           }`
-        //         );
-        //       }
-        //       procmgr.closeModal();
-        //       {
-        //         console.log("InputELem focus");
-        //         inputElem.focus();
-        //       }
-        //     },
-        //     () => {
-        //       // procmgr.modalResult = { result: "cancel" };
-        //       addWarn("Canceled.");
-        //       procmgr.closeModal();
-        //       console.log("InputELem focus");
-        //       inputElem.focus();
-        //     },
-        //   ],
-        // });
-
+              }
+              inputElem.current.focus();
+            },
+            () => {
+              //on "Cancel"
+              addWarn("Canceled rmdir " + mergedFilePath.path);
+              JamOS.setNotif("Canceled rmdir : " + mergedFilePath.path, "warn");
+              inputElem.current.focus();
+            },
+          ],
+        });
         return;
       case "ls":
         //join path if exists

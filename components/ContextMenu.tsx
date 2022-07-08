@@ -75,7 +75,6 @@ export default function ContextMenu(props) {
   }, []);
   useEffectOnce(() => {
     return () => {
-      console.log("Unregister...");
       CallbackStore.unregisterByIds(menus.callbackIds);
     };
   });
@@ -115,10 +114,6 @@ export default function ContextMenu(props) {
                   .filter((_item) => _item !== "__separator__")
                   .findIndex((_item) => _item === item);
                 CallbackStore.getById(menus.callbackIds.at(cbIdx))?.(item);
-                console.log(
-                  "menus.callbackIds.at(cbIdx):",
-                  menus.callbackIds.at(cbIdx)
-                );
                 killThis();
               }}
               style={{

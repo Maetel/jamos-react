@@ -1,0 +1,13 @@
+.container {
+  /* margin-bottom:20px; */
+}
+
+.input {
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  resize: none;
+  border-radius: 20px;
+  box-sizing: border-box;
+  outline: none;
+}

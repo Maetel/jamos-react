@@ -4,8 +4,6 @@ import JamOS from "../features/JamOS/JamOS";
 import Path from "../scripts/Path";
 import styles from "../styles/FinderIcon.module.css";
 import ShimmerImage from "./ShimmerImage";
-import hash from "object-hash";
-import CallbackStore from "../features/JamOS/Callbacks";
 
 const abbreviate = (path: string) => {
   const max = 15;
@@ -16,7 +14,7 @@ export default function FinderIcon(props) {
   let contElem = useRef<HTMLDivElement>(null),
     highElem = useRef(null),
     descElem = useRef(null);
-
+  const owner: string = props.owner; //owner process id | 'system'
   const procmgr = JamOS.procmgr;
   const nodepath: string = props.node.path;
   const node: Node = JamOS.filemgr.nodeReadable(nodepath);
@@ -66,11 +64,23 @@ export default function FinderIcon(props) {
       ["Open", "__separator__", "Rename"],
       [
         () => {
-          console.log("Onclick:");
           onClick(node);
         },
         () => {
-          console.log("Rename");
+          const _path = new Path(nodepath);
+          procmgr.openTextModal(owner, {
+            title: "Rename",
+            descs: [`Rename from ${nodepath} to`],
+            placeholder: _path.last,
+            callbacks: [
+              (params) => {
+                const from = nodepath;
+                const to = Path.join(_path.parent, params).path;
+                console.log(`try filmgr.mv from [ ${from}] to [ ${to} ]`);
+                JamOS.filemgr.mv(from, to);
+              },
+            ],
+          });
         },
       ]
     );

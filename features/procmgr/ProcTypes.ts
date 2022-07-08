@@ -16,13 +16,16 @@ export default interface Process {
   //onFocus?:()=>void,
   toolbar:ToolbarItem[],
   node?:Node,
+  killable?:boolean,
 
   children?:string[], // automatically added in procSlice.addProc reducer
   parent?:string, //in case this is a child process
 
   //value input from modal (child) window
-  modalRetval?:string,
-  killable?:boolean,
+  // modalRetval?:string,
+  // textmodalRetval?:string,
+  // moveFrom?:string,
+  
 
   //window options
   hideNav?:boolean,
@@ -38,6 +41,8 @@ export default interface Process {
   isMinimized?:boolean,
   isMaximized?:boolean,
   resize? : 'both' | 'none',
+
+  
 
   [key:string]:any
 }
@@ -68,6 +73,7 @@ export const _ProcessCommands:ProcessCommand[] = [
   {comp:"text", icon:"/imgs/text.svg", type:'system'},
   
   {comp:"modal", icon:"/imgs/circlequestion.svg"},
+  {comp:"textmodal", icon:"/imgs/circlequestion.svg"},
   {comp:"filedialogue", icon:"/imgs/circlequestion.svg"},
   {comp:"contextmenu", icon:"/imgs/circlequestion.svg"},
 

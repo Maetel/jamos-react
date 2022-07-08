@@ -1,7 +1,7 @@
 import { useAppSelector } from "../../app/hooks";
 import store from "../../app/store";
 import { FileDialProps } from "../../components/FileDialogue";
-import { ModalCallbacks, ModalProps } from "../../components/Modal";
+import { ModalProps } from "../../components/Modal";
 import { ToolbarControl } from "../../grounds/Toolbar";
 import Path, { addError } from "../../scripts/Path";
 import {  ToolbarItem } from "../../scripts/ToolbarTypes";
@@ -80,7 +80,7 @@ public psValue(){
     const d = dirValue(path.path);
     if(d){
       //if is directory, open it
-      this.exeCmd(d.node.exeCmd);
+      this.exeCmd(d.node.exeCmd, {node : d.node});
       return;
     }
 
@@ -180,16 +180,18 @@ public psValue(){
       descs:args?.descs??['This action cannot be undone.'],
       buttons:args?.buttons?? (onDontSave?['Save', "Don't save", 'Cancel']:['Save', 'Cancel'])
     };
-    this.add('modal', {parent:procId, modal:modalProps});
-    ModalCallbacks.register(procId, (val)=>{
-      if(val==='Save'){
-        onSave();
-      } else if (val === "Don't save"){
-        onDontSave?.();
-      } else {
-        args?.onCancel?.();
-      }
-    });
+    //TODO
+    // CallbackStore.registerById(`${procId}/Modal/`)
+    // this.add('modal', {parent:procId, modal:modalProps});
+    // ModalCallbacks.register(procId, (val)=>{
+    //   if(val==='Save'){
+    //     onSave();
+    //   } else if (val === "Don't save"){
+    //     onDontSave?.();
+    //   } else {
+    //     args?.onCancel?.();
+    //   }
+    // });
   }
 
   public openConfirm(procId:string, onConfirm:()=>void,  args?: {title?:string,descs?:string[], buttons?:string[], onCancel?:()=>any}){
@@ -200,16 +202,18 @@ public psValue(){
       buttons:args?.buttons??['Okay', 'Cancel']
     };
     this.add('modal', {parent:procId, modal:modalProps});
-    ModalCallbacks.register(procId, (val)=>{
-      if(val==='Okay'){
-        onConfirm();
-      } else {
-        args?.onCancel?.();
-      }
-    });
+
+    //TODO
+    // ModalCallbacks.register(procId, (val)=>{
+    //   if(val==='Okay'){
+    //     onConfirm();
+    //   } else {
+    //     args?.onCancel?.();
+    //   }
+    // });
   }
 
-  public openModal(procId:string, args?: {title?:string,descs?:string[], buttons?:string[], callbacks?:(()=>void)[]}){
+  public openModal(procId:string, args?: {title?:string,descs?:string[], buttons?:string[], callbacks?:((params?:any)=>void)[], type?:'modal'|'textmodal'}){
     let modalProps :ModalProps = {parent:procId};
     if(args){
       modalProps = {...modalProps, ...args};
@@ -217,19 +221,20 @@ public psValue(){
         delete modalProps['callbacks'];
       }
     }
-    this.add('modal', {parent:procId, modal:modalProps});
 
-    const callbackMap:{[key:string]:()=>void} = {};
-    if(args?.buttons){
-      args.buttons.forEach((btn,i)=>{
-        if(args?.callbacks?.at(i)){
-          callbackMap[btn] = args.callbacks.at(i);
-        }
+    const callbackIds:string[] = [];
+    args?.buttons?.forEach((btn,i)=>{
+      const id = `${procId}/Modal/${btn}`;
+      const callbackExists = args?.callbacks?.at(i);
+      CallbackStore.registerById(id, callbackExists?args.callbacks.at(i):(params)=>{
+        console.log("Placeholder callback, params:",params);
       })
-    }
-    ModalCallbacks.register(procId, (val)=>{
-      callbackMap[val]?.();
+      callbackIds.push(id);
     })
+    modalProps = {...modalProps, ...{callbackIds:callbackIds}};
+    this.add(args?.type ?? 'modal', {parent:procId, modal:modalProps});
+    // Object.assign(modalProps, {callbackIds:callbackIds})
+    // modalProps['callbackIds'] = callbackIds;
 
     if(args?.buttons?.length !== args?.callbacks?.length){
       console.warn("openModal : button and callback count do not match. ")
@@ -238,7 +243,20 @@ public psValue(){
     }
   }
 
-  
+  public openTextModal(procId:string, args?:{title?:string, placeholder?:string, descs?:string[], buttons?:string[], callbacks?:((params?:any)=>void)[]}) {
+    const defaultArgs = {
+      title:args?.title?? 'Input text',
+      descs:args?.descs,
+      buttons:args?.buttons ?? ['Okay', 'Cancel'],
+      callbacks:args?.callbacks,
+      type:'textmodal' as ('modal'|'textmodal'),
+      placeholder:args?.placeholder
+    }
+
+    this.openModal(procId, defaultArgs)
+  }
+
+
   // watch proc.fileDial for retval
   public openFileDialogue(procId:string, type:'Save'|'Load', args?: {name?:string, includes?:string[], excludes?:string[], onOkay?: (params?)=>void,
     onCancel?: (params?)=>void,onExit?: (params?)=>void,}){
@@ -325,7 +343,8 @@ public psValue(){
   }
 
   public getValue (procId:string, prop:string){
-    return store.getState().proc.procs.find(proc=>proc.id===procId)?.[prop];
+    const found = store.getState().proc.procs.find(proc=>proc.id===procId);
+    return found?.[prop];
   }
 
   public getReadable (procId:string, prop:string){

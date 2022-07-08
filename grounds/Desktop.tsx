@@ -38,7 +38,11 @@ export default function Desktop(props) {
       <FinderIcon fileNode={node.node} />
     {/each} */}
         {homeNodes.map((node, i) => {
-          return React.createElement(FinderIcon, { node: node, key: i });
+          return React.createElement(FinderIcon, {
+            node: node,
+            key: i,
+            owner: "system",
+          });
         })}
       </div>
     </div>
