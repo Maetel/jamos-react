@@ -807,7 +807,8 @@ export default function Terminal(props) {
         break;
       case "finder":
         dest = Path.join(pwd.path, cmds.at(1)).path;
-        procmgr.add("finder", { path: dest });
+        // procmgr.add("finder", { path: dest });
+        procmgr.exeCmd(`finder ${dest}`);
         break;
       case "browser":
         dest = cmds.at(1) || "";

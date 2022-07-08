@@ -46,6 +46,7 @@ export default function Viewer(props) {
   const openLoadFileDialogue = () => {
     JamOS.procmgr.openFileDialogue(proc.id, "Load", {
       name: "Open image",
+      pathHint: new Path(nodePathReadable).parent,
       includes: ["image"],
       onOkay: (params) => {
         if (!params) {

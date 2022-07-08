@@ -12,7 +12,12 @@
   align-items: center;
   box-shadow: 0px 0px 2px #333;
 }
+.iconWrapper {
+  display:inline-block;
+}
 .browserContent {
+  width:40px;
+  height:40px;
   margin: 0;
   padding: 0;
   background-color: transparent;
@@ -31,19 +36,22 @@
   cursor: not-allowed;
 }
 .browserContent.button:hover {
-  background-color: #333;
-  color: #dbdbdb;
+  /* background-color: #333; */
+  /* color: #dbdbdb; */
 }
 
 .browserContent.button:disabled:hover {
-  color: #888;
-  background-color: transparent;
+  /* color: #888; */
+  /* background-color: transparent; */
 }
 
 .browserContent.path {
+  height:100%;
   width: calc(100% - 100px);
   resize: none;
   margin-left: 10px;
+  display:flex;
+  align-items: center;
 }
 .iconContainer {
   margin: 0;

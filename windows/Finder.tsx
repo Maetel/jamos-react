@@ -38,33 +38,35 @@ export function FinderCore(props) {
     }
   }, []);
   const currentPath = JamOS.procmgr.getReadable(proc.id, "currentPath");
+  const disableBack = currentPath === "~";
   const setCurrentPath = (path) => {
     JamOS.procmgr.set(proc.id, { currentPath: path });
     updateNode();
   };
-  const [pathList, setPathList] = useState([initialPath]);
   const fileDialProps: FileDialProps = proc.fileDialProps;
   const incls = fileDialProps?.includes;
   const excls = fileDialProps?.excludes;
   const onIconClick = (_node: Node) => {
     const nodeIsDir = () => _node.type === "dir";
     setCurrentPath(nodeIsDir() ? _node.path : currentPath);
-    setPathList((l) => {
-      return nodeIsDir() ? [...l, _node.path] : l;
-    });
+
     if (!nodeIsDir() && !blockExeFile) {
       procmgr.exeFile(new Path(_node.path));
     }
     CallbackStore.getById(callbackId)?.(_node);
   };
   const browseBack = (e) => {
-    setCurrentPath(pathList.at(pathList.length - 2) ?? currentPath);
-    setPathList((l) => l.slice(0, -1));
+    const _path = JamOS.procmgr.getValue(proc.id, "currentPath");
+    setCurrentPath(new Path(_path).parent);
+    return;
+
+    // setCurrentPath(pathList.at(pathList.length - 2) ?? currentPath);
+    // setPathList((l) => l.slice(0, -1));
   };
 
   useEffect(() => {
     if (backBtn?.current) {
-      (backBtn.current as HTMLButtonElement).disabled = pathList.length <= 1;
+      (backBtn.current as HTMLButtonElement).disabled = disableBack;
     }
   });
 
@@ -86,7 +88,20 @@ export function FinderCore(props) {
 
   const procmgr = JamOS.procmgr;
   const filemgr = JamOS.filemgr;
-
+  const colors = JamOS.theme.colors;
+  const [btnHovered, setBtnHovered] = useState(false);
+  const buildButtonStyle = () => {
+    return btnHovered
+      ? {
+          color: colors["2"],
+          backgroundColor: colors["1"],
+        }
+      : {
+          color: colors["1"],
+          backgroundColor: colors["2"],
+        };
+  };
+  const btnStyle = buildButtonStyle();
   ////////////// browse back and forth
   const nodes = filemgr.nodesReadable(currentPath);
   return nodes ? (
@@ -96,8 +111,24 @@ export function FinderCore(props) {
           className={`${styles.browserContent} ${styles.button}`}
           ref={backBtn}
           onClick={browseBack}
+          onMouseEnter={() => {
+            setBtnHovered(true && !disableBack);
+          }}
+          onPointerLeave={() => {
+            //TODO
+            //note : onMouseLeave event is not triggered when disabled, react bug
+            setBtnHovered(false && !disableBack);
+          }}
+          style={btnStyle}
         >
           &larr;
+          {/* <div className={styles.iconWrapper}>
+            <ShimmerImage
+              src={"/imgs/back.svg"}
+              width={20}
+              height={20}
+            ></ShimmerImage>
+          </div> */}
         </button>
         {/* <button
             className={`${styles.browserContent} ${styles.button}`}
@@ -119,7 +150,7 @@ export function FinderCore(props) {
           if (!incls || incls?.includes(node.type) || node.type === "dir") {
             return React.createElement(FinderIcon, {
               node: node,
-              key: i,
+              key: node.id,
               onClick: onIconClick,
               owner: proc.id,
             });

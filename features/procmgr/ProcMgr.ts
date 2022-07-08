@@ -6,6 +6,7 @@ import { ToolbarControl } from "../../grounds/Toolbar";
 import Path, { addError } from "../../scripts/Path";
 import {  ToolbarItem } from "../../scripts/ToolbarTypes";
 import { dirValue, fileValue } from "../file/fileSlice";
+import { Node } from "../file/FileTypes";
 import CallbackStore from "../JamOS/Callbacks";
 import JamOS from "../JamOS/JamOS";
 
@@ -106,12 +107,18 @@ public psValue(){
     //parse commands with multiple arguments
     switch (cmd) {
       case "finder":
+        const dirpath = _cmds.slice(1).join(" ");
+        const dirnode:Node = dirValue(dirpath)?.node;
+        console.log("dirnode:",dirnode);
+        this.add(cmd, { path: dirpath, node:dirnode, ...args });
+        break;
       case "notepad":
       case "markdown":
       case "browser":
       case "viewer":
         const path = _cmds.slice(1).join(" ");
-        this.add(cmd, { path: path, ...args });
+        const node:Node = dirValue(path)?.node ?? fileValue(path)?.node;
+        this.add(cmd, { path: path, node:node, ...args });
         break;
       case "styler":
         const style = _cmds.slice(1).join(" ");
@@ -227,7 +234,7 @@ public psValue(){
       const id = `${procId}/Modal/${btn}`;
       const callbackExists = args?.callbacks?.at(i);
       CallbackStore.registerById(id, callbackExists?args.callbacks.at(i):(params)=>{
-        console.log("Placeholder callback, params:",params);
+        // console.log("Placeholder callback, params:",params);
       })
       callbackIds.push(id);
     })
@@ -236,7 +243,7 @@ public psValue(){
     // Object.assign(modalProps, {callbackIds:callbackIds})
     // modalProps['callbackIds'] = callbackIds;
 
-    if(args?.buttons?.length !== args?.callbacks?.length){
+    if(false && args?.buttons?.length !== args?.callbacks?.length){
       console.warn("openModal : button and callback count do not match. ")
       console.warn(' - args?.buttons?.length : ',args?.buttons?.length)
       console.warn(' - args?.callbacks?.length : ',args?.callbacks?.length);
@@ -256,9 +263,7 @@ public psValue(){
     this.openModal(procId, defaultArgs)
   }
 
-
-  // watch proc.fileDial for retval
-  public openFileDialogue(procId:string, type:'Save'|'Load', args?: {name?:string, includes?:string[], excludes?:string[], onOkay?: (params?)=>void,
+  public openFileDialogue(procId:string, type:'Save'|'Load', args?: {name?:string, pathHint?:string, includes?:string[], excludes?:string[], onOkay?: (params?)=>void,
     onCancel?: (params?)=>void,onExit?: (params?)=>void,}){
 
     const onOkayCallbackId = `${procId}/FileDialogue/onOkay`;
@@ -293,7 +298,8 @@ public psValue(){
         fileDialProps[key] = args[key];
       }
     })
-    const retval = {parent:procId, fileDialProps:fileDialProps};
+    const node:Node = dirValue(args?.pathHint)?.node ?? dirValue('~').node;
+    const retval = {parent:procId, fileDialProps:fileDialProps, node:node};
     if(args?.name){
       retval['name'] = args.name;
     }
