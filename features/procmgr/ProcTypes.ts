@@ -22,14 +22,15 @@ export default interface Process {
 
   //value input from modal (child) window
   modalRetval?:string,
+  killable?:boolean,
 
   //window options
-  killable?:boolean,
   hideNav?:boolean,
   hideNavButtons?:boolean,
   hideOnDock?:boolean,
   disableBackground?:boolean,
-  translucentBackgroundOnDisable?:boolean,
+  opaqueBackground?:boolean,
+  closeOnBackgroundClick?:boolean,
   disableDrag?:boolean,
   disableCloseBtn?:boolean,
   disableMinBtn?:boolean,
@@ -68,6 +69,7 @@ export const _ProcessCommands:ProcessCommand[] = [
   
   {comp:"modal", icon:"/imgs/circlequestion.svg"},
   {comp:"filedialogue", icon:"/imgs/circlequestion.svg"},
+  {comp:"contextmenu", icon:"/imgs/circlequestion.svg"},
 
   {comp:"testwindow"},
   {comp:"viewer", icon:"/imgs/viewer.svg"},

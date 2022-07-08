@@ -105,13 +105,11 @@ export default function System(props) {
 
   const [beforeUnloadFunc, setBefore] = useState(null);
   useEffect(() => {
+    //TODO : this smells
     if (muteOptions) {
       return;
     }
 
-    console.log(
-      `Update option. saveOnExit:${saveOnExit}, askOnExit:${askOnExit}`
-    );
     const onSaveOnExit = (e) => {
       JamOS.saveData("breadData", JamOS.stringify());
       console.log("Save on exit");

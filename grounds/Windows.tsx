@@ -22,6 +22,7 @@ import Modal from "../components/Modal";
 import System from "./System";
 import Viewer from "../windows/Viewer";
 import FileDialogue from "../components/FileDialogue";
+import ContextMenu from "../components/ContextMenu";
 
 const winCmdMap: { [key: string]: (props) => JSX.Element } = {
   testwindow: TestWindow,
@@ -42,6 +43,7 @@ const winCmdMap: { [key: string]: (props) => JSX.Element } = {
   system: System,
   viewer: Viewer,
   filedialogue: FileDialogue,
+  contextmenu: ContextMenu,
 };
 
 export default function Windows(props) {

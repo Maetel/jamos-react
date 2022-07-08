@@ -1,9 +1,11 @@
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import store from "../../app/store";
+import { CtxMenuProps } from "../../components/ContextMenu";
 import FileMgr from "../file/FileMgr";
 import ProcMgr from "../procmgr/ProcMgr";
 import SetMgr from "../settings/SetMgr";
 import { Theme } from "../settings/Themes";
+import CallbackStore from "./Callbacks";
 import { Notif, selectNotifDuration, selectNotifs, setNotification } from "./osSlice";
 
 export interface SerializedData {
@@ -68,5 +70,25 @@ export default class JamOS {
     public static reset(){
       localStorage.clear();
     }
-  
+  public static openContextMenu(e, items:string[], callbacks:(()=>void)[]){
+    const itemsFiltered = items.filter(item=>(item!=='__separator__'));
+    if(itemsFiltered.length !== callbacks.length){
+      throw new Error("");
+    }
+    if(e.pageX===undefined){
+      throw new Error("");
+    }
+    
+    const ids = itemsFiltered.map(item=>`system/ContextMenu/${item}`)
+    callbacks.forEach((cb,i)=>{
+      CallbackStore.registerById(ids.at(i),cb);
+    })
+    const props:CtxMenuProps = {
+      pageX:e.pageX,
+      pageY:e.pageY,
+      items:items,
+      callbackIds:ids,
+    }
+    this.procmgr.add('contextmenu', {parent:'system', ctxMenuProps:props});
+  }
 }

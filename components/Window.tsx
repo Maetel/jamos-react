@@ -35,6 +35,10 @@ export default function Window(props) {
   const procmgr = JamOS.procmgr;
   const proc: Process = { ...props.proc };
   const {
+    hideNav,
+    hideNavButtons,
+    opaqueBackground,
+    closeOnBackgroundClick,
     disableBackground,
     disableDrag,
     disableMinBtn,
@@ -46,7 +50,7 @@ export default function Window(props) {
   const btnMinClass = proc["disableMinBtn"] ? styles.disabled : "";
   const btnCloseClass = proc["disableCloseBtn"] ? styles.disabled : "";
 
-  proc.name = proc.name ?? (proc.hideNav ? "" : "Application");
+  proc.name = proc.name ?? (hideNav ? "" : "Application");
   const get = (prop) => procmgr.getReadable(proc.id, prop);
   // const get = (prop) => procmgr.get(proc.id, prop);
 
@@ -276,10 +280,10 @@ export default function Window(props) {
     const retval = {};
     retval["color"] = _colors["2"];
     retval["backgroundColor"] = _colors["1"];
-    if (proc.disableDrag || proc.hideNav) {
+    if (proc.disableDrag || hideNav) {
       retval["cursor"] = "auto";
     }
-    if (proc.hideNav) {
+    if (hideNav) {
       // retval["display"] = "none";
       retval["color"] = _colors["1"];
       retval["backgroundColor"] = "transparent";
@@ -431,7 +435,7 @@ export default function Window(props) {
           ></ShimmerImage>
         )}
         <span className={styles["window-title"]}>
-          {proc.hideNav ? "" : proc.name}
+          {hideNav ? "" : proc.name}
         </span>
       </div>
     );
@@ -445,9 +449,9 @@ export default function Window(props) {
           proc.onFocus?.();
         }}
         style={{
-          position: proc.hideNav ? "absolute" : "relative",
+          position: hideNav ? "absolute" : "relative",
           top: 0,
-          height: proc.hideNav ? "100%" : "calc(100% - 30px)",
+          height: hideNav ? "100%" : "calc(100% - 30px)",
         }}
       >
         {(props as any).children}
@@ -456,13 +460,13 @@ export default function Window(props) {
   };
 
   const Buttons = (props) => {
-    const bg = proc.hideNav ? _colors["1"] : _colors["2"];
+    const bg = hideNav ? _colors["1"] : _colors["2"];
     return (
       <ul
         className={styles["button-container"]}
         style={{
           backgroundColor: navHovered ? bg : "transparent",
-          display: proc.hideNavButtons ? "none" : "flex",
+          display: hideNavButtons ? "none" : "flex",
         }}
         onMouseEnter={(e) => {
           // navElemStyle["backgroundColor"] = _colors["3"];
@@ -492,15 +496,12 @@ export default function Window(props) {
     );
   };
 
-  const elems = proc.hideNav
-    ? [Header, NestedBody, Buttons]
-    : [NestedBody, Header, Buttons];
-  // const contentBgSrc = "/imgs/paper2.webp";
-  // const contentBgSrc = "/imgs/neon1.jpg";
+  const bgColor = opaqueBackground ? _colors["2"] + "77" : "transparent";
+
   const contentBgSrc = undefined;
   return (
     <>
-      {disableBackground ? (
+      {disableBackground && (
         <div
           className="disableBackground"
           style={{
@@ -509,11 +510,16 @@ export default function Window(props) {
             left: "0px",
             width: "100vw",
             height: "100vh",
-            backgroundColor: _colors["2"] + "77",
-            cursor: "not-allowed",
+            backgroundColor: bgColor,
+            // cursor: "not-allowed",
+          }}
+          onClick={(e) => {
+            if (closeOnBackgroundClick) {
+              procmgr.kill(proc.id);
+            }
           }}
         ></div>
-      ) : undefined}
+      )}
       <section
         className={`${styles["window-container"]}`}
         id={winId}
@@ -530,9 +536,9 @@ export default function Window(props) {
             proc.onFocus?.();
           }}
           style={{
-            // position: proc.hideNav ? "absolute" : "relative",
-            top: proc.hideNav ? 0 : 30,
-            height: proc.hideNav ? "100%" : "calc(100% - 30px)",
+            // position: hideNav ? "absolute" : "relative",
+            top: hideNav ? 0 : 30,
+            height: hideNav ? "100%" : "calc(100% - 30px)",
           }}
         >
           {contentBgSrc && (
@@ -546,7 +552,7 @@ export default function Window(props) {
           )}
           {(props as any).children}
         </div>
-        <Header></Header>
+        {!hideNav && !disableDrag && <Header></Header>}
         <Buttons></Buttons>
       </section>
     </>

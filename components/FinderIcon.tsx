@@ -1,12 +1,11 @@
-import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { File, Node } from "../features/file/FileTypes";
 import JamOS from "../features/JamOS/JamOS";
 import Path from "../scripts/Path";
-import { randomId } from "../scripts/utils";
 import styles from "../styles/FinderIcon.module.css";
-import Loading from "./Loading";
 import ShimmerImage from "./ShimmerImage";
+import hash from "object-hash";
+import CallbackStore from "../features/JamOS/Callbacks";
 
 const abbreviate = (path: string) => {
   const max = 15;
@@ -14,7 +13,7 @@ const abbreviate = (path: string) => {
 };
 
 export default function FinderIcon(props) {
-  let contElem = useRef(null),
+  let contElem = useRef<HTMLDivElement>(null),
     highElem = useRef(null),
     descElem = useRef(null);
 
@@ -60,6 +59,27 @@ export default function FinderIcon(props) {
   const filename = new Path(node.path).last;
   const dispFilename = hovered ? filename : abbreviate(filename);
 
+  const handleContext = (e) => {
+    e.preventDefault();
+    JamOS.openContextMenu(
+      e,
+      ["Open", "__separator__", "Rename"],
+      [
+        () => {
+          console.log("Onclick:");
+          onClick(node);
+        },
+        () => {
+          console.log("Rename");
+        },
+      ]
+    );
+  };
+
+  useEffect(() => {
+    contElem.current.oncontextmenu = handleContext;
+  }, []);
+
   return (
     node && (
       <div
@@ -84,25 +104,6 @@ export default function FinderIcon(props) {
           }}
         />
         <div className={styles.imgContainer} style={imgContainerStyle}>
-          {/* <ShimerImage
-            src={src}
-            alt={`${node.type} icon of ${node.path}`}
-            onLoad={(e) => {
-              // console.log("e:", e);
-              setLoading(!true);
-            }}
-            onLoadingComplete={(e) => {
-              setLoading(false);
-            }}
-            objectFit="contain"
-            objectPosition={"center center"}
-            placeholder="blur"
-            blurDataURL={`data:image/svg+xml;base64,${toBase64(
-              shimmer("100%", "100%")
-            )}`}
-            width={"70%"}
-            height={"70%"}
-          ></ShimmerImage> */}
           <ShimmerImage
             src={src}
             alt={`${node.type} icon of ${node.path}`}
@@ -118,14 +119,6 @@ export default function FinderIcon(props) {
             width={"70%"}
             height={"70%"}
           ></ShimmerImage>
-          {false && (
-            <Loading
-              width="70%"
-              height="70%"
-              barHeight="0"
-              borderRadius="1rem"
-            ></Loading>
-          )}
         </div>
         <div
           className={styles.desc}

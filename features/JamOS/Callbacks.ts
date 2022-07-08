@@ -24,12 +24,25 @@ export default class CallbackStore {
     return this._callbacks[procId]?.[callbackKey];
   }
 
+  private static _debug:boolean = !true;
   private static _callbacksById:{[key:string]:Callback} = {};
   public static registerById(callbackId:string, cb:Callback){
     this._callbacksById[callbackId] = cb;
+
+    if(this._debug)
+    {
+      console.log("Register callbackId:",callbackId,", this._callbacksById[callbackId]:",this._callbacksById[callbackId])
+    }
   }
   public static unregisterById(callbackId:string){
+    if(this._debug){
+
+      console.log('Unregister:',callbackId,", delete:",this._callbacksById[callbackId]);
+    }
     delete this._callbacksById[callbackId];
+  }
+  public static unregisterByIds(callbackIds:string[]){
+    callbackIds.forEach(id=>this.unregisterById(id));
   }
   public static getById(callbackId:string){
     return this._callbacksById[callbackId];
