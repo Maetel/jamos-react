@@ -2,6 +2,9 @@ import Path from "../../scripts/Path";
 import Log from "../log/Log";
 import { getProcessCommandsIcon } from "../procmgr/ProcTypes";
 
+//TODO : A node should be linked from root
+// hard-coded path will not work efficiently
+// ex) when a directory is renamed, its containing dirs and files must be renamed too, which will conclude in disefficiency
 export interface Node {
   id: string,
   path:string,

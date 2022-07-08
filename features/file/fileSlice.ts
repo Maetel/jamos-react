@@ -11,7 +11,6 @@ export interface FileState {
 }
 
 const initialHomePath = '~';
-const initialHomePathRefined = new Path(initialHomePath);
 const initialHome:Dir = {
   dirs:[],
   files:[],
@@ -22,7 +21,6 @@ const initialState :FileState = {
   
 }
 
-const dateString = ()=>{return new Date().toDateString()}
 const _verifyPath = (path:string)=>{
   if (!path.startsWith(initialHomePath)) {
     return false;
@@ -154,6 +152,7 @@ const fileSlice = createSlice({
     rm : (state,action:PayloadAction<string>)=>{
       _rm(state, action.payload);
     },
+
     mv : (state,action:PayloadAction<{from:string,to:string}>)=>{
       const from = action.payload.from.trim();
       const to = action.payload.to.trim();
@@ -176,14 +175,27 @@ const fileSlice = createSlice({
         }
       }
       
+      const pathFrom = new Path(from);
       const dirFound = findDir(state, from);
+
+      
       if(dirFound){
-        dirFound.node.path = to;;
+        // dirFound.node.path = to;
+        
+        // for v0.1, rename all containing nodes recursively
+        const changePrefix = (dir:WritableDraft<Dir>)=>{
+          dir.node.path = dir.node.path.replace(from, to);
+          dir.files.forEach(_file=>{
+            _file.node.path = _file.node.path.replace(from, to);
+          });
+          dir.dirs.forEach(_dir=>changePrefix(_dir));
+        }
+        changePrefix(dirFound);
       }
       
       const fileFound = findFile(state, from);
       if(fileFound){
-        fileFound.node.path = to;;
+        fileFound.node.path = to;
       }
     },
     rmdir : (state,action:PayloadAction<string>)=>{
