@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import PromptTableView, { TableData } from "../components/PromptTableView";
 import Window from "../components/Window";
+import CallbackStore from "../features/JamOS/Callbacks";
 import JamOS from "../features/JamOS/JamOS";
 import Process from "../features/procmgr/ProcTypes";
 
@@ -79,14 +80,43 @@ export default function SystemInfo(props) {
     );
   };
 
+  const CallbacksList = (props) => {
+    const rows = [];
+    console.log("CallbackStore.callbacks:", CallbackStore.callbacks);
+    for (let key in CallbackStore.callbacks) {
+      rows.push([key, CallbackStore.callbacks[key].toString()]);
+    }
+    if (rows.length === 0) {
+      rows.push(["No callback found", "No callback found"]);
+    }
+    const tableData: TableData = {
+      desc: `CallbackStore.callbacks`,
+      heads: ["Callback name", "Function"],
+      rows: rows,
+      weights: [1, 4],
+    };
+    return <PromptTableView tableData={tableData}></PromptTableView>;
+  };
+
   return (
     <Window {...props} proc={proc}>
       <div className={styles.container}>
         <div className={`${styles.flex1}`}>
-          Currently running{" "}
-          {`${procmgr.procs.length} ${
-            procmgr.procs.length > 1 ? "processes" : "process"
-          }`}
+          <div className={styles.overall}>
+            <h1>Overall</h1>
+            <ul>
+              <li>
+                Currently running{" "}
+                {`${procmgr.procs.length} ${
+                  procmgr.procs.length > 1 ? "processes" : "process"
+                }`}
+              </li>
+              <li>
+                <CallbacksList></CallbacksList>
+              </li>
+            </ul>
+          </div>
+
           {procs.map((proc, i) => {
             return <CollapsibleProc proc={proc} key={i}></CollapsibleProc>;
           })}

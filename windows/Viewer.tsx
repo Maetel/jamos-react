@@ -117,7 +117,7 @@ export default function Viewer(props) {
 
     if (0) {
       const rect = {
-        width: _w + 30,
+        width: _w,
         height: _h,
       };
       JamOS.procmgr.set(proc.id, { rect: rect });
@@ -193,9 +193,7 @@ export default function Viewer(props) {
 
       const { imageIdx, imageCount } = getMeta();
       windowName =
-        "Image viewer - " +
-        nodePathReadable +
-        ` [${imageIdx + 1}/${imageCount}]`;
+        new Path(nodePathReadable).last + ` [${imageIdx + 1}/${imageCount}]`;
     } else {
       // console.log("nodePathReadable.length: false");
       navNext.current.style.setProperty("display", "none");

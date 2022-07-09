@@ -1,5 +1,5 @@
 
-type Callback = (params)=>any;
+type Callback = (params?)=>any;
 type Callbacks = {[key:string]: Callback};
 export default class CallbackStore {
   private static _callbacks:{[key:string]:Callbacks} = {};
@@ -26,6 +26,7 @@ export default class CallbackStore {
 
   private static _debug:boolean = !true;
   private static _callbacksById:{[key:string]:Callback} = {};
+  public static get callbacks() { return this._callbacksById; }
   public static registerById(callbackId:string, cb:Callback){
     this._callbacksById[callbackId] = cb;
 
@@ -33,16 +34,25 @@ export default class CallbackStore {
     {
       console.log("Register callbackId:",callbackId,", this._callbacksById[callbackId]:",this._callbacksById[callbackId])
     }
+    return this;
   }
   public static unregisterById(callbackId:string){
+    if(!callbackId || callbackId.length===0){
+      return;
+    } 
     if(this._debug){
 
       console.log('Unregister:',callbackId,", delete:",this._callbacksById[callbackId]);
     }
     delete this._callbacksById[callbackId];
+    return this;
   }
   public static unregisterByIds(callbackIds:string[]){
+    if(!callbackIds){
+      return;
+    }
     callbackIds.forEach(id=>this.unregisterById(id));
+    return this;
   }
   public static getById(callbackId:string){
     return this._callbacksById[callbackId];

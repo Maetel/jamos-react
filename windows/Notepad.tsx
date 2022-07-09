@@ -11,6 +11,8 @@ export default function Notepad(props) {
   const filemgr = JamOS.filemgr;
   const proc: Process = { ...props.proc };
   proc.name = proc.name || "Notepad";
+  proc.resize = proc.resize ?? "both";
+
   const filePath = JamOS.procmgr.getReadable(proc.id, "filePath");
   const setFilePath = (path: string) => {
     JamOS.procmgr.set(proc.id, { filePath: path });

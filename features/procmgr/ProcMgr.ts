@@ -433,4 +433,13 @@ public psValue(){
     this.id = this.psValue().length+1;
       console.log("Id after load: ",this.id);
   }
+
+  public blink(procId:string, timeout_ms = 300){
+    this.set(procId, { beginBlink:true})
+      this.set(procId, { endBlink:false})
+      setTimeout(()=>{
+      this.set(procId, { beginBlink:false})
+      this.set(procId, { endBlink:true})
+    }, timeout_ms);
+  }
 }

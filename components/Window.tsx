@@ -1,6 +1,7 @@
 import Image from "next/image";
 import React from "react";
 import { useEffect, useRef, useState } from "react";
+import CallbackStore from "../features/JamOS/Callbacks";
 import JamOS from "../features/JamOS/JamOS";
 import Log from "../features/log/Log";
 
@@ -55,6 +56,26 @@ export default function Window(props) {
   // const get = (prop) => procmgr.get(proc.id, prop);
 
   ////////////////// rect / style / theme
+  const beginBlink = procmgr.getReadable(proc.id, "beginBlink");
+  const endBlink = procmgr.getReadable(proc.id, "endBlink");
+  const [blinking, setBlinking] = useState(false);
+  const onBlink = () => {
+    setBlinking((val) => !val);
+  };
+  useEffect(() => {
+    if (beginBlink) {
+      const id = setInterval(onBlink, 60);
+      procmgr.set(proc.id, { blinkIntervalId: id });
+      procmgr.set(proc.id, { endBlink: false });
+    }
+  }, [beginBlink]);
+  useEffect(() => {
+    if (endBlink) {
+      const id = procmgr.getValue(proc.id, "blinkIntervalId");
+      clearInterval(id);
+      procmgr.set(proc.id, { beginBlink: false });
+    }
+  }, [endBlink]);
   const _colors = JamOS.theme.colors;
   const buildStyle = (rect: Rect) => {
     const retval = {};
@@ -112,7 +133,9 @@ export default function Window(props) {
     {
       retval["color"] = _colors["1"];
       retval["backgroundColor"] = _colors["2"];
-      retval["boxShadow"] = _colors["boxShadow"];
+      retval["boxShadow"] =
+        beginBlink && !endBlink && blinking ? "none" : _colors["boxShadow"];
+      console.log('retval["boxShadow"]:', retval["boxShadow"]);
     }
 
     //bar
@@ -131,6 +154,9 @@ export default function Window(props) {
     return retval;
   };
   const [contElemStyle, setContElemStyle] = useState(null);
+  useEffect(() => {
+    setContElemStyle(buildStyle(rectReadable));
+  }, [blinking]);
   useEffect(() => {
     // console.log("New rect called");
     // console.log("Initial rect : ", proc.rect);
@@ -514,6 +540,7 @@ export default function Window(props) {
             // cursor: "not-allowed",
           }}
           onClick={(e) => {
+            CallbackStore.getById(proc.onBackgroundClick)?.();
             if (closeOnBackgroundClick) {
               procmgr.kill(proc.id);
             }

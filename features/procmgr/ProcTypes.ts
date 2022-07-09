@@ -18,6 +18,7 @@ export default interface Process {
   node?:Node,
   killable?:boolean,
 
+  style?:{[key:string]:string}, //whatever additional styles
   children?:string[], // automatically added in procSlice.addProc reducer
   parent?:string, //in case this is a child process
 
@@ -26,6 +27,10 @@ export default interface Process {
   // textmodalRetval?:string,
   // moveFrom?:string,
   
+  //callbackIds, can be found in CallbackStore.callbacks
+  onBackgroundClick?:string,
+  beginBlink?:boolean,
+  endBlink?:boolean,
 
   //window options
   hideNav?:boolean,

@@ -7,6 +7,7 @@ import styles from "../styles/FileDialogue.module.css";
 import JamOS from "../features/JamOS/JamOS";
 import { Node } from "../features/file/FileTypes";
 import Path from "../scripts/Path";
+import useEffectOnce from "../scripts/useEffectOnce";
 
 export interface FileDialProps {
   parent: string;
@@ -34,6 +35,7 @@ export default function FileDialogue(props) {
   proc.path = "~";
   proc.blockExeFile = true;
   proc.callbackId = `FileDialogue-${proc.id}`;
+  proc.onBackgroundClick = `${proc.id}/FileDialogue/onBackgroundClick`;
 
   const colors = JamOS.theme.colors;
   const procmgr = JamOS.procmgr;
@@ -54,8 +56,21 @@ export default function FileDialogue(props) {
         }
       }
       // console.log("registerById, params:", params);
+    }).registerById(proc.onBackgroundClick, (params) => {
+      procmgr.blink(proc.id);
     });
   }, []);
+
+  useEffectOnce(() => {
+    return () => {
+      CallbackStore.unregisterByIds([
+        proc.callbackId,
+        fileDialProps.onOkayCallbackId,
+        fileDialProps.onCancelCallbackId,
+        fileDialProps.onExitCallbackId,
+      ]);
+    };
+  });
 
   const handleOkay = (e) => {
     const val = Path.join(

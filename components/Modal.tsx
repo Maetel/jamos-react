@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { ToolbarControl } from "../grounds/Toolbar";
 import { clamp } from "../scripts/utils";
 import CallbackStore from "../features/JamOS/Callbacks";
+import useEffectOnce from "../scripts/useEffectOnce";
 
 export interface ModalProps {
   parent: string;
@@ -184,6 +185,12 @@ export default function Modal(props) {
     }
     return retval;
   };
+
+  useEffectOnce(() => {
+    return () => {
+      CallbackStore.unregisterByIds(modal.callbackIds);
+    };
+  });
 
   return (
     <Window {...props} proc={proc}>

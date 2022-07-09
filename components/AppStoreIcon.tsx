@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { File } from "../features/file/FileTypes";
 import JamOS from "../features/JamOS/JamOS";
 import Path from "../scripts/Path";
@@ -7,6 +7,8 @@ import styles from "../styles/AppStoreIcon.module.css";
 import ShimmerImage from "./ShimmerImage";
 
 export default function AppStoreIcon(props) {
+  const owner = props.owner;
+  const contElem = useRef<HTMLDivElement>(null);
   const file: File = props.file;
   const filemgr = JamOS.filemgr;
   let updateExists = () => {
@@ -15,7 +17,7 @@ export default function AppStoreIcon(props) {
   const [exists, setExists] = useState(updateExists());
   const _colors = JamOS.theme.colors;
 
-  const onClick = (e) => {
+  const onClick = () => {
     if (filemgr.fileExists(file.node.path)) {
       //remove;
       filemgr.rm(file.node.path);
@@ -25,8 +27,33 @@ export default function AppStoreIcon(props) {
     setExists(updateExists());
   };
 
+  const handleContext = (e) => {
+    e.preventDefault();
+    JamOS.openContextMenu(
+      e,
+      ["About", exists ? "Remove" : "Add"],
+      [
+        () => {
+          JamOS.procmgr.openModal(owner, {
+            title: "About",
+            descs: ["To be updated"],
+            buttons: ["Okay"],
+          });
+        },
+        () => {
+          //pass
+          onClick();
+        },
+      ]
+    );
+  };
+
+  useEffect(() => {
+    contElem.current.oncontextmenu = handleContext;
+  }, [exists]);
+
   return (
-    <div className={`${styles["item-container"]}`}>
+    <div className={`${styles["item-container"]}`} ref={contElem}>
       <div className={`${styles.item}`} onClick={onClick}>
         <div className={`${styles["image-container"]}`}>
           <ShimmerImage
