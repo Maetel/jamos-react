@@ -135,7 +135,6 @@ export default function Window(props) {
       retval["backgroundColor"] = _colors["2"];
       retval["boxShadow"] =
         beginBlink && !endBlink && blinking ? "none" : _colors["boxShadow"];
-      console.log('retval["boxShadow"]:', retval["boxShadow"]);
     }
 
     //bar
@@ -196,6 +195,12 @@ export default function Window(props) {
 
     {
       // console.log(proc.name, ": disableBackground:", disableBackground);
+    }
+
+    {
+      if (proc.hideOnDock) {
+        procmgr.set(proc.id, { hideOnDock: true });
+      }
     }
   }, []);
   const rectReadable: Rect = get("rect");

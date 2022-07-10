@@ -3,8 +3,6 @@ import JamOS from "../features/JamOS/JamOS";
 import Process from "../features/procmgr/ProcTypes";
 import Modal, { ModalCallbackChannel, ModalProps } from "./Modal";
 import styles from "../styles/TextModal.module.css";
-import useEffectOnce from "../scripts/useEffectOnce";
-import CallbackStore from "../features/JamOS/Callbacks";
 
 export default function TextModal(props) {
   const callbackChannel: ModalCallbackChannel = [
@@ -18,6 +16,7 @@ export default function TextModal(props) {
   const procmgr = JamOS.procmgr;
   const proc: Process = { ...props.proc };
   const modal: ModalProps = proc.modal;
+  proc.hideOnDock = true;
   proc.rect = {
     width: 500,
     height: 320,

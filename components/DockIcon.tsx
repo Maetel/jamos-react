@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import JamOS from "../features/JamOS/JamOS";
-import { getProcessCommandsIcon } from "../features/procmgr/ProcTypes";
+import Process, { getProcessCommandsIcon } from "../features/procmgr/ProcTypes";
 import styles from "../styles/DockIcon.module.css";
 import ShimmerImage from "./ShimmerImage";
 
@@ -19,7 +19,7 @@ export default function DockIcon(props) {
   const onIconClick = onClick ?? onClickDefault;
   const src = getProcessCommandsIcon(type);
 
-  let contElem = useRef(null);
+  let contElem = useRef<HTMLDivElement>(null);
   const procmgr = JamOS.procmgr;
 
   // if (!node) {
@@ -37,6 +37,51 @@ export default function DockIcon(props) {
   const color1 = colors["1"];
   const color2 = colors["2"];
   const color3 = colors["3"];
+  const procsOfType: Process[] = procmgr.processOfType(type);
+
+  const handleContext = (e) => {
+    e.preventDefault();
+    JamOS.procmgr.openDock();
+    JamOS.closeAllContextMenus();
+
+    let menus, callbacks;
+    if (procsOfType.length === 0) {
+      menus = ["Open"];
+      callbacks = [
+        () => {
+          console.log("type:", type);
+          procmgr.add(type);
+          JamOS.procmgr.closeDock();
+        },
+      ];
+    } else {
+      menus = [
+        ...procsOfType.map((_proc) => _proc.name),
+        "__separator__",
+        "Close all",
+      ];
+      callbacks = [
+        ...procsOfType.map((_proc) => () => {
+          procmgr.setFront(_proc.id);
+          JamOS.procmgr.closeDock();
+        }),
+        () => {
+          procmgr.killAllofType(type);
+        },
+      ];
+    }
+
+    const rect = contElem.current.getBoundingClientRect();
+    const topOffset = 10;
+    const x = rect.left / window.innerWidth < 0.5 ? rect.left : rect.right;
+    const y = rect.top - topOffset;
+
+    JamOS.openContextMenu(x, y, menus, callbacks);
+  };
+
+  useEffect(() => {
+    contElem.current.oncontextmenu = handleContext;
+  }, [procsOfType, hovered]);
 
   useEffect(() => {
     contElem.current.style.overflow = hovered ? "show" : "hidden";

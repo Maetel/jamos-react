@@ -36,6 +36,23 @@ const _setActiveWindow = (state, id:string)=>{
   proc.children?.forEach(child=>{_setActiveWindow(state, child)})
 }
 
+const _killProc = (state, id:string)=>{
+  if(!id){
+    // a child might be killed already
+    return;
+  }
+  const found = state.procs.find(proc=>proc.id===id);
+  if(!found){
+    return;
+  }
+  //kill children recursively
+  found.children?.forEach(childProcId=>{
+    _killProc(state, childProcId);
+  })
+
+  state.procs = state.procs.filter(proc=>proc.id!==id);
+}
+
 export const procSlice = createSlice({
   name:'proc',
   initialState,
@@ -81,30 +98,34 @@ export const procSlice = createSlice({
       state.procs.push(action.payload);
     },
 
-    killProc:(state, action:PayloadAction<string>)=>{
-      const _killProc = (id:string)=>{
-        if(!id){
-          // a child might be killed already
-          return;
+    killAllofType:(state, action:PayloadAction<string>)=>{
+      const inputType = action.payload;
+      const killIds = [];
+      state.procs.forEach(proc=>{
+        if(proc.comp===inputType){
+          killIds.push(proc.id);
         }
-        const found = state.procs.find(proc=>proc.id===id);
-        if(!found){
-          return;
-        }
-        //kill children recursively
-        found.children?.forEach(childProcId=>{
-          _killProc(childProcId);
-        })
+      })
+      console.log("inputType:",inputType);
+      console.log("Killids:",killIds);
+      killIds.forEach(id=>{
+        _killProc(state, id);
+      })
+      
+      //squeez index
+      state.procs = [...state.procs].sort((l,r)=>parseInt(l.zIndex)-parseInt(r.zIndex)).map((proc, i)=>({...proc, zIndex:''+i}));
+    },
+    
 
-        state.procs = state.procs.filter(proc=>proc.id!==id);
-      }
+    killProc:(state, action:PayloadAction<string>)=>{
+      
       const inputId = action.payload;
       const found = state.procs.find(proc=>proc.id===inputId);
       if(!found || found.comp==='system'){
         return;
       }
 
-      _killProc(inputId);
+      _killProc(state, inputId);
 
       //squeez index
       state.procs = [...state.procs].sort((l,r)=>parseInt(l.zIndex)-parseInt(r.zIndex)).map((proc, i)=>({...proc, zIndex:''+i}));
@@ -336,7 +357,6 @@ export const selectGroupedProcsForDock = (state:AppState)=>{
   const procs:Process[] = state.proc.procs;
     const grouped:{[key:string]:Process[]} = procs.reduce((prev,proc)=>{
       if(proc.hideOnDock){
-        // console.log("hideOnDock:",proc.comp);
         return prev;
       }
       if(!prev[proc.comp]) {
@@ -381,5 +401,15 @@ export const selectFrontsParent = (state:AppState):Process=>{
   return topParent(state, front);
 }
 
+export const selectProcessOfType = (procType:String)=>(state:AppState)=>{
+  return state.proc.procs.reduce((prev,next)=>{
+    if(next.comp===procType){
+      prev.push(next);
+    }
+    return prev;
+  },[]);
+}
+
+
 export default procSlice.reducer;
-export const { addProc, killProc, killAllProcs, increaseIndices, setActiveWindow,setProcProps, minimize, unMinimize,toggleMinimize,toggleMaximize,setToolbarItem, openToolbar, closeToolbar, toggleToolbar, openDock, closeDock,toggleDock,pushToLast, loadProcFromString} = procSlice.actions
+export const { addProc, killProc, killAllProcs, increaseIndices, setActiveWindow,setProcProps, minimize, unMinimize,toggleMinimize,toggleMaximize,setToolbarItem, openToolbar, closeToolbar, toggleToolbar, openDock, closeDock,toggleDock,pushToLast, loadProcFromString, killAllofType} = procSlice.actions

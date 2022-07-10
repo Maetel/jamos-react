@@ -59,8 +59,10 @@ export default function FinderIcon(props) {
 
   const handleContext = (e) => {
     e.preventDefault();
+    JamOS.closeAllContextMenus();
     JamOS.openContextMenu(
-      e,
+      e.pageX,
+      e.pageY,
       ["Open", "__separator__", "Rename"],
       [
         () => {

@@ -36,6 +36,7 @@ export default function FileDialogue(props) {
   proc.blockExeFile = true;
   proc.callbackId = `FileDialogue-${proc.id}`;
   proc.onBackgroundClick = `${proc.id}/FileDialogue/onBackgroundClick`;
+  proc.hideOnDock = true;
 
   const colors = JamOS.theme.colors;
   const procmgr = JamOS.procmgr;

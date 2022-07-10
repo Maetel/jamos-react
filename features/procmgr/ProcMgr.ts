@@ -15,6 +15,7 @@ import {
   closeDock,
   closeToolbar,
   increaseIndices,
+  killAllofType,
   killAllProcs,
   killProc,
   loadProcFromString,
@@ -32,6 +33,7 @@ import {
   selectIsToolbarOpen,
   selectProcessById,
   selectProcesses,
+  selectProcessOfType,
   selectProcInIndexOrder,
   selectProcProp,
   setActiveWindow,
@@ -393,6 +395,10 @@ public psValue(){
     store.dispatch(closeDock());
   }
 
+  public killAllofType(type:string){
+    store.dispatch(killAllofType(type));
+  }
+
   public toggleMinimize(procId:string){
     store.dispatch(toggleMinimize(procId))
   }
@@ -441,5 +447,9 @@ public psValue(){
       this.set(procId, { beginBlink:false})
       this.set(procId, { endBlink:true})
     }, timeout_ms);
+  }
+
+  public processOfType(type:string):Process[]{
+    return useAppSelector(selectProcessOfType(type));
   }
 }

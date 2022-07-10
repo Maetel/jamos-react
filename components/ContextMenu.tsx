@@ -50,8 +50,8 @@ export default function ContextMenu(props) {
     const retval = {
       top: menus.pageY - (openDown ? 0 : menuH),
       left: menus.pageX - (openRight ? 0 : menuW),
-      width: menuW,
-      height: menuH,
+      // width: menuW,
+      // height: menuH,
       minWidth: menuW,
       minHeight: menuH,
     };

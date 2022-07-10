@@ -3,6 +3,7 @@ import store from "../../app/store";
 import { CtxMenuProps } from "../../components/ContextMenu";
 import FileMgr from "../file/FileMgr";
 import ProcMgr from "../procmgr/ProcMgr";
+import { killAllofType } from "../procmgr/procSlice";
 import SetMgr from "../settings/SetMgr";
 import { Theme } from "../settings/Themes";
 import CallbackStore from "./Callbacks";
@@ -70,12 +71,12 @@ export default class JamOS {
     public static reset(){
       localStorage.clear();
     }
-  public static openContextMenu(e, items:string[], callbacks:(()=>void)[]){
+    public static closeAllContextMenus(){
+      store.dispatch(killAllofType('contextmenu'));
+    }
+  public static openContextMenu(x:number, y:number, items:string[], callbacks:(()=>void)[]){
     const itemsFiltered = items.filter(item=>(item!=='__separator__'));
     if(itemsFiltered.length !== callbacks.length){
-      throw new Error("");
-    }
-    if(e.pageX===undefined){
       throw new Error("");
     }
     
@@ -84,8 +85,8 @@ export default class JamOS {
       CallbackStore.registerById(ids.at(i),cb);
     })
     const props:CtxMenuProps = {
-      pageX:e.pageX,
-      pageY:e.pageY,
+      pageX:x,
+      pageY:y,
       items:items,
       callbackIds:ids,
     }

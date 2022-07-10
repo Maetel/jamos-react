@@ -34,6 +34,7 @@ export default function Modal(props) {
   proc.closeOnBackgroundClick = proc.closeOnBackgroundClick ?? true;
   // proc.disableDrag = false;
   proc.hideNav = proc.hideNav ?? true;
+  proc.hideOnDock = true;
 
   const colors = JamOS.theme.colors;
   const procmgr = JamOS.procmgr;
