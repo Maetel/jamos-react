@@ -173,7 +173,7 @@ export default function Terminal(props) {
     _add(textItem);
   };
   const addPs = () => {
-    const data = procmgr.psValue().map((p) => {
+    const data = procmgr.processesValue().map((p) => {
       // 0. this?
       // 1. id
       // 2. name
@@ -602,7 +602,9 @@ export default function Terminal(props) {
       //   addText("Fetched data : " + JSON.stringify(res));
       //   break;
       case "kill":
-        const procToKill = procmgr.psValue().find((proc) => proc.id === merged);
+        const procToKill = procmgr
+          .processesValue()
+          .find((proc) => proc.id === merged);
         if (!procToKill) {
           addWarn("No process id found : " + merged);
           break;

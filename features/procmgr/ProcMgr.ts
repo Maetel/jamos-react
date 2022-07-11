@@ -75,9 +75,9 @@ export default class ProcMgr{
     store.dispatch(killAllProcs(procId));
   }
 
-public psValue(){
-  return processesValue();
-}
+  public processesValue(){
+    return processesValue();
+  }
 
   public exeFile(path: Path, args?: { [key: string]: any }) {
     const d = dirValue(path.path);
@@ -436,20 +436,25 @@ public psValue(){
     } catch (error) {
       console.error(error);
     }
-    this.id = this.psValue().length+1;
+    this.id = this.processesValue().length+1;
       console.log("Id after load: ",this.id);
   }
 
   public blink(procId:string, timeout_ms = 300){
-    this.set(procId, { beginBlink:true})
-      this.set(procId, { endBlink:false})
+    this.set(procId, { beginBlink:true, endBlink:false})
       setTimeout(()=>{
-      this.set(procId, { beginBlink:false})
-      this.set(procId, { endBlink:true})
+      this.set(procId, { beginBlink:false, endBlink:true})
     }, timeout_ms);
   }
 
   public processOfType(type:string):Process[]{
     return useAppSelector(selectProcessOfType(type));
+  }
+
+  public processReadable(procId:string){
+    return useAppSelector(selectProcessById('system'));
+  }
+  public processValue(procId:string){
+    return store.getState().proc.procs.find(_proc=>_proc.id===procId);
   }
 }

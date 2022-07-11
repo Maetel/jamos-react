@@ -7,21 +7,34 @@ import ShimmerImage from "./ShimmerImage";
 
 const abbreviate = (path: string) => {
   const max = 15;
-  return path.slice(0, max) + (path.length > max ? "..." : "");
+  return path?.slice(0, max) + (path?.length > max ? "..." : "");
 };
+
+export interface FinderIconProps {
+  node: Node;
+  onClick: (node) => void;
+  owner: string;
+  onNodeDrag?: (e) => void;
+  onNodeDrop?: (e) => void;
+}
 
 export default function FinderIcon(props) {
   let contElem = useRef<HTMLDivElement>(null),
     highElem = useRef(null),
     descElem = useRef(null);
-  const owner: string = props.owner; //owner process id | 'system'
+  const _props: FinderIconProps = props.finderIconProps;
+  const owner: string = _props.owner; //owner process id | 'system'
   const procmgr = JamOS.procmgr;
-  const nodepath: string = props.node.path;
+  const nodepath: string = _props.node.path;
   const node: Node = JamOS.filemgr.nodeReadable(nodepath);
   const file: File = JamOS.filemgr.fileReadable(nodepath);
+
+  const handleDragStart: (e) => void = _props.onNodeDrag;
+  const handleDrop: (e) => void = _props.onNodeDrop;
+
   const [loading, setLoading] = useState(!false);
   // const node: Node = file?.node;
-  const onClick: (Event) => void =
+  const onClick: (node) => void =
     props.onClick ??
     function (node: Node) {
       procmgr.exeFile(new Path(node.path));
@@ -31,10 +44,10 @@ export default function FinderIcon(props) {
   //   return;
   // }
   const setSrc = () => {
-    if (node.type === "image") {
-      return file?.data["src"] ?? node.iconPath;
+    if (node?.type === "image") {
+      return file?.data["src"] ?? node?.iconPath;
     }
-    return node.iconPath;
+    return node?.iconPath;
   };
   const src: string = setSrc();
   const width = 90;
@@ -54,7 +67,7 @@ export default function FinderIcon(props) {
     contElem.current.style.overflow = hoverIn ? "show" : "hidden";
   };
 
-  const filename = new Path(node.path).last;
+  const filename = new Path(node?.path).last;
   const dispFilename = hovered ? filename : abbreviate(filename);
 
   const handleContext = (e) => {
@@ -89,8 +102,40 @@ export default function FinderIcon(props) {
   };
 
   useEffect(() => {
-    contElem.current.oncontextmenu = handleContext;
+    if (contElem.current) {
+      contElem.current.oncontextmenu = handleContext;
+    }
   }, []);
+
+  // const handleDragStart = (e) => {
+  //   // e.preventDefault();
+  //   // console.log("Handle drag:", nodepath);
+  // };
+
+  // const handleDrop = (e) => {
+  //   e.preventDefault();
+
+  //   if (node.type === "dir") {
+  //     const fm = JamOS.filemgr;
+
+  //     const from: string = e.dataTransfer.getData("text/plain");
+  //     const to = node.path;
+
+  //     if ((fm.fileExists(from) || fm.dirExists(from)) && fm.dirExists(to)) {
+  //       const fromPath = new Path(from);
+  //       const dest = from.replace(fromPath.parent, to);
+  //       console.log("from:", from);
+  //       console.log("dest:", dest);
+  //       fm.mv(from, dest);
+  //     }
+  //   }
+  // };
+
+  const handleDragOver = (e) => {
+    // prevent dragOver to fire onDrop event
+    // e.stopPropagation();
+    e.preventDefault();
+  };
 
   return (
     node && (
@@ -107,6 +152,10 @@ export default function FinderIcon(props) {
           callHover(e, false);
         }}
         style={{ color: color1 }}
+        onDragStart={handleDragStart}
+        onDrop={handleDrop}
+        onDragOver={handleDragOver}
+        draggable={true}
       >
         <span
           className={styles.highlight}
@@ -115,7 +164,11 @@ export default function FinderIcon(props) {
             background: `linear-gradient(135deg, ${color1} 25%, ${color2} 60%, ${color3})`,
           }}
         />
-        <div className={styles.imgContainer} style={imgContainerStyle}>
+        <div
+          className={styles.imgContainer}
+          style={imgContainerStyle}
+          draggable={false}
+        >
           <ShimmerImage
             src={src}
             alt={`${node.type} icon of ${node.path}`}

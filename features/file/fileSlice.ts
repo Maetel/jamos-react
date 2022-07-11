@@ -157,6 +157,10 @@ const fileSlice = createSlice({
       const from = action.payload.from.trim();
       const to = action.payload.to.trim();
       
+      {
+        console.log(`From:${from}, to:${to}`);
+      }
+
       //verify
       {
         if(!_verifyPath(from) || !_verifyPath(to)){
@@ -175,10 +179,9 @@ const fileSlice = createSlice({
         }
       }
       
-      const pathFrom = new Path(from);
+      //case 1. from is a directory
       const dirFound = findDir(state, from);
-
-      
+      // debugger;
       if(dirFound){
         // dirFound.node.path = to;
         
@@ -191,11 +194,28 @@ const fileSlice = createSlice({
           dir.dirs.forEach(_dir=>changePrefix(_dir));
         }
         changePrefix(dirFound);
+        return;
       }
       
-      const fileFound = findFile(state, from);
+      //case 2. from is a file
+      const fileFound : WritableDraft<File> = findFile(state, from);
       if(fileFound){
+        const destDir : WritableDraft<Dir> = findDir(state, new Path(to).parent);
+        if(!destDir){
+          console.error("destDir not found : ",to);
+          return;
+        }
+
+        //step 1.
+        const fromDir: WritableDraft<Dir> = findDir(state, new Path(from).parent);
+        fromDir.files = [...fromDir.files.filter(_f=>_f.node.path !== from)];
+        
+        //step 2.
         fileFound.node.path = to;
+        fileFound.node.id = fileFound.node.type + to;
+        
+        //step 3.
+        destDir.files.push(fileFound);
       }
     },
     rmdir : (state,action:PayloadAction<string>)=>{

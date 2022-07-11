@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { FileDialProps } from "../components/FileDialogue";
-import FinderIcon from "../components/FinderIcon";
+import FinderIcon, { FinderIconProps } from "../components/FinderIcon";
 import Window from "../components/Window";
 import { Node } from "../features/file/FileTypes";
 import CallbackStore from "../features/JamOS/Callbacks";
@@ -10,6 +10,72 @@ import { ToolbarControl } from "../grounds/Toolbar";
 import Path from "../scripts/Path";
 
 import styles from "../styles/Finder.module.css";
+
+export interface NodesViewProps {
+  owner: string;
+  nodes: Node[];
+  excls?: string[];
+  incls?: string[];
+
+  onIconClick?: (node) => void;
+  // onNodeDrag?: (node: Node) => (e) => void;
+  // onNodeDrop?: (node: Node) => (e) => void;
+}
+export function NodesView(props) {
+  const nodesViewProps: NodesViewProps = props.nodesViewProps;
+  const { owner, nodes, excls, incls } = nodesViewProps;
+  const { onIconClick } = nodesViewProps;
+
+  const onNodeDrag = (node: Node) => (e) => {
+    console.log("drag");
+    e.dataTransfer.setData("text/plain", node.path);
+    e.dataTransfer.dropEffect = "move";
+  };
+
+  const onNodeDrop = (node: Node) => (e) => {
+    console.log("drop");
+    e.preventDefault();
+
+    if (node.type === "dir") {
+      const fm = JamOS.filemgr;
+
+      const from: string = e.dataTransfer.getData("text/plain");
+      const to = node.path;
+
+      if ((fm.fileExists(from) || fm.dirExists(from)) && fm.dirExists(to)) {
+        const fromPath = new Path(from);
+        const dest = from.replace(fromPath.parent, to);
+        console.log("from:", from);
+        console.log("dest:", dest);
+        fm.mv(from, dest);
+      }
+    }
+  };
+
+  return (
+    <>
+      {nodes.map((node, i) => {
+        if (excls?.includes(node.type)) {
+          return;
+        }
+
+        if (!incls || incls?.includes(node.type) || node.type === "dir") {
+          const _props: FinderIconProps = {
+            node: node,
+            owner: owner,
+            onClick: onIconClick,
+            onNodeDrag: onNodeDrag(node),
+            onNodeDrop: onNodeDrop(node),
+          };
+          return React.createElement(FinderIcon, {
+            key: node.id,
+            finderIconProps: _props,
+          });
+        }
+      })}
+    </>
+  );
+}
 
 export function FinderCore(props) {
   const proc: Process = props.proc;
@@ -104,61 +170,59 @@ export function FinderCore(props) {
   const btnStyle = buildButtonStyle();
   ////////////// browse back and forth
   const nodes = filemgr.nodesReadable(currentPath);
-  return nodes ? (
-    <div className={styles.container}>
-      <div className={styles.browser}>
-        <button
-          className={`${styles.browserContent} ${styles.button}`}
-          ref={backBtn}
-          onClick={browseBack}
-          onMouseEnter={() => {
-            setBtnHovered(true && !disableBack);
-          }}
-          onPointerLeave={() => {
-            //TODO
-            //note : onMouseLeave event is not triggered when disabled, react bug
-            setBtnHovered(false && !disableBack);
-          }}
-          style={btnStyle}
-        >
-          &larr;
-          {/* <div className={styles.iconWrapper}>
+
+  const nodesViewProps: NodesViewProps = {
+    nodes: nodes,
+    owner: proc.id,
+    excls: excls,
+    incls: incls,
+    onIconClick: onIconClick,
+  };
+
+  return (
+    nodes && (
+      <div className={styles.container}>
+        <div className={styles.browser}>
+          <button
+            className={`${styles.browserContent} ${styles.button}`}
+            ref={backBtn}
+            onClick={browseBack}
+            onMouseEnter={() => {
+              setBtnHovered(true && !disableBack);
+            }}
+            onPointerLeave={() => {
+              //TODO
+              //note : onMouseLeave event is not triggered when disabled, react bug
+              setBtnHovered(false && !disableBack);
+            }}
+            style={btnStyle}
+          >
+            &larr;
+            {/* <div className={styles.iconWrapper}>
             <ShimmerImage
               src={"/imgs/back.svg"}
               width={20}
               height={20}
             ></ShimmerImage>
           </div> */}
-        </button>
-        {/* <button
+          </button>
+          {/* <button
             className={`${styles.browserContent} ${styles.button}`}
             ref={forwardBtn}
             onClick={browseForward}
           >
             &rarr;
           </button> */}
-        <span className={`${styles.browserContent} ${styles.path}`}>
-          {currentPath}
-        </span>
+          <span className={`${styles.browserContent} ${styles.path}`}>
+            {currentPath}
+          </span>
+        </div>
+        <div className={styles.iconContainer}>
+          <NodesView nodesViewProps={nodesViewProps}></NodesView>
+        </div>
       </div>
-      <div className={styles.iconContainer}>
-        {nodes.map((node, i) => {
-          if (excls?.includes(node.type)) {
-            return;
-          }
-
-          if (!incls || incls?.includes(node.type) || node.type === "dir") {
-            return React.createElement(FinderIcon, {
-              node: node,
-              key: node.id,
-              onClick: onIconClick,
-              owner: proc.id,
-            });
-          }
-        })}
-      </div>
-    </div>
-  ) : undefined;
+    )
+  );
 }
 
 export default function Finder(props) {

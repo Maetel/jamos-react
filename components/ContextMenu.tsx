@@ -38,7 +38,7 @@ export default function ContextMenu(props) {
     const paddingVertical = 10;
     const itemHeight = 30;
     const separatorHeight = 10;
-    const menuW = 200;
+    const menuW = 280;
     const menuH =
       paddingVertical +
       menus.items
@@ -50,8 +50,8 @@ export default function ContextMenu(props) {
     const retval = {
       top: menus.pageY - (openDown ? 0 : menuH),
       left: menus.pageX - (openRight ? 0 : menuW),
-      // width: menuW,
-      // height: menuH,
+      width: menuW,
+      height: menuH,
       minWidth: menuW,
       minHeight: menuH,
     };
