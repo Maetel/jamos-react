@@ -3,7 +3,7 @@ import store from "../../app/store";
 import { CtxMenuProps } from "../../components/ContextMenu";
 import FileMgr from "../file/FileMgr";
 import ProcMgr from "../procmgr/ProcMgr";
-import { killAllofType } from "../procmgr/procSlice";
+import {killAllofType} from "../procmgr/procSlice";
 import SetMgr from "../settings/SetMgr";
 import { Theme } from "../settings/Themes";
 import CallbackStore from "./Callbacks";

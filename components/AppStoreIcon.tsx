@@ -30,7 +30,8 @@ export default function AppStoreIcon(props) {
   const handleContext = (e) => {
     e.preventDefault();
     JamOS.openContextMenu(
-      e,
+      e.pageX,
+      e.pageY,
       ["About", exists ? "Remove" : "Add"],
       [
         () => {
