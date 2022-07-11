@@ -106,8 +106,6 @@ export const procSlice = createSlice({
           killIds.push(proc.id);
         }
       })
-      console.log("inputType:",inputType);
-      console.log("Killids:",killIds);
       killIds.forEach(id=>{
         _killProc(state, id);
       })

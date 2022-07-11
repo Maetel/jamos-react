@@ -46,7 +46,7 @@ export default function DockIcon(props) {
 
     let menus, callbacks;
     if (procsOfType.length === 0) {
-      console.log("Added JamOS.procmgr.closeDock()");
+      // console.log("Added JamOS.procmgr.closeDock()");
       menus = ["Open"];
       callbacks = [
         () => {
@@ -55,7 +55,7 @@ export default function DockIcon(props) {
         },
       ];
     } else {
-      console.log("Added JamOS.procmgr.closeDock()");
+      // console.log("Added JamOS.procmgr.closeDock()");
       menus = [
         ...procsOfType.map((_proc) => _proc.name),
         "__separator__",

@@ -1,12 +1,11 @@
-import React, { useState } from "react";
-import { useEffect } from "react";
-import FinderIcon from "../components/FinderIcon";
-import { File } from "../features/file/FileTypes";
-import Path from "../scripts/Path";
-
+import React from "react";
 import styles from "../styles/Desktop.module.css";
 import JamOS from "../features/JamOS/JamOS";
-import { FinderCore, NodesView, NodesViewProps } from "../windows/Finder";
+import {
+  handleFinderIconDrop,
+  NodesView,
+  NodesViewProps,
+} from "../windows/Finder";
 
 const backgroundImg = "/imgs/wall2.jpg";
 const broomImg = "/imgs/broom.svg";
@@ -22,6 +21,7 @@ export default function Desktop(props) {
     owner: "system",
     nodes: homeNodes,
   };
+  const handleDrop = handleFinderIconDrop("system");
 
   return (
     <div
@@ -30,14 +30,7 @@ export default function Desktop(props) {
       onDragOver={(e) => {
         e.preventDefault();
       }}
-      onDrop={(e) => {
-        const path = e.dataTransfer.getData("text/plain");
-        if (path) {
-          const refined = new Path(path);
-          const dest = path.replace(refined.parent, "~");
-          filemgr.mv(path, dest);
-        }
-      }}
+      onDrop={handleDrop}
     >
       <div className={styles.bgImageWrapper}>
         <img

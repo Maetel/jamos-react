@@ -265,16 +265,16 @@ function CollapsibleMenu(props) {
   const menu: TbMenu = props.menu;
   const colors = JamOS.theme.colors;
   const collMenuElem = useRef(null);
-  // const [collActive, setCollActive] = useState(false);
-  const collActive = JamOS.procmgr.getReadable(
-    "system",
-    `toolbar/${menu.menu}`
-  );
-  const setCollActive = (val: boolean) => {
-    const obj = {};
-    obj[`toolbar/${menu.menu}`] = val;
-    JamOS.procmgr.set("system", obj);
-  };
+  const [collActive, setCollActive] = useState(false);
+  // const collActive = JamOS.procmgr.getReadable(
+  //   "system",
+  //   `toolbar/${menu.menu}`
+  // );
+  // const setCollActive = (val: boolean) => {
+  //   const obj = {};
+  //   obj[`toolbar/${menu.menu}`] = val;
+  //   JamOS.procmgr.set("system", obj);
+  // };
   const isActive = collActive && props.clicked === props.id;
   const itemClassName = isActive ? styles.active : "";
 

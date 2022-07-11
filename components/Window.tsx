@@ -8,6 +8,7 @@ import Log from "../features/log/Log";
 import Process, { Rect } from "../features/procmgr/ProcTypes";
 import { ThemeColors } from "../features/settings/Themes";
 import { ToolbarControl } from "../grounds/Toolbar";
+import useEffectOnce from "../scripts/useEffectOnce";
 import { clamp, randomId } from "../scripts/utils";
 import styles from "../styles/Window.module.css";
 import ShimmerImage from "./ShimmerImage";
@@ -56,6 +57,7 @@ export default function Window(props) {
   // const get = (prop) => procmgr.get(proc.id, prop);
 
   ////////////////// rect / style / theme
+  const rectReadable: Rect = get("rect");
   const beginBlink = procmgr.getReadable(proc.id, "beginBlink");
   const endBlink = procmgr.getReadable(proc.id, "endBlink");
   const [blinking, setBlinking] = useState(false);
@@ -197,13 +199,18 @@ export default function Window(props) {
       // console.log(proc.name, ": disableBackground:", disableBackground);
     }
 
-    {
-      if (proc.hideOnDock) {
-        procmgr.set(proc.id, { hideOnDock: true });
-      }
+    if (proc.hideOnDock) {
+      procmgr.set(proc.id, { hideOnDock: true });
     }
   }, []);
-  const rectReadable: Rect = get("rect");
+
+  useEffectOnce(() => {
+    CallbackStore.getById(procmgr.getValue(proc.id, "onMount"))?.();
+    return () => {
+      CallbackStore.getById(procmgr.getValue(proc.id, "onDestroy"))?.();
+    };
+  });
+
   // console.log("rectReadable:", rectReadable);
 
   //////////////////////////////////// register Toolbar.quit()
@@ -300,6 +307,14 @@ export default function Window(props) {
     }
     setContElemStyle(() => buildStyle(rectReadable));
   }, [rectReadable, _colors, isMax, isMin, isFront]);
+
+  useEffect(() => {
+    if (isFront) {
+      CallbackStore.getById(procmgr.getValue(proc.id, "onFront"))?.();
+    } else {
+      CallbackStore.getById(procmgr.getValue(proc.id, "onFocusOut"))?.();
+    }
+  }, [isFront]);
 
   ////////////////// detect resize
   const resizeObserver = new ResizeObserver((entries) => {
@@ -568,12 +583,28 @@ export default function Window(props) {
         <div
           className={styles["content-container"]}
           onClick={(e) => {
-            proc.onFocus?.();
+            CallbackStore.getById(procmgr.getValue(proc.id, "onClick"))?.(e);
           }}
           style={{
             // position: hideNav ? "absolute" : "relative",
             top: hideNav ? 0 : 30,
             height: hideNav ? "100%" : "calc(100% - 30px)",
+          }}
+          onDragOver={(e) => {
+            e.preventDefault();
+          }}
+          onDragEnter={(e) => {
+            CallbackStore.getById(procmgr.getValue(proc.id, "onDragEnter"))?.(
+              e
+            );
+          }}
+          onDragLeave={(e) => {
+            CallbackStore.getById(procmgr.getValue(proc.id, "onDragLeave"))?.(
+              e
+            );
+          }}
+          onDrop={(e) => {
+            CallbackStore.getById(procmgr.getValue(proc.id, "onDrop"))?.(e);
           }}
         >
           {contentBgSrc && (

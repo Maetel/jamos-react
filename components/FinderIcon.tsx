@@ -28,8 +28,12 @@ export default function FinderIcon(props) {
   const file: File = JamOS.filemgr.fileReadable(nodepath);
 
   const handleDragStart = (e) => {
+    procmgr.set("system", { finderIconDragging: true });
     e.dataTransfer.setData("text/plain", node.path);
-    e.dataTransfer.dropEffect = "move";
+    e.dataTransfer.effectAllowed = "copy";
+  };
+  const handleDragEnd = (e) => {
+    procmgr.set("system", { finderIconDragging: false });
   };
 
   const handleDrop = (e) => {
@@ -49,6 +53,7 @@ export default function FinderIcon(props) {
         const fromPath = new Path(from);
         const dest = from.replace(fromPath.parent, to);
         fm.mv(from, dest);
+        JamOS.setNotif(`Moved ${from} to ${dest}`);
       }
     }
   };
@@ -128,33 +133,9 @@ export default function FinderIcon(props) {
     }
   }, []);
 
-  // const handleDragStart = (e) => {
-  //   // e.preventDefault();
-  //   // console.log("Handle drag:", nodepath);
-  // };
-
-  // const handleDrop = (e) => {
-  //   e.preventDefault();
-
-  //   if (node.type === "dir") {
-  //     const fm = JamOS.filemgr;
-
-  //     const from: string = e.dataTransfer.getData("text/plain");
-  //     const to = node.path;
-
-  //     if ((fm.fileExists(from) || fm.dirExists(from)) && fm.dirExists(to)) {
-  //       const fromPath = new Path(from);
-  //       const dest = from.replace(fromPath.parent, to);
-  //       console.log("from:", from);
-  //       console.log("dest:", dest);
-  //       fm.mv(from, dest);
-  //     }
-  //   }
-  // };
-
   const handleDragOver = (e) => {
     // prevent dragOver to fire onDrop event
-    // e.stopPropagation();
+    e.stopPropagation();
     e.preventDefault();
     setHovered(true);
   };
@@ -175,6 +156,7 @@ export default function FinderIcon(props) {
         }}
         style={{ color: color1 }}
         onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
         onDrop={(e) => {
           handleDrop(e);
           setHovered(false);

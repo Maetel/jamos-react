@@ -29,7 +29,16 @@ export default interface Process {
   // moveFrom?:string,
   
   //callbackIds, can be found in CallbackStore.callbacks
+  onFront?:string,
+  onFocusOut?:string,
+  // onMount?:string,   //better be handled at each component
+  // onDestroy?:string, //better be handled at each component
   onBackgroundClick?:string,
+  onDragEnter?:string,
+  onDragLeave?:string,
+  onDrop?:string,
+  onClick?:string,
+
   beginBlink?:boolean,
   endBlink?:boolean,
 
@@ -58,6 +67,7 @@ export default interface Process {
   currentPath?:string,
   textAreaValue?:string,
   imageIdx?:number,
+  finderIconDragging?:boolean,
 
   [key:string]:any
 }

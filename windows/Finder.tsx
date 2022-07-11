@@ -11,6 +11,26 @@ import Path from "../scripts/Path";
 
 import styles from "../styles/Finder.module.css";
 
+export function handleFinderIconDrop(procId: string) {
+  return (e) => {
+    const path = e.dataTransfer.getData("text/plain");
+    if (path) {
+      const refined = new Path(path);
+      const to =
+        procId === "system"
+          ? "~"
+          : JamOS.procmgr.getValue(procId, "currentPath");
+
+      const dest = path.replace(refined.parent, to);
+      if (path === dest || path === to) {
+        return;
+      }
+      JamOS.filemgr.mv(path, dest);
+      JamOS.setNotif(`Moved ${path} to ${dest}`);
+    }
+  };
+}
+
 export interface NodesViewProps {
   owner: string;
   nodes: Node[];
@@ -55,7 +75,7 @@ export function FinderCore(props) {
   const blockExeFile = proc.blockExeFile;
   const backBtn = useRef(null);
   // const initialPath = JamOS.filemgr.dirExists(proc.path) ? proc.path : proc.node.path;
-  const initialPath = proc.node.path;
+  const initialPath = proc.node?.path ?? proc.path ?? "~";
 
   const updateNode = () => {
     const node: Node = JamOS.procmgr.getValue(proc.id, "node");
@@ -157,6 +177,50 @@ export function FinderCore(props) {
       });
   }, [currentPath]);
 
+  const handleDragLeave = (e) => {
+    setTempBg(null);
+  };
+  const handleDragEnter = (e) => {
+    const isDragging = procmgr.getValue("system", "finderIconDragging");
+    console.log("handleDragEnter, isDragging:", isDragging);
+    setTempBg(isDragging ? `10px 10px 40px ${colors["3"]}` : null);
+    procmgr.setFront(proc.id);
+    procmgr.blink(proc.id);
+  };
+  const [tempBg, setTempBg] = useState(null);
+  // const handleDrop = (e) => {
+  //   const path = e.dataTransfer.getData("text/plain");
+  //   if (path) {
+  //     const refined = new Path(path);
+  //     const dest = path.replace(refined.parent, currentPath);
+  //     if (path === dest) {
+  //       return;
+  //     }
+  //     filemgr.mv(path, dest);
+  //     JamOS.setNotif(`Moved ${path} to ${dest}`);
+  //   }
+  // };
+  const handleDrop = handleFinderIconDrop(proc.id);
+
+  useEffect(() => {
+    //drag action delegate to window
+    CallbackStore.register(
+      `${proc.id}/FinderIcon/onDragEnter`,
+      handleDragEnter
+    );
+    CallbackStore.register(
+      `${proc.id}/FinderIcon/onDragLeave`,
+      handleDragLeave
+    );
+    CallbackStore.register(`${proc.id}/FinderIcon/onDrop`, handleDrop);
+
+    procmgr.set(proc.id, {
+      onDragEnter: `${proc.id}/FinderIcon/onDragEnter`,
+      onDragLeave: `${proc.id}/FinderIcon/onDragLeave`,
+      onDrop: `${proc.id}/FinderIcon/onDrop`,
+    });
+  }, []);
+
   return (
     nodes && (
       <div
@@ -164,14 +228,9 @@ export function FinderCore(props) {
         onDragOver={(e) => {
           e.preventDefault();
         }}
-        onDrop={(e) => {
-          const path = e.dataTransfer.getData("text/plain");
-          if (path) {
-            const refined = new Path(path);
-            const dest = path.replace(refined.parent, currentPath);
-            filemgr.mv(path, dest);
-          }
-        }}
+        // onDragEnter={handleDragEnter}
+        // onDragLeave={handleDragLeave}
+        // onDrop={handleDrop}
       >
         <div className={styles.browser}>
           <button

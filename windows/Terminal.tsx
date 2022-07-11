@@ -19,6 +19,7 @@ import { ToolbarControl } from "../grounds/Toolbar";
 import JamOS from "../features/JamOS/JamOS";
 import Process from "../features/procmgr/ProcTypes";
 import { dirExists } from "../features/file/fileSlice";
+import CallbackStore from "../features/JamOS/Callbacks";
 
 const viewMap = {
   PromptTextView: PromptTextView,
@@ -44,13 +45,6 @@ export default function Terminal(props) {
   const focusOnInput = () => {
     inputElem.current.focus();
   };
-  proc.onFocus = focusOnInput;
-  const otherProcs = procmgr.procs;
-  const fileDialRetval = procmgr.getReadable(proc.id, "fileDial");
-
-  useEffect(() => {
-    // addText("get from file dial : " + fileDialRetval);
-  }, [fileDialRetval]);
 
   /////////////////////////
   const isToolbarOpen = procmgr.isToolbarOpen();
