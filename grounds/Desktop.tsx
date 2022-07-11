@@ -12,6 +12,7 @@ const backgroundImg = "/imgs/wall2.jpg";
 const broomImg = "/imgs/broom.svg";
 
 export default function Desktop(props) {
+  const filemgr = JamOS.filemgr;
   const homeNodes = JamOS.filemgr.nodesReadable("~");
 
   const _colors = JamOS.theme.colors;
@@ -22,16 +23,22 @@ export default function Desktop(props) {
     nodes: homeNodes,
   };
 
-  useEffect(() => {
-    console.log(
-      `Home ${homeNodes.length}icons of ${homeNodes
-        .map((node) => new Path(node.path).last)
-        .join(", ")}`
-    );
-  }, [homeNodes]);
-
   return (
-    <div id="desktop" className={styles.container}>
+    <div
+      id="desktop"
+      className={styles.container}
+      onDragOver={(e) => {
+        e.preventDefault();
+      }}
+      onDrop={(e) => {
+        const path = e.dataTransfer.getData("text/plain");
+        if (path) {
+          const refined = new Path(path);
+          const dest = path.replace(refined.parent, "~");
+          filemgr.mv(path, dest);
+        }
+      }}
+    >
       <div className={styles.bgImageWrapper}>
         <img
           className={styles.bgImage}
@@ -44,16 +51,6 @@ export default function Desktop(props) {
         />
       </div>
       <div className={styles.iconContainer}>
-        {/* {#each $nodes as node (node.node.id)}
-      <FinderIcon fileNode={node.node} />
-    {/each} */}
-        {/* {homeNodes.map((node, i) => {
-          return React.createElement(FinderIcon, {
-            node: node,
-            key: i,
-            owner: "system",
-          });
-        })} */}
         <NodesView nodesViewProps={nodesViewProps}></NodesView>
       </div>
     </div>

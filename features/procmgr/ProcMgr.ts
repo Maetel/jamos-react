@@ -67,8 +67,10 @@ export default class ProcMgr{
   }
 
   public kill(procId:string){
-    ToolbarControl.getInstance().unregister(procId);
+    //kill first
     store.dispatch(killProc(procId));
+    ToolbarControl.getInstance().unregister(procId);
+    CallbackStore.unregisterByProcID(procId);
   }
 
   public killAll(procId?:string){
@@ -111,7 +113,6 @@ export default class ProcMgr{
       case "finder":
         const dirpath = _cmds.slice(1).join(" ");
         const dirnode:Node = dirValue(dirpath)?.node;
-        console.log("dirnode:",dirnode);
         this.add(cmd, { path: dirpath, node:dirnode, ...args });
         break;
       case "notepad":
@@ -190,7 +191,7 @@ export default class ProcMgr{
       buttons:args?.buttons?? (onDontSave?['Save', "Don't save", 'Cancel']:['Save', 'Cancel'])
     };
     //TODO
-    // CallbackStore.registerById(`${procId}/Modal/`)
+    // CallbackStore.register(`${procId}/Modal/`)
     // this.add('modal', {parent:procId, modal:modalProps});
     // ModalCallbacks.register(procId, (val)=>{
     //   if(val==='Save'){
@@ -235,7 +236,7 @@ export default class ProcMgr{
     args?.buttons?.forEach((btn,i)=>{
       const id = `${procId}/Modal/${btn}`;
       const callbackExists = args?.callbacks?.at(i);
-      CallbackStore.registerById(id, callbackExists?args.callbacks.at(i):(params)=>{
+      CallbackStore.register(id, callbackExists?args.callbacks.at(i):(params)=>{
         // console.log("Placeholder callback, params:",params);
       })
       callbackIds.push(id);
@@ -272,19 +273,19 @@ export default class ProcMgr{
     const onCancelCallbackId = `${procId}/FileDialogue/onCancel`;
     const onExitCallbackId = `${procId}/FileDialogue/onExit`;
     if(args?.onOkay){
-      CallbackStore.registerById(onOkayCallbackId, args?.onOkay);
+      CallbackStore.register(onOkayCallbackId, args?.onOkay);
     } else {
-      CallbackStore.unregisterById(onOkayCallbackId);
+      CallbackStore.unregister(onOkayCallbackId);
     }
     if(args?.onCancel){
-      CallbackStore.registerById(onCancelCallbackId, args?.onCancel);
+      CallbackStore.register(onCancelCallbackId, args?.onCancel);
     } else {
-      CallbackStore.unregisterById(onCancelCallbackId);
+      CallbackStore.unregister(onCancelCallbackId);
     }
     if(args?.onExit){
-      CallbackStore.registerById(onExitCallbackId, args?.onExit);
+      CallbackStore.register(onExitCallbackId, args?.onExit);
     } else {
-      CallbackStore.unregisterById(onExitCallbackId);
+      CallbackStore.unregister(onExitCallbackId);
     }
 
     let fileDialProps :FileDialProps = {

@@ -211,6 +211,9 @@ export default function Window(props) {
         'Cannot update a component (`Toolbar`) while rendering a different component (`Toolbar`). To locate the bad setState() call inside `Toolbar`'
         */
   useEffect(() => {
+    if (proc.hideOnToolbar) {
+      return;
+    }
     ToolbarControl.RegisterBuilder(proc.id).register(
       proc.name,
       `Quit ${proc.name}`,

@@ -189,7 +189,7 @@ export default function Modal(props) {
 
   useEffectOnce(() => {
     return () => {
-      CallbackStore.unregisterByIds(modal.callbackIds);
+      CallbackStore.unregisterIDs(modal.callbackIds);
     };
   });
 

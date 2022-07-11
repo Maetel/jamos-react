@@ -37,6 +37,7 @@ export default interface Process {
   hideNav?:boolean,
   hideNavButtons?:boolean,
   hideOnDock?:boolean,
+  hideOnToolbar?:boolean,
   disableBackground?:boolean,
   opaqueBackground?:boolean,
   closeOnBackgroundClick?:boolean,

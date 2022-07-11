@@ -82,7 +82,7 @@ export default class JamOS {
     
     const ids = itemsFiltered.map(item=>`system/ContextMenu/${item}`)
     callbacks.forEach((cb,i)=>{
-      CallbackStore.registerById(ids.at(i),cb);
+      CallbackStore.register(ids.at(i),cb);
     })
     const props:CtxMenuProps = {
       pageX:x,

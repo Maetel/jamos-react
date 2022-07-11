@@ -24,6 +24,7 @@ export default function ContextMenu(props) {
   proc.hideNav = true;
   proc.hideNavButtons = true;
   proc.hideOnDock = true;
+  proc.hideOnToolbar = true;
   proc.disableDrag = true;
   const buildRect = () => {
     const w = window.innerWidth;
@@ -86,7 +87,7 @@ export default function ContextMenu(props) {
   }, []);
   useEffectOnce(() => {
     return () => {
-      CallbackStore.unregisterByIds(menus.callbackIds);
+      CallbackStore.unregisterIDs(menus.callbackIds);
     };
   });
 

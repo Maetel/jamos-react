@@ -26,32 +26,6 @@ export function NodesView(props) {
   const { owner, nodes, excls, incls } = nodesViewProps;
   const { onIconClick } = nodesViewProps;
 
-  const onNodeDrag = (node: Node) => (e) => {
-    console.log("drag");
-    e.dataTransfer.setData("text/plain", node.path);
-    e.dataTransfer.dropEffect = "move";
-  };
-
-  const onNodeDrop = (node: Node) => (e) => {
-    console.log("drop");
-    e.preventDefault();
-
-    if (node.type === "dir") {
-      const fm = JamOS.filemgr;
-
-      const from: string = e.dataTransfer.getData("text/plain");
-      const to = node.path;
-
-      if ((fm.fileExists(from) || fm.dirExists(from)) && fm.dirExists(to)) {
-        const fromPath = new Path(from);
-        const dest = from.replace(fromPath.parent, to);
-        console.log("from:", from);
-        console.log("dest:", dest);
-        fm.mv(from, dest);
-      }
-    }
-  };
-
   return (
     <>
       {nodes.map((node, i) => {
@@ -64,8 +38,6 @@ export function NodesView(props) {
             node: node,
             owner: owner,
             onClick: onIconClick,
-            onNodeDrag: onNodeDrag(node),
-            onNodeDrop: onNodeDrop(node),
           };
           return React.createElement(FinderIcon, {
             key: node.id,
@@ -93,17 +65,15 @@ export function FinderCore(props) {
   };
 
   useEffect(() => {
-    //priority
+    //prior
     let curPath = initialPath;
     if (JamOS.filemgr.dirExists(curPath)) {
       JamOS.procmgr.set(proc.id, { currentPath: curPath });
       updateNode();
-      return;
-    } else {
-      throw new Error("");
     }
   }, []);
-  const currentPath = JamOS.procmgr.getReadable(proc.id, "currentPath");
+  const currentPath =
+    JamOS.procmgr.getReadable(proc.id, "currentPath") ?? initialPath;
   const disableBack = currentPath === "~";
   const setCurrentPath = (path) => {
     JamOS.procmgr.set(proc.id, { currentPath: path });
@@ -136,22 +106,6 @@ export function FinderCore(props) {
     }
   });
 
-  useEffect(() => {
-    if (!currentPath) {
-      return;
-    }
-    if (!JamOS.filemgr.dirExists(currentPath)) {
-      JamOS.setNotif("Directory removed : " + currentPath, "error");
-      procmgr.kill(proc.id);
-    }
-
-    ToolbarControl.RegisterBuilder(proc.id)
-      .unregisterAll()
-      .register("Finder", "New directory", () => {
-        filemgr.mkdir(Path.join(currentPath, "New directory").path);
-      });
-  }, [currentPath]);
-
   const procmgr = JamOS.procmgr;
   const filemgr = JamOS.filemgr;
   const colors = JamOS.theme.colors;
@@ -169,8 +123,18 @@ export function FinderCore(props) {
   };
   const btnStyle = buildButtonStyle();
   ////////////// browse back and forth
-  const nodes = filemgr.nodesReadable(currentPath);
-
+  const nodesFromNode = (path: string) => {
+    const retval: Node[] = [];
+    const d = JamOS.filemgr.dirValue(path);
+    if (!d) {
+      return undefined;
+    }
+    d.dirs.forEach((dir) => retval.push(dir.node));
+    d.files.forEach((file) => retval.push(file.node));
+    return retval;
+  };
+  const nodes =
+    filemgr.nodesReadable(currentPath) ?? nodesFromNode(initialPath);
   const nodesViewProps: NodesViewProps = {
     nodes: nodes,
     owner: proc.id,
@@ -179,9 +143,36 @@ export function FinderCore(props) {
     onIconClick: onIconClick,
   };
 
+  useEffect(() => {
+    if (!nodes && !filemgr.dirExists(initialPath)) {
+      procmgr.kill(proc.id);
+    }
+    if (proc.hideOnToolbar) {
+      return;
+    }
+    ToolbarControl.RegisterBuilder(proc.id)
+      .unregisterAll()
+      .register("Finder", "New directory", () => {
+        filemgr.mkdir(Path.join(currentPath, "New directory").path);
+      });
+  }, [currentPath]);
+
   return (
     nodes && (
-      <div className={styles.container}>
+      <div
+        className={styles.container}
+        onDragOver={(e) => {
+          e.preventDefault();
+        }}
+        onDrop={(e) => {
+          const path = e.dataTransfer.getData("text/plain");
+          if (path) {
+            const refined = new Path(path);
+            const dest = path.replace(refined.parent, currentPath);
+            filemgr.mv(path, dest);
+          }
+        }}
+      >
         <div className={styles.browser}>
           <button
             className={`${styles.browserContent} ${styles.button}`}
@@ -229,6 +220,8 @@ export default function Finder(props) {
   const proc = { ...props.proc };
   proc.name = proc.name ?? "Finder";
   proc.resize = proc.resize ?? "both";
+  // const currentPath = JamOS.procmgr.getReadable(proc.id, 'currentPath');
+  // useEffect(()=>{},[currentPath]);
 
   return (
     <Window {...props} proc={proc}>

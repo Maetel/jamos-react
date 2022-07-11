@@ -7,15 +7,13 @@ import ShimmerImage from "./ShimmerImage";
 
 const abbreviate = (path: string) => {
   const max = 15;
-  return path?.slice(0, max) + (path?.length > max ? "..." : "");
+  return path.slice(0, max) + (path.length > max ? "..." : "");
 };
 
 export interface FinderIconProps {
   node: Node;
   onClick: (node) => void;
   owner: string;
-  onNodeDrag?: (e) => void;
-  onNodeDrop?: (e) => void;
 }
 
 export default function FinderIcon(props) {
@@ -29,13 +27,36 @@ export default function FinderIcon(props) {
   const node: Node = JamOS.filemgr.nodeReadable(nodepath);
   const file: File = JamOS.filemgr.fileReadable(nodepath);
 
-  const handleDragStart: (e) => void = _props.onNodeDrag;
-  const handleDrop: (e) => void = _props.onNodeDrop;
+  const handleDragStart = (e) => {
+    e.dataTransfer.setData("text/plain", node.path);
+    e.dataTransfer.dropEffect = "move";
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+
+    if (node.type === "dir") {
+      const fm = JamOS.filemgr;
+
+      const from: string = e.dataTransfer.getData("text/plain");
+      const to = node.path;
+
+      if (from === to) {
+        return;
+      }
+
+      if ((fm.fileExists(from) || fm.dirExists(from)) && fm.dirExists(to)) {
+        const fromPath = new Path(from);
+        const dest = from.replace(fromPath.parent, to);
+        fm.mv(from, dest);
+      }
+    }
+  };
 
   const [loading, setLoading] = useState(!false);
   // const node: Node = file?.node;
   const onClick: (node) => void =
-    props.onClick ??
+    _props.onClick ??
     function (node: Node) {
       procmgr.exeFile(new Path(node.path));
     };
@@ -44,10 +65,10 @@ export default function FinderIcon(props) {
   //   return;
   // }
   const setSrc = () => {
-    if (node?.type === "image") {
-      return file?.data["src"] ?? node?.iconPath;
+    if (node.type === "image") {
+      return file?.data["src"] ?? node.iconPath;
     }
-    return node?.iconPath;
+    return node.iconPath;
   };
   const src: string = setSrc();
   const width = 90;
@@ -67,7 +88,7 @@ export default function FinderIcon(props) {
     contElem.current.style.overflow = hoverIn ? "show" : "hidden";
   };
 
-  const filename = new Path(node?.path).last;
+  const filename = new Path(node.path).last;
   const dispFilename = hovered ? filename : abbreviate(filename);
 
   const handleContext = (e) => {
@@ -135,6 +156,7 @@ export default function FinderIcon(props) {
     // prevent dragOver to fire onDrop event
     // e.stopPropagation();
     e.preventDefault();
+    setHovered(true);
   };
 
   return (
@@ -153,8 +175,14 @@ export default function FinderIcon(props) {
         }}
         style={{ color: color1 }}
         onDragStart={handleDragStart}
-        onDrop={handleDrop}
+        onDrop={(e) => {
+          handleDrop(e);
+          setHovered(false);
+        }}
         onDragOver={handleDragOver}
+        onDragLeave={(e) => {
+          setHovered(false);
+        }}
         draggable={true}
       >
         <span

@@ -37,6 +37,7 @@ export default function FileDialogue(props) {
   proc.callbackId = `FileDialogue-${proc.id}`;
   proc.onBackgroundClick = `${proc.id}/FileDialogue/onBackgroundClick`;
   proc.hideOnDock = true;
+  proc.hideOnToolbar = true;
 
   const colors = JamOS.theme.colors;
   const procmgr = JamOS.procmgr;
@@ -45,7 +46,7 @@ export default function FileDialogue(props) {
 
   useEffect(() => {
     //register FinderCore.onIconClick
-    CallbackStore.registerById(proc.callbackId, (params) => {
+    CallbackStore.register(proc.callbackId, (params) => {
       const node: Node = params;
       procmgr.set(proc.id, { inputValue: new Path(node.path).last ?? "" });
       if (inputElem.current) {
@@ -57,14 +58,14 @@ export default function FileDialogue(props) {
         }
       }
       // console.log("registerById, params:", params);
-    }).registerById(proc.onBackgroundClick, (params) => {
+    }).register(proc.onBackgroundClick, (params) => {
       procmgr.blink(proc.id);
     });
   }, []);
 
   useEffectOnce(() => {
     return () => {
-      CallbackStore.unregisterByIds([
+      CallbackStore.unregisterIDs([
         proc.callbackId,
         fileDialProps.onOkayCallbackId,
         fileDialProps.onCancelCallbackId,

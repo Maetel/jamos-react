@@ -157,12 +157,12 @@ const fileSlice = createSlice({
       const from = action.payload.from.trim();
       const to = action.payload.to.trim();
       
-      {
-        console.log(`From:${from}, to:${to}`);
-      }
-
       //verify
       {
+        if(from === to){
+          return;
+        }
+
         if(!_verifyPath(from) || !_verifyPath(to)){
           console.error(`Path provided is not correct. from:${from} to:${to}`)
           return;
@@ -181,10 +181,24 @@ const fileSlice = createSlice({
       
       //case 1. from is a directory
       const dirFound = findDir(state, from);
-      // debugger;
       if(dirFound){
-        // dirFound.node.path = to;
+        const destDir : WritableDraft<Dir> = findDir(state, new Path(to).parent);
+        if(!destDir){
+          return;
+        }
         
+        //step 1.
+        const fromParent: WritableDraft<Dir> = findDir(state, new Path(from).parent);
+        fromParent.dirs = [...fromParent.dirs.filter(_f=>_f.node.path !== from)];
+
+        //step 2.
+        dirFound.node.path = to;
+        dirFound.node.id = dirFound.node.type + to;
+
+        //step 3.
+        destDir.dirs.push(dirFound);
+
+        //step 4.
         // for v0.1, rename all containing nodes recursively
         const changePrefix = (dir:WritableDraft<Dir>)=>{
           dir.node.path = dir.node.path.replace(from, to);
@@ -202,13 +216,12 @@ const fileSlice = createSlice({
       if(fileFound){
         const destDir : WritableDraft<Dir> = findDir(state, new Path(to).parent);
         if(!destDir){
-          console.error("destDir not found : ",to);
           return;
         }
 
         //step 1.
-        const fromDir: WritableDraft<Dir> = findDir(state, new Path(from).parent);
-        fromDir.files = [...fromDir.files.filter(_f=>_f.node.path !== from)];
+        const fromParent: WritableDraft<Dir> = findDir(state, new Path(from).parent);
+        fromParent.files = [...fromParent.files.filter(_f=>_f.node.path !== from)];
         
         //step 2.
         fileFound.node.path = to;
