@@ -76,6 +76,10 @@ export default function Terminal(props) {
   useEffect(() => {
     focusOnInput();
     registerToolbarCallback();
+    CallbackStore.register(`${proc.id}/Terminal/onClick`, () => {
+      focusOnInput();
+    });
+    procmgr.set(proc.id, { onClick: `${proc.id}/Terminal/onClick` });
   }, []);
 
   const [username, setUsername] = useState("jam@127.0.0.1");
@@ -101,6 +105,7 @@ export default function Terminal(props) {
       hist: [...cmds.hist, cmd],
       cursor: cmds.hist.length + 1,
     }));
+    procmgr.set(proc.id, { desc: cmd });
   };
   const cmdHistoryUp = (e) => {
     e.preventDefault();

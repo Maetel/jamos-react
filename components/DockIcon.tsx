@@ -57,7 +57,7 @@ export default function DockIcon(props) {
     } else {
       // console.log("Added JamOS.procmgr.closeDock()");
       menus = [
-        ...procsOfType.map((_proc) => _proc.name),
+        ...procsOfType.map((_proc) => _proc.desc ?? _proc.name),
         "__separator__",
         "Close all",
       ];

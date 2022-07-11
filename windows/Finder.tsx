@@ -175,6 +175,7 @@ export function FinderCore(props) {
       .register("Finder", "New directory", () => {
         filemgr.mkdir(Path.join(currentPath, "New directory").path);
       });
+    procmgr.set(proc.id, { desc: currentPath });
   }, [currentPath]);
 
   const handleDragLeave = (e) => {

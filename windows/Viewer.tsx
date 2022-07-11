@@ -186,6 +186,7 @@ export default function Viewer(props) {
       : fallbackOnLoad;
     setSrc(_setsrc);
     let windowName = "Image viewer";
+    let desc = null;
     if (nodePathReadable?.length) {
       // console.log("nodePathReadable.length: true");
       navNext.current.style.setProperty("display", "flex");
@@ -194,6 +195,7 @@ export default function Viewer(props) {
       const { imageIdx, imageCount } = getMeta();
       windowName =
         new Path(nodePathReadable).last + ` [${imageIdx + 1}/${imageCount}]`;
+      desc = new Path(nodePathReadable).last;
     } else {
       // console.log("nodePathReadable.length: false");
       navNext.current.style.setProperty("display", "none");
@@ -203,6 +205,7 @@ export default function Viewer(props) {
     }
     JamOS.procmgr.set(proc.id, {
       name: windowName,
+      desc: desc,
     });
   }, [nodePathReadable]);
 

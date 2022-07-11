@@ -15,6 +15,7 @@ export default interface Process {
   name:string,
   zIndex:string,
   //onFocus?:()=>void,
+  desc?:string, // to be displayed on dock context menu
   toolbar:ToolbarItem[],
   node?:Node,
   killable?:boolean,
