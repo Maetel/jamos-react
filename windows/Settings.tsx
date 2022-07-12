@@ -1,7 +1,6 @@
 import Window from "../components/Window";
 import JamOS from "../features/JamOS/JamOS";
-import { closeToolbar } from "../features/procmgr/procSlice";
-import SetMgr, { settingDescription } from "../features/settings/SetMgr";
+import { settingDescription } from "../features/settings/SetMgr";
 import styles from "../styles/Settings.module.css";
 
 export default function Settings(props) {
