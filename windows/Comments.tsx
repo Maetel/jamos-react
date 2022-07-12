@@ -5,7 +5,10 @@ import JamOS from "../features/JamOS/JamOS";
 import Process from "../features/procmgr/ProcTypes";
 import styles from "../styles/Comments.module.css";
 
-const server = "http://localhost:3000/";
+const server =
+  process.env.NODE_ENV === "test"
+    ? "http://localhost:3000/"
+    : "https://jamos-v2.herokuapp.com/";
 // const server = 'http://jamos-v2/';
 const posts = server + "post";
 
@@ -150,6 +153,7 @@ export default function Comments(props) {
 
   useEffect(() => {
     fetchAndUpdate();
+    JamOS.setNotif(`Connecting to ${posts}...`);
   }, []);
   useEffect(() => {
     console.log("commentUpdate, fetch and update");
