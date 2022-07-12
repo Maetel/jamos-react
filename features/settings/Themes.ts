@@ -16,19 +16,17 @@ export interface Theme {
 
 ///Theme list
 export const defaultTheme: Theme = {
-  name: "Forest",
+  //https://www.schemecolor.com/funky-music.php
+  name: "Navy",
   colors: {
-    "1": "#cbccbc",
-    "2": "#3e4437",
-    "3": "#d4c9c1",
-    "4": "#404c24",
-    "5": "#a2ac94",
-    okay: "#186030",
-    warn: "#f07800",
-    error: "#d80000",
-    // navback: "#dbdbdb",
-    // navcolor: "#595FB5",
-    boxShadow: "2px 2px 26px #a2ac94",
+    "1": "#f8f8ff",
+    "3": "#031b28",
+    "4": "#0b2838",
+    "2": "#083248",
+    okay: "#4DBD60",
+    warn: "#FFD154",
+    error: "#EE475E",
+    boxShadow: "2px 2px 20px #dbdbdb",
   },
   nav: "default",
 };
@@ -70,25 +68,54 @@ const officialThemes:Theme[] = [
       },
       nav: "default",
     },
+    
     {
-      //https://www.schemecolor.com/funky-music.php
-      name: "Lo-fi",
+      //
+      name: "Flamingo",
       colors: {
-        "1": "#CEA2D7",
-        "2": "#674AB3",
-        "3": "#A348A6",
-        "4": "#9F63C4",
-        "5": "#9075D8",
-        okay: "#4DBD60",
-        warn: "#FFD154",
-        error: "#EE475E",
-        // navback: "#dbdbdb",
-        // navcolor: "#595FB5",
-        boxShadow: "2px 2px 26px #9F63C4",
+        "1": "#ED706F",
+        "2": "#EAD3CE",
+        "3": "#F1c8c1",
+        "4": "#78aba9",
+        "5": "#3a9aa3",
+        okay: "#98843c",
+        warn: "#dcbc84",
+        error: "#f70a06",
+        boxShadow: "2px 2px 20px #F1c8c1",
       },
       nav: "default",
     },
-
+    {
+      //
+      name: "Swedish",
+      colors: {
+        "1": "#ffcd00",
+        "2": "#004b87",
+        "3": "#dbdbdb",
+        okay: "#82ac26",
+        warn: "#ffa22a",
+        error: "#ff662a",
+        boxShadow: "2px 2px 16px #ffcd00",
+      },
+      nav: "default",
+    },
+    {
+      name: "Forest",
+      colors: {
+        "1": "#cbccbc",
+        "2": "#3e4437",
+        "3": "#d4c9c1",
+        "4": "#404c24",
+        "5": "#a2ac94",
+        okay: "#186030",
+        warn: "#f07800",
+        error: "#d80000",
+        // navback: "#dbdbdb",
+        // navcolor: "#595FB5",
+        boxShadow: "2px 2px 26px #a2ac94",
+      },
+      nav: "default",
+    },
     {
       name: "Granite",
       colors: {
@@ -175,19 +202,20 @@ const officialThemes:Theme[] = [
       nav: "default",
     },
     {
-      //https://digitalsynopsis.com/design/minimal-web-color-palettes-combination-hex-code/
-      name: "Plum",
+      //https://www.schemecolor.com/funky-music.php
+      name: "Lo-fi",
       colors: {
-        "1": "#f2eae3",
-        "2": "#ff5978",
-        "3": "#ffc876",
-        "4": "#dc5990",
-        okay: "#82ac26",
-        warn: "#ffa22a",
-        error: "#ff662a",
+        "1": "#CEA2D7",
+        "2": "#674AB3",
+        "3": "#A348A6",
+        "4": "#9F63C4",
+        "5": "#9075D8",
+        okay: "#4DBD60",
+        warn: "#FFD154",
+        error: "#EE475E",
         // navback: "#dbdbdb",
         // navcolor: "#595FB5",
-        boxShadow: "2px 2px 13px #f2eae3",
+        boxShadow: "2px 2px 26px #9F63C4",
       },
       nav: "default",
     },
@@ -196,7 +224,8 @@ const officialThemes:Theme[] = [
       name: "Cloudy",
       colors: {
         "1": "#7896fc",
-        "2": "#fcf4ec",
+        // "2": "#fcf4ec",
+        "2": "#f9f1e0",
         "3": "#ffcfcb",
         "4": "#ff9f97",
         okay: "#82ac26",
@@ -204,7 +233,7 @@ const officialThemes:Theme[] = [
         error: "#ff662a",
         // navback: "#dbdbdb",
         // navcolor: "#595FB5",
-        boxShadow: "2px 2px 10px #7896fc",
+        boxShadow: "2px 2px 30px #ffcfcb",
       },
       nav: "default",
     },
@@ -212,9 +241,6 @@ const officialThemes:Theme[] = [
       //https://digitalsynopsis.com/design/minimal-web-color-palettes-combination-hex-code/
       name: "Binary",
       colors: {
-        // "1": "#111",
-        // "2": "#fcf4f0",
-        // "3": "#333",
         "1": "#000000",
         "2": "#ffffff",
         "3": "#777777",
@@ -231,22 +257,20 @@ const officialThemes:Theme[] = [
       //https://digitalsynopsis.com/design/minimal-web-color-palettes-combination-hex-code/
       name: "Cotton candy",
       colors: {
-        // "1": "#111",
-        // "2": "#fcf4f0",
-        // "3": "#333",
         "1": "#d5e4fb",
-        "3": "#5c58b6",
         "2": "#5994ce",
+        "3": "#5c58b6",
         "4": "#b957ce",
-        okay: "#00ff00",
-        warn: "#ffff00",
-        error: "#ff0000",
+        okay: "#82ac26",
+        warn: "#ffa22a",
+        error: "#ff662a",
         // navback: "#dbdbdb",
         // navcolor: "#595FB5",
-        boxShadow: "2px 2px 13px #111",
+        boxShadow: "2px 2px 13px #5c58b6",
       },
       nav: "default",
     },
+    
   ]
 ;
 
