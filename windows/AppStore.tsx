@@ -87,6 +87,11 @@ export default function AppStore(props) {
       file: filemgr.makeFile("~/Finder", "finder", { exeCmd: "finder ~" }),
       show: true,
     },
+    {
+      id: fetchAndIncrementId(),
+      file: filemgr.makeFile("~/Comments", "comments"),
+      show: true,
+    },
   ];
 
   const foundAny = () => {

@@ -1,0 +1,41 @@
+.container {
+  position:relative;
+  width:100%;
+  height:100%;
+  box-sizing: border-box;
+  margin:0;
+  padding:0;
+}
+
+.title {
+  height:10%;
+  margin:0;
+  text-align: center;
+  font-size: 2rem;
+  padding:20px;
+  box-sizing: border-box;
+}
+
+.commentGrid {
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  list-style: none;
+  margin:0;
+  padding:0;
+  box-sizing: border-box;
+  height:70%;
+  overflow-y:auto;
+  padding:10px;
+}
+
+.commentCard {
+  width:50%;
+}
+
+.leaveComment {
+  position:absolute;
+  width:100%;
+  bottom:0%;
+  height:20%;
+  /* min-height:150px; */
+}

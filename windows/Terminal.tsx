@@ -484,6 +484,7 @@ export default function Terminal(props) {
       case "logger":
       case "settings":
       case "systeminfo":
+      case "comments":
         procmgr.add(cmd);
         break;
 

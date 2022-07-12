@@ -127,6 +127,9 @@ export const _ProcessCommands:ProcessCommand[] = [
   {comp:"systeminfo",name:"SystemInfo", icon:"/imgs/systeminfo.svg", runOnce:true},
   {comp:'simpleabout',name:"About", icon:"/imgs/circlequestion.svg"},
   {comp:'toolbar',name:"Toolbar", icon:"/imgs/circlequestion.svg", type:'system'},
+
+  {comp:'comments',name:"Leave comments!", icon:"/imgs/comments.svg"},
+
 ]
 export const ProcessCommands = _ProcessCommands.filter(cmd=>((cmd.type === 'window') || (cmd.type === undefined))).map(cmd=>cmd.comp);
 
