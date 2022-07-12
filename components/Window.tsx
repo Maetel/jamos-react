@@ -54,6 +54,13 @@ export default function Window(props) {
 
   proc.name = proc.name ?? (hideNav ? "" : "Application");
   const get = (prop) => procmgr.getReadable(proc.id, prop);
+
+  // h d = remove
+  // h !d = keep
+  // !h d = keep
+  // !h !d = keep
+  const keepNav = !(hideNav && disableDrag);
+
   // const get = (prop) => procmgr.get(proc.id, prop);
 
   ////////////////// rect / style / theme
@@ -618,7 +625,7 @@ export default function Window(props) {
           )}
           {(props as any).children}
         </div>
-        {!hideNav && !disableDrag && <Header></Header>}
+        {keepNav && <Header></Header>}
         <Buttons></Buttons>
       </section>
     </>

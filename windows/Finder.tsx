@@ -11,6 +11,7 @@ import Path from "../scripts/Path";
 
 import styles from "../styles/Finder.module.css";
 
+//generalize to re-use in Desktop component
 export function handleFinderIconDrop(procId: string) {
   return (e) => {
     const path = e.dataTransfer.getData("text/plain");
@@ -178,17 +179,12 @@ export function FinderCore(props) {
     procmgr.set(proc.id, { desc: currentPath });
   }, [currentPath]);
 
-  const handleDragLeave = (e) => {
-    setTempBg(null);
-  };
+  const handleDragLeave = (e) => {};
   const handleDragEnter = (e) => {
     const isDragging = procmgr.getValue("system", "finderIconDragging");
-    console.log("handleDragEnter, isDragging:", isDragging);
-    setTempBg(isDragging ? `10px 10px 40px ${colors["3"]}` : null);
     procmgr.setFront(proc.id);
     procmgr.blink(proc.id);
   };
-  const [tempBg, setTempBg] = useState(null);
   // const handleDrop = (e) => {
   //   const path = e.dataTransfer.getData("text/plain");
   //   if (path) {

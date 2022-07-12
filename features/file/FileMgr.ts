@@ -21,11 +21,11 @@ export default class FileMgr {
     return fileExists(path);
   }
 
-  public fileValue(path:string){
+  public fileValue(path:string):File{
     return fileValue(path);
   }
 
-  public fileReadable(path:string){
+  public fileReadable(path:string):File{
     return useAppSelector(selectFile(path));
   }
 

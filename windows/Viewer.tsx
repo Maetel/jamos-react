@@ -6,6 +6,8 @@ import Process from "../features/procmgr/ProcTypes";
 import { ToolbarControl } from "../grounds/Toolbar";
 import Path from "../scripts/Path";
 import styles from "../styles/Viewer.module.css";
+import type { File, Dir } from "../features/file/FileTypes";
+import CallbackStore from "../features/JamOS/Callbacks";
 
 const fallbackOnLoad = "/imgs/imageerror.svg";
 
@@ -42,6 +44,42 @@ export default function Viewer(props) {
     };
     keyMap[e.key]?.();
   };
+
+  const handleDrop = (e) => {
+    const path = e.dataTransfer.getData("text/plain");
+    if (!path || path.length === 0) {
+      return;
+    }
+    // const refined = new Path(path);
+    let errorMessage = `Cannot open on Image viewer : '${path}'`;
+    let found = false;
+    const d: Dir = filemgr.dirValue(path);
+    if (d) {
+      const f: File = d.files.find((file) => file.node.type === "image");
+      if (f) {
+        setNodePath(f.node.path);
+        found = true;
+      } else {
+        errorMessage = "No image file found in " + path;
+      }
+    }
+
+    const f: File = filemgr.fileValue(path);
+    if (f && f.node.type === "image") {
+      setNodePath(f.node.path);
+      found = true;
+    }
+
+    if (!found) {
+      JamOS.setNotif(errorMessage, "error");
+    }
+  };
+  useEffect(() => {
+    CallbackStore.register(`${proc.id}/Viewer/onDrop`, handleDrop);
+    JamOS.procmgr.set(proc.id, {
+      onDrop: `${proc.id}/Viewer/onDrop`,
+    });
+  }, []);
 
   const openLoadFileDialogue = () => {
     JamOS.procmgr.openFileDialogue(proc.id, "Load", {

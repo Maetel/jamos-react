@@ -40,6 +40,7 @@ export default interface Process {
   onDrop?:string,
   onClick?:string,
 
+  //actions
   beginBlink?:boolean,
   endBlink?:boolean,
 
@@ -111,7 +112,7 @@ export const _ProcessCommands:ProcessCommand[] = [
   {comp:"notepad", icon:"/imgs/notepad.svg"},
   {comp:"terminal", icon:"/imgs/terminal.svg"},
   {comp:"logger", icon:"/imgs/logger.svg", runOnce:true},
-  {comp:"finder", icon:"/imgs/finder.svg"},
+  {comp:"finder", icon:"/imgs/dir.svg"},
   {comp:"atelier", icon:"/imgs/atelier.svg"},
   {comp:"postman", icon:"/imgs/postman.svg", runOnce:true},
   {comp:"appstore", icon:"/imgs/appstore.svg"},
