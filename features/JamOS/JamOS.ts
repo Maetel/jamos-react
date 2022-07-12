@@ -7,7 +7,7 @@ import {killAllofType} from "../procmgr/procSlice";
 import SetMgr from "../settings/SetMgr";
 import { Theme } from "../settings/Themes";
 import CallbackStore from "./Callbacks";
-import { Notif, selectNotifDuration, selectNotifs, setNotification } from "./osSlice";
+import { closeDock, closeToolbar, forceHideDock, forceHideToolbar, forceOpenDock, forceOpenToolbar, Notif, openDock, openToolbar, selectForceHideDock, selectForceHideToolbar, selectForceOpenDock, selectForceOpenToolbar, selectIsDockOpen, selectIsToolbarOpen, selectNotifDuration, selectNotifs, setNotification, toggleDock, toggleToolbar } from "./osSlice";
 
 export interface SerializedData {
   proc?:string,
@@ -74,7 +74,7 @@ export default class JamOS {
     public static closeAllContextMenus(){
       store.dispatch(killAllofType('contextmenu'));
     }
-  public static openContextMenu(x:number, y:number, items:string[], callbacks:(()=>void)[]){
+  public static openContextMenu(x:number, y:number, items:string[], callbacks:(()=>void)[], args?:{ onMount?:string, onDestroy?:string }){
     const itemsFiltered = items.filter(item=>(item!=='__separator__'));
     if(itemsFiltered.length !== callbacks.length){
       throw new Error("");
@@ -90,6 +90,58 @@ export default class JamOS {
       items:items,
       callbackIds:ids,
     }
-    this.procmgr.add('contextmenu', {parent:'system', ctxMenuProps:props});
+    this.procmgr.add('contextmenu', {parent:'system', ctxMenuProps:props, onDestroy:args?.onDestroy, onMount:args?.onMount});
+  }
+
+
+  public static isToolbarFixed(){
+    return useAppSelector(selectIsToolbarOpen);
+  }
+  public static isToolbarOpenForced(){
+    return useAppSelector(selectForceOpenToolbar);
+  }
+  public static isToolbarHiddenForced(){
+    return useAppSelector(selectForceHideToolbar);
+  }
+  public static isDockFixed(){
+    return useAppSelector(selectIsDockOpen);
+  }
+  public static isDockOpenForced(){
+    return useAppSelector(selectForceOpenDock);
+  }
+  public static isDockHiddenForced(){
+    return useAppSelector(selectForceHideDock);
+  }
+
+  public static toggleToolbar(){
+    store.dispatch(toggleToolbar());
+  }
+  public static openToolbar(){
+    store.dispatch(openToolbar());
+  }
+  public static closeToolbar(){
+    store.dispatch(closeToolbar());
+  }
+  public static forceHideToolbar(hide:boolean = true){
+    store.dispatch(forceHideToolbar(hide));
+  }
+  public static forceOpenToolbar(open:boolean = true){
+    store.dispatch(forceOpenToolbar(open));
+  }
+
+  public static toggleDock(){
+    store.dispatch(toggleDock());
+  }
+  public static openDock(){
+    store.dispatch(openDock());
+  }
+  public static closeDock(){
+    store.dispatch(closeDock());
+  }
+  public static forceHideDock(hide:boolean = true){
+    store.dispatch(forceHideDock(hide));
+  }
+  public static forceOpenDock(open:boolean = true){
+    store.dispatch(forceOpenDock(open));
   }
 }

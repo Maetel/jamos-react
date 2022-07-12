@@ -9,14 +9,12 @@ import Process, { ProcessCommands, Rect, runOnce, TotalCommands } from "./ProcTy
 
 export interface ProcState {
   procs:Process[]
-  openToolbar : boolean;
-  openDock : boolean;
+  
 }
 
 const initialState: ProcState = {
   procs:[],
-  openToolbar:false,
-  openDock:false,
+  
 }
 
 //set children active recursively
@@ -253,33 +251,12 @@ export const procSlice = createSlice({
         for(let key in max){
           proc['rect'][key] = max[key]
         }
-        if(isMaximized()){
-          state.openToolbar = false; //close toolbar on maximize
-        }
       }
       
       proc.isMaximized = isMaximized();
     },
 
-    openToolbar:(state, action:PayloadAction<void>)=>{
-      state.openToolbar = true;
-    },
-    closeToolbar:(state, action:PayloadAction<void>)=>{
-      state.openToolbar = false;
-    },
-    toggleToolbar:(state, action:PayloadAction<void>)=>{
-      state.openToolbar = !state.openToolbar;
-    },
-
-    openDock:(state, action:PayloadAction<void>)=>{
-      state.openDock = true;
-    },
-    closeDock:(state, action:PayloadAction<void>)=>{
-      state.openDock = false;
-    },
-    toggleDock:(state, action:PayloadAction<void>)=>{
-      state.openDock = !state.openDock;
-    },
+    
     pushToLast:(state, action:PayloadAction<string>)=>{
       const proc = state.procs.find(proc=>proc.id===action.payload);
       if(!proc){
@@ -313,8 +290,7 @@ export const procSlice = createSlice({
   
 })
 
-export const selectIsToolbarOpen = (state:AppState)=>state.proc.openToolbar;
-export const selectIsDockOpen = (state:AppState)=>state.proc.openDock;
+
 
 // export const selectProcessById = createSelector([state=>state.procs, (state, procId:string)=>procId], (procs,procId)=>{
 //   return procs.find(proc=>proc.id===procId);
@@ -393,9 +369,6 @@ function topParent (state:AppState, proc:Process):Process{
 }
 export const selectFrontsParent = (state:AppState):Process=>{
   const front = state.proc.procs.find(proc=>proc.zIndex==='0');
-  if(front?.name==='Terminal' && front?.id==='3'){
-    // debugger;
-  }
   return topParent(state, front);
 }
 
@@ -410,4 +383,4 @@ export const selectProcessOfType = (procType:String)=>(state:AppState)=>{
 
 
 export default procSlice.reducer;
-export const { addProc, killProc, killAllProcs, increaseIndices, setActiveWindow,setProcProps, minimize, unMinimize,toggleMinimize,toggleMaximize,setToolbarItem, openToolbar, closeToolbar, toggleToolbar, openDock, closeDock,toggleDock,pushToLast, loadProcFromString, killAllofType} = procSlice.actions
+export const { addProc, killProc, killAllProcs, increaseIndices, setActiveWindow,setProcProps, minimize, unMinimize,toggleMinimize,toggleMaximize,setToolbarItem, pushToLast, loadProcFromString, killAllofType} = procSlice.actions

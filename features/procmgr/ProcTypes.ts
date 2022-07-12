@@ -89,39 +89,44 @@ export interface Rect {
 
 export interface ProcessCommand {
   comp:string,
+  name:string,
   type?:'window'|'daemon'|'system', // if undefined, 'window'. 'system' cannot be called manually
   icon?:string, // if undefined, "/imgs/icon-default.svg"
   runOnce?:boolean, // if undefined, false
 }
 
-export const _ProcessCommands:ProcessCommand[] = [
-  {comp:"system", icon:"/imgs/bootloader.svg", runOnce:true, type:'system'},
-  {comp:"dir", icon:"/imgs/dir.svg", type:'system'},
-  {comp:"text", icon:"/imgs/text.svg", type:'system'},
-  
-  {comp:"modal", icon:"/imgs/circlequestion.svg"},
-  {comp:"textmodal", icon:"/imgs/circlequestion.svg"},
-  {comp:"filedialogue", icon:"/imgs/circlequestion.svg"},
-  {comp:"contextmenu", icon:"/imgs/circlequestion.svg"},
+export const ProcessTypeName = (type:string):string=>{
+  return _ProcessCommands.find(cmd=>cmd.comp===type)?.name;
+}
 
-  {comp:"testwindow"},
-  {comp:"viewer", icon:"/imgs/viewer.svg"},
-  {comp:"editor", },
-  {comp:"browser",},
-  {comp:"viewer"},
-  {comp:"notepad", icon:"/imgs/notepad.svg"},
-  {comp:"terminal", icon:"/imgs/terminal.svg"},
-  {comp:"logger", icon:"/imgs/logger.svg", runOnce:true},
-  {comp:"finder", icon:"/imgs/dir.svg"},
-  {comp:"atelier", icon:"/imgs/atelier.svg"},
-  {comp:"postman", icon:"/imgs/postman.svg", runOnce:true},
-  {comp:"appstore", icon:"/imgs/appstore.svg"},
-  {comp:"about", icon:"/imgs/jamos.png"},
-  {comp:"settings", icon:"/imgs/settings.svg", runOnce:true},
-  {comp:"styler", icon:"/imgs/styler.svg", runOnce:true},
-  {comp:"systeminfo", icon:"/imgs/systeminfo.svg", runOnce:true},
-  {comp:'simpleabout', icon:"/imgs/circlequestion.svg"},
-  {comp:'toolbar', icon:"/imgs/circlequestion.svg", type:'system'},
+export const _ProcessCommands:ProcessCommand[] = [
+  {comp:"system", name:"JamOS System", icon:"/imgs/bootloader.svg", runOnce:true, type:'system'},
+  {comp:"dir",name:"Directory", icon:"/imgs/dir.svg", type:'system'},
+  {comp:"text",name:"Text", icon:"/imgs/text.svg", type:'system'},
+  
+  {comp:"modal",name:"Modal", icon:"/imgs/circlequestion.svg"},
+  {comp:"textmodal", name:"TextModal",icon:"/imgs/circlequestion.svg"},
+  {comp:"filedialogue", name:"FileDialogue",icon:"/imgs/circlequestion.svg"},
+  {comp:"contextmenu", name:"Context Menu",icon:"/imgs/circlequestion.svg"},
+
+  {comp:"testwindow", name:'Test Window'},
+  {comp:"viewer",name:"Viewer", icon:"/imgs/viewer.svg"},
+  {comp:"editor",name:"Editor", },
+  {comp:"browser",name:"Browser",},
+  {comp:"viewer", name:'Image Viewer'},
+  {comp:"notepad", name:"Notepad",icon:"/imgs/notepad.svg"},
+  {comp:"terminal", name:"Terminal",icon:"/imgs/terminal.svg"},
+  {comp:"logger",name:"Logger", icon:"/imgs/logger.svg", runOnce:true},
+  {comp:"finder",name:"Finder", icon:"/imgs/dir.svg"},
+  {comp:"atelier",name:"Atelier", icon:"/imgs/atelier.svg"},
+  {comp:"postman", name:"Postman",icon:"/imgs/postman.svg", runOnce:true},
+  {comp:"appstore", name:"AppStore",icon:"/imgs/appstore.svg"},
+  {comp:"about",name:"About", icon:"/imgs/jamos.png"},
+  {comp:"settings", name:"Settings",icon:"/imgs/settings.svg", runOnce:true},
+  {comp:"styler", name:"Styler",icon:"/imgs/styler.svg", runOnce:true},
+  {comp:"systeminfo",name:"SystemInfo", icon:"/imgs/systeminfo.svg", runOnce:true},
+  {comp:'simpleabout',name:"About", icon:"/imgs/circlequestion.svg"},
+  {comp:'toolbar',name:"Toolbar", icon:"/imgs/circlequestion.svg", type:'system'},
 ]
 export const ProcessCommands = _ProcessCommands.filter(cmd=>((cmd.type === 'window') || (cmd.type === undefined))).map(cmd=>cmd.comp);
 

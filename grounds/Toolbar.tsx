@@ -127,19 +127,19 @@ export class ToolbarControl {
           return;
 
         case "toolbar":
-          if (params === "open") {
-            procmgr.openToolbar();
+          if (params === "fix") {
+            JamOS.openToolbar();
           }
           if (params === "close") {
-            procmgr.closeToolbar();
+            JamOS.closeToolbar();
           }
           return;
         case "dock":
-          if (params === "open") {
-            procmgr.openDock();
+          if (params === "fix") {
+            JamOS.openDock();
           }
           if (params === "close") {
-            procmgr.closeDock();
+            JamOS.closeDock();
           }
           return;
         default:
@@ -369,10 +369,17 @@ export default function Toolbar(props) {
   const [isEdge, setIsEdge] = useState(false);
   const [hovered, setHovered] = useState(false);
   const [clicked, setClicked] = useState(null);
-  const openByMgr = procmgr.isToolbarOpen();
+  const fixed = JamOS.isToolbarFixed();
+  const forceOpen = JamOS.isToolbarOpenForced();
+  const forceHidden = JamOS.isToolbarHiddenForced();
+  const isOpen = (forceOpen || fixed) && !forceHidden;
+  // console.log(
+  //   `forceOpen:${forceOpen} forceHidden:${forceHidden} isOpen:${isOpen}`
+  // );
   const show: () => boolean = () => isEdge || hovered || clicked !== null;
-  const toolbarActive = () => (show() || openByMgr ? styles.active : "");
-  const toolbarBgActive = () => (show() && !openByMgr ? styles.active : "");
+  const toolbarActive = () => (show() || isOpen ? styles.active : "");
+  const toolbarBgActive = () =>
+    (show() && !isOpen) || clicked !== null ? styles.active : "";
   const colors = JamOS.theme.colors;
 
   const front = JamOS.procmgr.front();
@@ -399,8 +406,8 @@ export default function Toolbar(props) {
   };
   const containerStyle = buildContainerStyle();
 
-  const isToolbarOpen = procmgr.isToolbarOpen();
-  const isDockOpen = procmgr.isDockOpen();
+  const isToolbarFixed = JamOS.isToolbarFixed();
+  const isDockFixed = JamOS.isDockFixed();
 
   const parseItems = (items: TbItem[]): TbProc => {
     //toggle toolbar
@@ -408,10 +415,10 @@ export default function Toolbar(props) {
       const tbIdx = systemMenu.indexOf(
         systemMenu.find((menu) => menu.item.includes("toolbar"))
       );
-      systemMenu[tbIdx].item = isToolbarOpen ? "Hide toolbar" : "Fix toolbar";
-      systemMenu[tbIdx].callback = isToolbarOpen
+      systemMenu[tbIdx].item = isToolbarFixed ? "Hide toolbar" : "Fix toolbar";
+      systemMenu[tbIdx].callback = isToolbarFixed
         ? "system.proc.toolbar.close"
-        : "system.proc.toolbar.open";
+        : "system.proc.toolbar.fix";
     }
 
     //toggle dock
@@ -419,10 +426,10 @@ export default function Toolbar(props) {
       const dockIdx = systemMenu.indexOf(
         systemMenu.find((menu) => menu.item.includes("dock"))
       );
-      systemMenu[dockIdx].item = isDockOpen ? "Hide dock" : "Fix dock";
-      systemMenu[dockIdx].callback = isDockOpen
+      systemMenu[dockIdx].item = isDockFixed ? "Hide dock" : "Fix dock";
+      systemMenu[dockIdx].callback = isDockFixed
         ? "system.proc.dock.close"
-        : "system.proc.dock.open";
+        : "system.proc.dock.fix";
     }
 
     const retval: TbMenu[] = [{ menu: "🍞", items: systemMenu }];
@@ -454,7 +461,7 @@ export default function Toolbar(props) {
     // console.log("frontMenus update :", frontMenus);
     const _tbproc = parseItems(frontMenus);
     setMenus(_tbproc);
-  }, [frontMenus, isToolbarOpen, isDockOpen]);
+  }, [frontMenus, isToolbarFixed, isDockFixed]);
 
   const uncollapse = (e) => {
     setHovered(false);

@@ -38,6 +38,8 @@ export default function FileDialogue(props) {
   proc.onBackgroundClick = `${proc.id}/FileDialogue/onBackgroundClick`;
   proc.hideOnDock = true;
   proc.hideOnToolbar = true;
+  proc.disableMaxBtn = true;
+  proc.disableMinBtn = true;
 
   const colors = JamOS.theme.colors;
   const procmgr = JamOS.procmgr;

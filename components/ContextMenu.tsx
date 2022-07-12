@@ -26,6 +26,12 @@ export default function ContextMenu(props) {
   proc.hideOnDock = true;
   proc.hideOnToolbar = true;
   proc.disableDrag = true;
+  useEffect(() => {
+    CallbackStore.getById(proc.onMount)?.();
+    return () => {
+      CallbackStore.getById(proc.onDestroy)?.();
+    };
+  }, []);
   const buildRect = () => {
     const w = window.innerWidth;
     const h = window.innerHeight;

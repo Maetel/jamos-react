@@ -21,6 +21,7 @@ export default function System(props) {
   const saveOnExit = setmgr.getReadable("saveOnExit");
   const askOnExit = setmgr.getReadable("askOnExit");
   const muteOptions = setmgr.getReadable("muteAllOptions");
+  const front = procmgr.front();
 
   const init = () => {
     procmgr.add("terminal");
@@ -73,12 +74,12 @@ export default function System(props) {
     }
 
     filemgr.addFiles(f);
-    procmgr.openToolbar();
-    procmgr.openDock();
+    JamOS.forceOpenToolbar();
+    JamOS.forceOpenDock();
     JamOS.setNotif("Welcome to JamOS", "system");
     setTimeout(() => {
-      procmgr.closeToolbar();
-      procmgr.closeDock();
+      JamOS.forceOpenToolbar(false);
+      JamOS.forceOpenDock(false);
     }, 1500);
   };
 
@@ -156,6 +157,16 @@ export default function System(props) {
       JamOS.saveData("breadData", JamOS.stringify());
     }
   }, [saveOnExit, askOnExit, muteOptions]);
+
+  useEffect(() => {
+    if (front.isMaximized) {
+      JamOS.forceHideToolbar();
+      JamOS.forceHideDock();
+    } else {
+      JamOS.forceHideToolbar(false);
+      JamOS.forceHideDock(false);
+    }
+  }, [front]);
 
   return <Daemon {...props} proc={proc}></Daemon>;
 }

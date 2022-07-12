@@ -47,7 +47,6 @@ export default function Terminal(props) {
   };
 
   /////////////////////////
-  const isToolbarOpen = procmgr.isToolbarOpen();
   const registerToolbarCallback = () => {
     ToolbarControl.RegisterBuilder(proc.id)
       .register("Terminal", "About terminal", async () => {
@@ -489,18 +488,18 @@ export default function Terminal(props) {
         break;
 
       case "dock":
-        procmgr.toggleDock();
+        JamOS.toggleDock();
         break;
       case "toolbar":
         const _l = merged.toLowerCase();
         if (merged.length === 0) {
-          procmgr.toggleToolbar();
+          JamOS.toggleToolbar();
           break;
         }
         if (_l === "open" || _l === "o") {
-          procmgr.openToolbar();
+          JamOS.openToolbar();
         } else if (_l === "close" || _l === "c") {
-          procmgr.closeToolbar();
+          JamOS.closeToolbar();
         }
         break;
       case "notepad":

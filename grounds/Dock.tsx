@@ -16,9 +16,15 @@ export default function Dock(props) {
   const procmgr = JamOS.procmgr;
   const [isEdge, setIsEdge] = useState(false);
   const [hovered, setHovered] = useState(false);
-  const fixed = procmgr.isDockOpen();
-  const show: boolean = isEdge || hovered || fixed || debugMode;
-  const className = show ? styles.active : "";
+  const fixed = JamOS.isDockFixed();
+  const openForced = JamOS.isDockOpenForced();
+  const isOpen = openForced || fixed;
+  const hiddenForced = JamOS.isDockHiddenForced(); // hide preceeds open
+  // console.log(
+  //   `fixed:${fixed} hiddenForced:${hiddenForced} openForced:${openForced}`
+  // );
+  const show: boolean = isEdge || hovered;
+  const className = show || (!hiddenForced && isOpen) ? styles.active : "";
   const colors = JamOS.theme.colors;
   // const groups = procmgr.groupedProcs();
   const groups = procmgr.groupedProcsForDock();

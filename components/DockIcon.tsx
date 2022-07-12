@@ -1,7 +1,11 @@
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
+import CallbackStore from "../features/JamOS/Callbacks";
 import JamOS from "../features/JamOS/JamOS";
-import Process, { getProcessCommandsIcon } from "../features/procmgr/ProcTypes";
+import Process, {
+  getProcessCommandsIcon,
+  ProcessTypeName,
+} from "../features/procmgr/ProcTypes";
 import styles from "../styles/DockIcon.module.css";
 import ShimmerImage from "./ShimmerImage";
 
@@ -41,17 +45,15 @@ export default function DockIcon(props) {
 
   const handleContext = (e) => {
     e.preventDefault();
-    JamOS.procmgr.openDock();
     JamOS.closeAllContextMenus();
 
     let menus, callbacks;
     if (procsOfType.length === 0) {
       // console.log("Added JamOS.procmgr.closeDock()");
-      menus = ["Open"];
+      menus = [`Open ${ProcessTypeName(type)}`];
       callbacks = [
         () => {
           procmgr.add(type);
-          JamOS.procmgr.closeDock();
         },
       ];
     } else {
@@ -64,7 +66,6 @@ export default function DockIcon(props) {
       callbacks = [
         ...procsOfType.map((_proc) => () => {
           procmgr.setFront(_proc.id);
-          JamOS.procmgr.closeDock();
         }),
         () => {
           procmgr.killAllofType(type);
@@ -77,7 +78,18 @@ export default function DockIcon(props) {
     const x = rect.left / window.innerWidth < 0.5 ? rect.left : rect.right;
     const y = rect.top - topOffset;
 
-    JamOS.openContextMenu(x, y, menus, callbacks);
+    const cbMount = "system/DockIcon/onContextMenuMount";
+    const cbDestroy = "system/DockIcon/onContextMenuDestroy";
+    CallbackStore.register(cbMount, () => {
+      JamOS.forceOpenDock(true);
+    });
+    CallbackStore.register(cbDestroy, () => {
+      JamOS.forceOpenDock(false);
+    });
+    JamOS.openContextMenu(x, y, menus, callbacks, {
+      onMount: cbMount,
+      onDestroy: cbDestroy,
+    });
   };
 
   useEffect(() => {
@@ -90,7 +102,10 @@ export default function DockIcon(props) {
   return (
     <div
       className={styles.container}
-      onClick={onIconClick}
+      onClick={(e) => {
+        onIconClick(e);
+        JamOS.closeAllContextMenus();
+      }}
       onMouseOver={(e) => {
         setHovered(true);
       }}

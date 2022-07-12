@@ -12,25 +12,19 @@ import JamOS from "../JamOS/JamOS";
 
 import {
   addProc,
-  closeDock,
-  closeToolbar,
   increaseIndices,
   killAllofType,
   killAllProcs,
   killProc,
   loadProcFromString,
   minimize,
-  openDock,
-  openToolbar,
   processesValue,
   pushToLast,
   selectFront,
   selectFrontsParent,
   selectGroupedProcs,
   selectGroupedProcsForDock,
-  selectIsDockOpen,
   selectIsMinimized,
-  selectIsToolbarOpen,
   selectProcessById,
   selectProcesses,
   selectProcessOfType,
@@ -39,10 +33,8 @@ import {
   setActiveWindow,
   setProcProps,
   setToolbarItem,
-  toggleDock,
   toggleMaximize,
   toggleMinimize,
-  toggleToolbar,
   unMinimize,
 } from "./procSlice";
 import Process, { ProcessCommand, ProcessCommands, _ProcessCommands } from "./ProcTypes";
@@ -367,33 +359,6 @@ export default class ProcMgr{
 
   public setToolbarItem (procId:string, item:ToolbarItem){
     store.dispatch(setToolbarItem({id:procId, item:item}));
-  }
-
-  public isToolbarOpen(){
-    return useAppSelector(selectIsToolbarOpen)
-  }
-  public isDockOpen(){
-    return useAppSelector(selectIsDockOpen)
-  }
-
-  public toggleToolbar(){
-    store.dispatch(toggleToolbar());
-  }
-  public openToolbar(){
-    store.dispatch(openToolbar());
-  }
-  public closeToolbar(){
-    store.dispatch(closeToolbar());
-  }
-
-  public toggleDock(){
-    store.dispatch(toggleDock());
-  }
-  public openDock(){
-    store.dispatch(openDock());
-  }
-  public closeDock(){
-    store.dispatch(closeDock());
   }
 
   public killAllofType(type:string){

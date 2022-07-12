@@ -428,7 +428,6 @@ export default function Window(props) {
         }
       }, safetimeout);
     }
-    console.log("toggleWindowMaximize");
     procmgr.toggleMaximize(proc.id);
     togglegrabbable();
   };
