@@ -4,7 +4,7 @@ import store, { AppState } from "../../app/store";
 
 export interface Notif {
   msg:string,
-  type: 'log' | 'warn' | 'error' | 'system',
+  type: 'log' | 'success' | 'warn' | 'error' | 'system',
 }
 
 export interface OSState {

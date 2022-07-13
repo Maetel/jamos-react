@@ -14,9 +14,8 @@ export default interface Process {
   comp:string,
   name:string,
   zIndex:string,
-  //onFocus?:()=>void,
-  desc?:string, // to be displayed on dock context menu
   toolbar:ToolbarItem[],
+  desc?:string, // to be displayed on dock context menu
   node?:Node,
   killable?:boolean,
 
@@ -128,7 +127,7 @@ export const _ProcessCommands:ProcessCommand[] = [
   {comp:'simpleabout',name:"About", icon:"/imgs/circlequestion.svg"},
   {comp:'toolbar',name:"Toolbar", icon:"/imgs/circlequestion.svg", type:'system'},
 
-  {comp:'comments',name:"Leave comments!", icon:"/imgs/comments.svg"},
+  {comp:'comments',name:"Leave comments!", icon:"/imgs/comments.svg", runOnce:true},
 
 ]
 export const ProcessCommands = _ProcessCommands.filter(cmd=>((cmd.type === 'window') || (cmd.type === undefined))).map(cmd=>cmd.comp);

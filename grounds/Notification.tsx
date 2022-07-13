@@ -12,6 +12,10 @@ export default function Notification(props) {
   const colors = JamOS.theme.colors;
   const buildNotifStyle = (type) => {
     switch (type) {
+      case "success":
+        return {
+          color: colors.okay,
+        };
       case "warn":
         return {
           color: colors.warn,

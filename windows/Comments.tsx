@@ -1,12 +1,13 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import ShimmerImage from "../components/ShimmerImage";
 import Window from "../components/Window";
 import JamOS from "../features/JamOS/JamOS";
 import Process from "../features/procmgr/ProcTypes";
 import styles from "../styles/Comments.module.css";
 
 const server =
-  process.env.NODE_ENV === "test"
+  process.env.NODE_ENV === "development"
     ? "http://localhost:3000/"
     : "https://jamos-v2.herokuapp.com/";
 // const server = 'http://jamos-v2/';
@@ -37,9 +38,59 @@ export interface CommentData {
 
 function CommentCard(props) {
   const comment: CommentData = props.comment;
+  const colors = JamOS.theme.colors;
+  const date = new Date(comment.time);
+  const [hovered, setHovered] = useState(false);
+  const [clicked, setClicked] = useState(false);
+  const isActive = clicked;
+  const isMore = comment.content !== comment.excerpt;
+  const buildStyle = () => {
+    const retval = {
+      color: colors["1"],
+      backgroundColor: colors["3"] + "22",
+      boxShadow: `1px 1px 5px ${colors["1"]}`,
+    };
+    if (hovered || isActive) {
+      retval.boxShadow = `1px 1px 14px ${colors["1"]}`;
+    }
+    return retval;
+  };
+  const style = buildStyle();
   return (
-    <li className={styles.commentCard}>
-      {comment.uid} : {comment.content}
+    <li
+      className={styles.commentCard}
+      style={style}
+      onPointerEnter={(e) => {
+        setHovered(true);
+      }}
+      onPointerLeave={(e) => {
+        setHovered(false);
+      }}
+      onClick={(e) => {
+        setClicked((val) => !val);
+      }}
+    >
+      <div className={styles.content}>
+        {isActive ? comment.content : comment.excerpt}{" "}
+        {!isActive && isMore && (
+          <span
+            className={styles.excerpt}
+            style={{
+              fontSize: "0.9rem",
+              opacity: hovered || isActive ? 0.8 : 0.6,
+              textDecoration: "underline",
+              cursor: "pointer",
+            }}
+          >
+            ...more
+          </span>
+        )}
+      </div>
+      <div className={styles.commentFooter}>
+        <span className={styles.authorBy}>written by</span>
+        <span className={styles.name}>{comment.uid}</span>
+        <span className={styles.time}>{date.toLocaleString()}</span>
+      </div>
     </li>
   );
 }
@@ -61,16 +112,38 @@ function LeaveComment(props) {
 
   const [user, setUser] = useState("");
   const [content, setContent] = useState("");
+
   const onCommentSubmit = (e) => {
     e.preventDefault();
+
     const postAndWait = async () => {
+      const _user = user.trim();
+      const _content = content.trim();
+      if (_user.length === 0) {
+        JamOS.setNotif("Name is empty");
+        return;
+      }
+      if (_content.length === 0) {
+        JamOS.setNotif("Content is empty");
+        return;
+      }
+
       const res = await axios
         .post(posts, {
-          user: user,
-          content: content,
+          user: _user,
+          content: _content,
         })
         .then((_res) => {
-          // console.log("post res : ", _res);
+          if (_res.data?.status !== 200) {
+            JamOS.setNotif(
+              "Could not post your comment. Error : " + _res.data?.content,
+              "error"
+            );
+          } else if (_res.data?.content) {
+            JamOS.setNotif("Thanks for leaving me a comment!", "success");
+            setUser("");
+            setContent("");
+          }
         })
         .catch((err) => {
           JamOS.setNotif(
@@ -85,6 +158,13 @@ function LeaveComment(props) {
     postAndWait();
   };
 
+  const nameInputElem = useRef(null);
+  useEffect(() => {
+    if (nameInputElem.current) {
+      nameInputElem.current.focus();
+    }
+  }, []);
+
   return (
     <div
       className={styles.leaveComment}
@@ -92,33 +172,40 @@ function LeaveComment(props) {
         boxShadow: colors.boxShadow,
       }}
     >
-      <div className={styles.inputArea}>
-        <form onSubmit={onCommentSubmit}>
-          <label>
-            Name:
-            <input
-              type="text"
-              name="user"
-              value={user}
-              onChange={(e) => {
-                setUser(e.target.value);
-              }}
-            />
-          </label>
-          <label>
-            Comment:
-            <input
-              type="text"
-              name="content"
-              value={content}
-              onChange={(e) => {
-                setContent(e.target.value);
-              }}
-            />
-          </label>
-          <input type="submit" value="Submit" />
-        </form>
-      </div>
+      <form onSubmit={onCommentSubmit} className={styles.inputArea}>
+        <label className={`${styles.label} ${styles.userLabel}`}>
+          Name:
+          <input
+            type="text"
+            name="user"
+            value={user}
+            onChange={(e) => {
+              setUser(e.target.value);
+            }}
+            ref={nameInputElem}
+          />
+        </label>
+        <label className={`${styles.label} ${styles.commentLabel}`}>
+          Comment:
+          <input
+            type="text"
+            name="content"
+            value={content}
+            onChange={(e) => {
+              setContent(e.target.value);
+            }}
+          />
+        </label>
+        <input
+          style={{
+            color: colors["2"],
+            backgroundColor: colors["1"],
+          }}
+          className={styles.submitBtn}
+          type="submit"
+          value="Leave a comment!"
+        />
+      </form>
     </div>
   );
 }
@@ -127,9 +214,18 @@ export default function Comments(props) {
   const proc: Process = { ...props.proc };
   proc.name = proc.name ?? "Leave Comments!";
   proc.hideNav = proc.hideNav ?? true;
+  proc.disableMaxBtn = proc.disableMaxBtn ?? true;
+  proc.rect = proc.rect ?? {
+    minWidth: 480,
+    width: 480,
+    minHeight: 640,
+    height: 800,
+  };
+  // proc.
+
   let comments: CommentData[] =
     JamOS.procmgr.getReadable(proc.id, "comments") ?? [];
-  comments = [...comments].reverse();
+  // comments = [...comments].reverse(); //reverse on serverside
   const commentUpdate: boolean = JamOS.procmgr.getReadable(
     proc.id,
     "commentUpdate"
@@ -156,11 +252,12 @@ export default function Comments(props) {
     JamOS.setNotif(`Connecting to ${posts}...`);
   }, []);
   useEffect(() => {
-    console.log("commentUpdate, fetch and update");
     if (commentUpdate) {
       fetchAndUpdate();
     }
   }, [commentUpdate]);
+
+  const [reloading, setReloading] = useState(false);
 
   return (
     <Window {...props} proc={proc}>
@@ -172,7 +269,24 @@ export default function Comments(props) {
           }}
         >
           Comments
+          <button
+            className={`${styles.reload} ${reloading && styles.spin}`}
+            onClick={(e) => {
+              setReloading(true);
+              setTimeout(() => {
+                setReloading(false);
+              }, 800);
+              fetchAndUpdate();
+            }}
+          >
+            <ShimmerImage
+              src={"/imgs/loading.svg"}
+              width={30}
+              height={30}
+            ></ShimmerImage>
+          </button>
         </h1>
+
         <CommentGrid comments={comments}></CommentGrid>
         <LeaveComment procId={proc.id}></LeaveComment>
       </div>

@@ -29,7 +29,7 @@ export default class JamOS {
   public static get notifDuration() {
     return useAppSelector(selectNotifDuration);
   }
-  public static setNotif(msg:string, type?:'log'|'warn'|'error'|'system'){
+  public static setNotif(msg:string, type?:'log'|'success'|'warn'|'error'|'system'){
     const notif:Notif = {
       msg:msg, type:(type??'log')
     };
