@@ -103,6 +103,7 @@ function CommentGrid(props) {
 function LeaveComment(props) {
   const colors = JamOS.theme.colors;
   const procId: string = props.procId;
+  const fetchAndUpdate = props.fetchAndUpdate;
 
   const jamUser: JamUser = JamOS.userReadable();
   const [user, setUser] = useState("");
@@ -152,6 +153,7 @@ function LeaveComment(props) {
             JamOS.setNotif("Thanks for leaving me a comment!", "success");
             setUser("");
             setContent("");
+            fetchAndUpdate();
           }
         })
         .catch((err) => {
@@ -159,10 +161,8 @@ function LeaveComment(props) {
             "Could not post your comment. Error : " + err,
             "error"
           );
+          fetchAndUpdate();
         });
-      JamOS.procmgr.set(procId, { commentUpdate: false });
-      JamOS.procmgr.set(procId, { commentUpdate: true });
-      console.log("res:", res);
     };
     postAndWait();
   };
@@ -298,7 +298,10 @@ export default function Comments(props) {
         </h1>
 
         <CommentGrid comments={comments}></CommentGrid>
-        <LeaveComment procId={proc.id}></LeaveComment>
+        <LeaveComment
+          procId={proc.id}
+          fetchAndUpdate={fetchAndUpdate}
+        ></LeaveComment>
       </div>
     </Window>
   );

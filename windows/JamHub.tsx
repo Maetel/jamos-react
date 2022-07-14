@@ -68,6 +68,20 @@ export default function _(props) {
     const pwValid = password.trim().length !== 0 && !password.includes(" ");
     return { userValid, pwValid };
   };
+  const setSuccess = (msg: string) => {
+    JamOS.setNotif(msg, "success");
+    setStatus({
+      type: "success",
+      msg: msg,
+    });
+  };
+  const setError = (msg: string) => {
+    JamOS.setNotif(msg, "error");
+    setStatus({
+      type: "error",
+      msg: msg,
+    });
+  };
   const onSubmit = (mode: HubMode) => {
     const { userValid, pwValid } = validateFields();
     const isValid = userValid && pwValid;
@@ -79,7 +93,8 @@ export default function _(props) {
         : "Account and password not valid";
 
     if (!isValid) {
-      JamOS.setNotif(errMsg, "error");
+      setError(errMsg);
+      // JamOS.setNotif(errMsg, "error");
       return;
     }
 
@@ -94,48 +109,80 @@ export default function _(props) {
     };
 
     const trySignIn = async () => {
-      const res = await axios.post(JamOS.apis.signin, userInput, config);
-      const stat = res.status;
-      const cont = res.data?.content;
-      // console.log("Signin Status : " + stat + "Content : ", cont);
-      const acc = cont["accessToken"];
-      const ref = cont["refreshToken"];
-
-      const signedIn = stat === 200 && acc && ref;
-      if (signedIn) {
-        JamOS.signin(userInput.user, acc, ref);
-        const confirmSignIn = async () => {
-          const res = await axios.get(JamOS.apis.signincheck, JamOS.authHeader);
+      const res = await axios
+        .post(JamOS.apis.signin, userInput, config)
+        .then(async (res) => {
           const stat = res.status;
           const cont = res.data?.content;
-          if (stat === 200) {
-            JamOS.setNotif("Signed in as " + JamOS.userValue().id);
+          // console.log("Signin Status : " + stat + "Content : ", cont);
+          const acc = cont["accessToken"];
+          const ref = cont["refreshToken"];
+
+          const signedIn = stat === 200 && acc && ref;
+          if (signedIn) {
+            JamOS.signin(userInput.user, acc, ref);
+            const confirmSignIn = async () => {
+              await axios
+                .get(JamOS.apis.signincheck, JamOS.authHeader)
+                .then((_res) => {
+                  const stat = _res.status;
+                  const cont = _res.data?.content;
+                  if (stat === 200) {
+                    // JamOS.setNotif("Signed in as " + JamOS.userValue().id);
+                    setSuccess("Signed in as " + JamOS.userValue().id);
+                  } else {
+                    JamOS.signout();
+                    setError("Failed to sign in as " + userInput.user);
+                    // JamOS.setNotif("Failed to sign in as " + userInput.user, "error");
+                  }
+                });
+            };
+            await confirmSignIn();
           } else {
-            JamOS.signout();
-            JamOS.setNotif("Failed to sign in as " + userInput.user, "error");
+            setError("Failed to sign in as " + userInput.user);
+            // JamOS.setNotif("Failed to sign in as " + userInput.user, "error");
           }
-        };
-        await confirmSignIn();
-      } else {
-        JamOS.setNotif("Failed to sign in as " + userInput.user, "error");
-      }
+        })
+        .catch((err) => {
+          console.error(err);
+          const cont = err.response?.data?.content;
+          if (cont) {
+            setError(cont);
+          } else {
+            setError("Failed to sign in with unknown error code");
+          }
+        });
     };
 
     const trySignup = async () => {
-      const res = await axios.post(JamOS.apis.signup, userInput, config);
-      const stat = res.status;
-      const cont = res.data?.content;
-      console.log("Signup Status : " + stat + ", Content : ", cont);
-      if (stat === 200) {
-        JamOS.setNotif("Signed up as " + userInput.user);
-        await trySignIn();
-      } else {
-        if (cont) {
-          JamOS.setNotif(cont, "error");
-        } else {
-          JamOS.setNotif("Failed to sign up as " + userInput.user, "error");
-        }
-      }
+      await axios
+        .post(JamOS.apis.signup, userInput, config)
+        .then(async (res) => {
+          const stat = res.status;
+          const cont = res.data?.content;
+          if (stat === 200) {
+            // JamOS.setNotif("Signed up as " + userInput.user);
+            setSuccess("Signed in as " + JamOS.userValue().id);
+            await trySignIn();
+          } else {
+            if (cont) {
+              setError(cont);
+              // JamOS.setNotif(cont, "error");
+            } else {
+              setError("Failed to sign in as " + userInput.user);
+              // JamOS.setNotif("Failed to sign up as " + userInput.user, "error");
+            }
+          }
+        })
+        .catch((err) => {
+          console.error(err);
+          const cont = err.response?.data?.content;
+          if (cont) {
+            setError(cont);
+          } else {
+            setError("Failed to sign up with unknown error code");
+          }
+        });
     };
 
     if (mode === "signin") {
@@ -171,6 +218,29 @@ export default function _(props) {
     );
   };
 
+  interface Status {
+    type: "standby" | "success" | "warn" | "error";
+    msg: string;
+  }
+  const status: Status = JamOS.procmgr.getReadable(proc.id, "hubStatus") ?? {
+    type: "standby",
+    msg: "",
+  };
+  const setStatus = (stat: Status) => {
+    JamOS.procmgr.set(proc.id, { hubStatus: stat });
+  };
+  useEffect(() => {
+    setStatus({ type: "standby", msg: "" });
+  }, []);
+  const statusColor =
+    status.type === "standby"
+      ? colors["1"]
+      : status.type === "success"
+      ? colors.okay
+      : status.type === "warn"
+      ? colors.warn
+      : colors.error;
+
   return (
     <Window {...props} proc={proc}>
       <div className={styles.container}>
@@ -182,6 +252,9 @@ export default function _(props) {
         </div>
 
         <div className={styles.inputArea}>
+          <div className={styles.statusMsg} style={{ color: statusColor }}>
+            {status.msg}
+          </div>
           <form
             onSubmit={(e) => {
               e.preventDefault();
@@ -219,7 +292,7 @@ export default function _(props) {
           </form>
           <div className={styles.btns}>
             <button
-              className={styles.btn}
+              className={`${styles.btn} ${styles.half}`}
               style={btnStyle}
               onClick={(e) => {
                 onSubmit("signup");
@@ -228,7 +301,7 @@ export default function _(props) {
               Create Account
             </button>
             <button
-              className={styles.btn}
+              className={`${styles.btn} ${styles.half}`}
               style={btnStyle}
               onClick={(e) => {
                 JamOS.procmgr.kill(proc.id);

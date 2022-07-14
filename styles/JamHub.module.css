@@ -46,6 +46,11 @@
   width:100%;
 }
 
+.statusMsg {
+  height:1.5rem;
+  margin-bottom:10px;
+}
+
 .inputArea input{
   width:100%;
   margin:0;
@@ -63,6 +68,14 @@
   border-radius: 8px;
   margin-bottom: 8px;;
   cursor:pointer;
+}
+
+.btns {
+  display:flex;
+}
+
+.half {
+  width:50%;
 }
 
 .loginForm {
