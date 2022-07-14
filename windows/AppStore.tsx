@@ -92,6 +92,11 @@ export default function AppStore(props) {
       file: filemgr.makeFile("~/Comments", "comments"),
       show: true,
     },
+    {
+      id: fetchAndIncrementId(),
+      file: filemgr.makeFile("~/JamHub", "jamhub"),
+      show: true,
+    },
   ];
 
   const foundAny = () => {

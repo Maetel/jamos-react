@@ -81,7 +81,10 @@ export default function Terminal(props) {
     procmgr.set(proc.id, { onClick: `${proc.id}/Terminal/onClick` });
   }, []);
 
-  const [username, setUsername] = useState("jam@127.0.0.1");
+  const jamUser = JamOS.userReadable().id;
+  const jamWorld = JamOS.worldReadable().name;
+  const username = `${jamUser}@${jamWorld}`;
+
   const [cmdValue, setCmdValue] = useState("");
 
   //current directory
@@ -485,6 +488,7 @@ export default function Terminal(props) {
       case "settings":
       case "systeminfo":
       case "comments":
+      case "jamhub":
         procmgr.add(cmd);
         break;
 

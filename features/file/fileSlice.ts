@@ -192,7 +192,7 @@ const fileSlice = createSlice({
         fromParent.dirs = [...fromParent.dirs.filter(_f=>_f.node.path !== from)];
 
         //step 2.
-        dirFound.node.path = to;
+        // dirFound.node.path = to; //will be changed down there
         dirFound.node.id = dirFound.node.type + to;
 
         //step 3.

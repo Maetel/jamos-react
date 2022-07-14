@@ -3,19 +3,13 @@ import { useEffect, useRef, useState } from "react";
 import ShimmerImage from "../components/ShimmerImage";
 import Window from "../components/Window";
 import JamOS from "../features/JamOS/JamOS";
+import { JamUser } from "../features/JamOS/osSlice";
 import Process from "../features/procmgr/ProcTypes";
 import styles from "../styles/Comments.module.css";
 
-const server =
-  process.env.NODE_ENV === "development"
-    ? "http://localhost:3000/"
-    : "https://jamos-v2.herokuapp.com/";
-// const server = 'http://jamos-v2/';
-const posts = server + "post";
-
 export async function getServerSideProps(context) {
   const comments = await axios
-    .get(posts)
+    .get(JamOS.apis.posts)
     .then((res) => {
       console.log(res);
       return res;
@@ -110,14 +104,22 @@ function LeaveComment(props) {
   const colors = JamOS.theme.colors;
   const procId: string = props.procId;
 
+  const jamUser: JamUser = JamOS.userReadable();
   const [user, setUser] = useState("");
   const [content, setContent] = useState("");
+  const isLoggedIn = jamUser.loggedin;
 
   const onCommentSubmit = (e) => {
     e.preventDefault();
 
+    if (!isLoggedIn) {
+      JamOS.procmgr.add("jamhub", { parent: procId, disableBackground: true });
+      return;
+    }
+
     const postAndWait = async () => {
-      const _user = user.trim();
+      // const _user = user.trim();
+      const _user = jamUser.id;
       const _content = content.trim();
       if (_user.length === 0) {
         JamOS.setNotif("Name is empty");
@@ -129,10 +131,17 @@ function LeaveComment(props) {
       }
 
       const res = await axios
-        .post(posts, {
-          user: _user,
-          content: _content,
-        })
+        .post(
+          JamOS.apis.posts,
+          {
+            user: jamUser.id,
+            content: _content,
+          },
+          {
+            ...JamOS.authHeader,
+            withCredentials: true,
+          }
+        )
         .then((_res) => {
           if (_res.data?.status !== 200) {
             JamOS.setNotif(
@@ -178,7 +187,8 @@ function LeaveComment(props) {
           <input
             type="text"
             name="user"
-            value={user}
+            disabled
+            value={jamUser.id}
             onChange={(e) => {
               setUser(e.target.value);
             }}
@@ -203,7 +213,7 @@ function LeaveComment(props) {
           }}
           className={styles.submitBtn}
           type="submit"
-          value="Leave a comment!"
+          value={isLoggedIn ? "Leave a comment!" : "Sign in to leave a comment"}
         />
       </form>
     </div>
@@ -234,7 +244,7 @@ export default function Comments(props) {
 
   const fetchAndUpdate = () => {
     const fetchContents = async () => {
-      const res = await axios.get(posts);
+      const res = await axios.get(JamOS.apis.posts);
       const content = res?.["data"]?.["content"];
       return content;
     };
@@ -249,7 +259,7 @@ export default function Comments(props) {
 
   useEffect(() => {
     fetchAndUpdate();
-    JamOS.setNotif(`Connecting to ${posts}...`);
+    JamOS.setNotif(`Connecting to ${JamOS.apis.posts}...`);
   }, []);
   useEffect(() => {
     if (commentUpdate) {

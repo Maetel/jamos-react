@@ -87,7 +87,9 @@ export default function About(props) {
           />
         </div>
         <div className={styles["text-container"]} ref={textElem}>
-          <h1 className={`${styles.t} ${styles.title}`}>JamOS v0.1</h1>
+          <h1 className={`${styles.t} ${styles.title}`}>
+            JamOS v{JamOS.version}
+          </h1>
           <p className={`${styles.t} ${styles.desc}`}>
             designed & developed by Wonjun Hwang
           </p>

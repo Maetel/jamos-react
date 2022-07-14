@@ -18,6 +18,7 @@ export default interface Process {
   desc?:string, // to be displayed on dock context menu
   node?:Node,
   killable?:boolean,
+  runOnce?:boolean,
 
   style?:{[key:string]:string}, //whatever additional styles
   children?:string[], // automatically added in procSlice.addProc reducer
@@ -127,7 +128,9 @@ export const _ProcessCommands:ProcessCommand[] = [
   {comp:'simpleabout',name:"About", icon:"/imgs/circlequestion.svg"},
   {comp:'toolbar',name:"Toolbar", icon:"/imgs/circlequestion.svg", type:'system'},
 
+  //network usage
   {comp:'comments',name:"Leave comments!", icon:"/imgs/comments.svg", runOnce:true},
+  {comp:'jamhub',name:"JamHub", icon:"/imgs/jamos.png", runOnce:true},
 
 ]
 export const ProcessCommands = _ProcessCommands.filter(cmd=>((cmd.type === 'window') || (cmd.type === undefined))).map(cmd=>cmd.comp);

@@ -117,7 +117,6 @@ export default function FinderIcon(props) {
               (params) => {
                 const from = nodepath;
                 const to = Path.join(_path.parent, params).path;
-                console.log(`try filmgr.mv from [ ${from}] to [ ${to} ]`);
                 JamOS.filemgr.mv(from, to);
               },
             ],

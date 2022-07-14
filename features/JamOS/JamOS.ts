@@ -1,13 +1,14 @@
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import store from "../../app/store";
 import { CtxMenuProps } from "../../components/ContextMenu";
+import { getCookie } from "../../scripts/utils";
 import FileMgr from "../file/FileMgr";
 import ProcMgr from "../procmgr/ProcMgr";
 import {killAllofType} from "../procmgr/procSlice";
 import SetMgr from "../settings/SetMgr";
 import { Theme } from "../settings/Themes";
 import CallbackStore from "./Callbacks";
-import { closeDock, closeToolbar, forceHideDock, forceHideToolbar, forceOpenDock, forceOpenToolbar, Notif, openDock, openToolbar, selectForceHideDock, selectForceHideToolbar, selectForceOpenDock, selectForceOpenToolbar, selectIsDockOpen, selectIsToolbarOpen, selectNotifDuration, selectNotifs, setNotification, toggleDock, toggleToolbar } from "./osSlice";
+import { closeDock, closeToolbar, forceHideDock, forceHideToolbar, forceOpenDock, forceOpenToolbar, getUser, getWorld, JamUser, JamWorld, Notif, openDock, openToolbar, selectForceHideDock, selectForceHideToolbar, selectForceOpenDock, selectForceOpenToolbar, selectIsDockOpen, selectIsToolbarOpen, selectNotifDuration, selectNotifs, selectUser, selectWorld, setNotification, setUser, toggleDock, toggleToolbar, signout } from "./osSlice";
 
 export interface SerializedData {
   proc?:string,
@@ -18,7 +19,7 @@ export interface SerializedData {
 
 
 export default class JamOS {
-  
+  public static get version() {return '0.2'};
   public static get procmgr() {return ProcMgr.getInstance()};
   public static get filemgr() {return FileMgr.getInstance()};
   public static get setmgr() {return SetMgr.getInstance()};
@@ -34,6 +35,14 @@ export default class JamOS {
       msg:msg, type:(type??'log')
     };
     store.dispatch(setNotification(notif))
+
+
+    if(type==='error'){
+      console.error('[Error] ' +msg);
+    }
+    if(type==='system'){
+      console.log('[System] ' +msg);
+    }
     // useAppDispatch(setNotification(notif));
   }
 
@@ -143,5 +152,54 @@ export default class JamOS {
   }
   public static forceOpenDock(open:boolean = true){
     store.dispatch(forceOpenDock(open));
+  }
+
+  public static get server() {
+    const server =
+  process.env.NODE_ENV === "development"
+    ? "http://localhost:3000/"
+    : "https://jamos-v2.herokuapp.com/";
+// const server = 'http://jamos-v2/';
+return server;
+  }
+  public static get apis() {
+    return {
+      posts : this.server + "post", //get,post
+      signup : this.server + "user/signup",  //post
+      signin : this.server + "user/signin",  //post
+      signincheck : this.server + "user/check",  //get
+    }
+  }
+
+  public static userValue():JamUser{
+    return getUser();
+  }
+  public static userReadable():JamUser {
+    return useAppSelector(selectUser);
+  }
+  public static worldValue():JamWorld{
+    return getWorld();
+  }
+  public static worldReadable():JamWorld {
+    return useAppSelector(selectWorld);
+  }
+
+  public static get authHeader () {
+    // const token = getCookie('accessToken');
+    const token = this.userValue().token;
+    return token ? { headers: {"Authorization" : `Bearer ${token}`} } : {};
+  }
+
+  public static signin(userId:string, accessToken:string, refreshToken:string){
+    const user:JamUser = {
+      id : userId,
+      loggedin:true,
+      token:accessToken
+    }
+    store.dispatch(setUser(user));
+  }
+
+  public static signout(){
+    store.dispatch(signout());
   }
 }

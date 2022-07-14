@@ -7,7 +7,20 @@ export interface Notif {
   type: 'log' | 'success' | 'warn' | 'error' | 'system',
 }
 
+export interface JamUser {
+  id : string,
+  loggedin:boolean,
+  token? : string,
+}
+
+export interface JamWorld {
+  name:string,
+}
+
 export interface OSState {
+  jamUser : JamUser;
+  jamWorld : JamWorld;
+
   openToolbar : boolean;
   openDock : boolean;
   forceHideToolbar : boolean;
@@ -20,7 +33,12 @@ export interface OSState {
   [key:string]:any;
 }
 
+const _initialUser = {id:'guest', loggedin:false};
+const _initialWorld = {name:'sample_world'}
 const initialState :OSState = {
+  jamUser : {..._initialUser},
+  jamWorld : {..._initialWorld},
+
   openToolbar:false,
   openDock:false,
   forceHideToolbar : false,
@@ -37,6 +55,17 @@ const osSlice = createSlice({
   initialState,
   reducers:{
    
+    setUser:(state,action:PayloadAction<JamUser>)=>{
+      const user:JamUser = action.payload;
+      state.jamUser = {...user};
+      state.jamWorld.name = user.id+"-world";
+    },
+
+    signout:(state,action:PayloadAction<void>)=>{
+      state.jamUser = {..._initialUser};
+      state.jamWorld = {..._initialWorld};
+    },
+
     setNotification:(state,action:PayloadAction<Notif>)=>{
       state.notifs.push(action.payload);
     },
@@ -76,6 +105,10 @@ const osSlice = createSlice({
 });
 
 
+export const getUser = ():JamUser=>store.getState().os.jamUser;
+export const getWorld = ():JamWorld=>store.getState().os.jamWorld;
+export const selectUser = (state:AppState)=>state.os.jamUser;
+export const selectWorld = (state:AppState)=>state.os.jamWorld;
 export const selectIsToolbarOpen = (state:AppState)=>state.os.openToolbar;
 export const selectIsDockOpen = (state:AppState)=>state.os.openDock;
 export const selectForceOpenToolbar = (state:AppState)=>state.os.forceOpenToolbar;
@@ -86,4 +119,4 @@ export const selectForceHideDock = (state:AppState)=>state.os.forceHideDock;
 export const selectNotifDuration = (state:AppState):number=>state.os.notifDuration;
 export const selectNotifs = (state:AppState):Notif[]=>state.os.notifs;
 export default osSlice.reducer;
-export const { setNotification, openToolbar, closeToolbar, toggleToolbar, openDock, closeDock,toggleDock,forceHideToolbar, forceHideDock,forceOpenToolbar, forceOpenDock, } = osSlice.actions;
+export const { setNotification, openToolbar, closeToolbar, toggleToolbar, openDock, closeDock,toggleDock,forceHideToolbar, forceHideDock,forceOpenToolbar, forceOpenDock, setUser, signout } = osSlice.actions;

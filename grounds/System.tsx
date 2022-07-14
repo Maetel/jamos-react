@@ -31,6 +31,7 @@ export default function System(props) {
     const f: File[] = [
       filemgr.makeFile("~/AppStore", "appstore"),
       filemgr.makeFile("~/Viewer", "viewer"),
+      filemgr.makeFile("~/JamHub", "jamhub"),
       // filemgr.makeFile("~/Logger", "logger"),
       // filemgr.makeFile("~/Terminal", "terminal"),
       // filemgr.makeFile("~/System Info", "systeminfo"),
