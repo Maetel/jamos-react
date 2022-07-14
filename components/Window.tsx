@@ -1,13 +1,10 @@
-import Image from "next/image";
 import React from "react";
 import { useEffect, useRef, useState } from "react";
-import CallbackStore from "../features/JamOS/Callbacks";
+import CallbackStore from "../features/JamOS/CallbackStore";
 import JamOS from "../features/JamOS/JamOS";
 import Log from "../features/log/Log";
 
 import Process, { Rect } from "../features/procmgr/ProcTypes";
-import { ThemeColors } from "../features/settings/Themes";
-import { ToolbarControl } from "../grounds/Toolbar";
 import useEffectOnce from "../scripts/useEffectOnce";
 import { clamp, randomId } from "../scripts/utils";
 import styles from "../styles/Window.module.css";
@@ -228,7 +225,8 @@ export default function Window(props) {
     if (proc.hideOnToolbar) {
       return;
     }
-    ToolbarControl.RegisterBuilder(proc.id).register(
+    JamOS.procmgr.addToolbarItem(
+      proc.id,
       proc.name,
       `Quit ${proc.name}`,
       () => {

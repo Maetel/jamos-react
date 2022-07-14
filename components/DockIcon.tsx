@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
-import CallbackStore from "../features/JamOS/Callbacks";
+import CallbackStore from "../features/JamOS/CallbackStore";
 import JamOS from "../features/JamOS/JamOS";
 import Process, {
   getProcessCommandsIcon,

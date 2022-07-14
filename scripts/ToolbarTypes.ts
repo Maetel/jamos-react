@@ -15,8 +15,11 @@ export function ToolbarItemsAreSame(lhs:ToolbarItem, rhs:ToolbarItem){
   return ToolbarItemId(lhs)===ToolbarItemId(rhs);
 }
 
+export function ToolbarItemIdRaw(procId:string, menu:string, item:string){
+  return `${procId}/Toolbar/${menu}/${item}`;
+}
 export function ToolbarItemId(item:ToolbarItem){
-  return `${item.caller}//${item.menu}//${item.item}`;
+  return `${item.caller}/Toolbar/${item.menu}/${item.item}`;
 }
 export interface ToolbarItem {
   caller: string; // 'system' || procId

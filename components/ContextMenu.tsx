@@ -1,4 +1,4 @@
-import CallbackStore from "../features/JamOS/Callbacks";
+import CallbackStore from "../features/JamOS/CallbackStore";
 import Process from "../features/procmgr/ProcTypes";
 import Window from "./Window";
 import styles from "../styles/ContextMenu.module.css";

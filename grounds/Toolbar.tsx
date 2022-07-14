@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
+import CallbackStore from "../features/JamOS/CallbackStore";
 import JamOS from "../features/JamOS/JamOS";
+import { JamUser } from "../features/JamOS/osSlice";
 import Log from "../features/log/Log";
 import { ToolbarItem, ToolbarItemId } from "../scripts/ToolbarTypes";
 
@@ -14,46 +16,52 @@ const systemMenu: ToolbarItem[] = [
     caller: "system",
     menu: "🍞",
     item: "About JamOS",
-    callback: "system.proc.add.about",
+    callback: "system/Toolbar/add/about",
+  },
+  {
+    caller: "system",
+    menu: "🍞",
+    item: "Sign in",
+    callback: "system/Toolbar/add/jamhub",
     separator: true,
   },
   {
     caller: "system",
     menu: "🍞",
     item: "Settings",
-    callback: "system.proc.add.settings",
+    callback: "system/Toolbar/add/settings",
   },
   {
     caller: "system",
     menu: "🍞",
     item: "System Monitor",
-    callback: "system.proc.add.systeminfo",
+    callback: "system/Toolbar/add/systeminfo",
     separator: true,
   },
   {
     caller: "system",
     menu: "🍞",
     item: "Fix toolbar",
-    callback: "system.proc.toolbar.open",
+    callback: "system/Toolbar/toolbar/open",
   },
   {
     caller: "system",
     menu: "🍞",
     item: "Fix dock",
-    callback: "system.proc.dock.open",
+    callback: "system/Toolbar/dock/open",
     separator: true,
   },
   {
     caller: "system",
     menu: "🍞",
     item: "AppStore",
-    callback: "system.proc.add.appstore",
+    callback: "system/Toolbar/add/appstore",
   },
   {
     caller: "system",
     menu: "🍞",
     item: "Terminal",
-    callback: "system.proc.add.terminal",
+    callback: "system/Toolbar/add/terminal",
     separator: true,
   },
 
@@ -61,142 +69,9 @@ const systemMenu: ToolbarItem[] = [
     caller: "system",
     menu: "🍞",
     item: "Close all windows",
-    callback: "system.proc.killall.system",
+    callback: "system/Toolbar/killall/system",
   },
 ];
-
-export class RegisterBuilder {
-  constructor(public procId: string) {}
-  public register(
-    menu,
-    item,
-    cb,
-    additional?: {
-      separator?: boolean;
-      disabled?: boolean;
-      order?: number;
-      callback?: string;
-    }
-  ) {
-    const data: ToolbarItem = {
-      caller: this.procId,
-      menu: menu,
-      item: item,
-    };
-
-    for (let key in additional) {
-      data[key] = additional[key];
-    }
-
-    ToolbarControl.getInstance().register(data, cb);
-    return this;
-  }
-  public unregisterAll() {
-    ToolbarControl.getInstance().unregister(this.procId);
-    return this;
-  }
-}
-export class ToolbarControl {
-  public static RegisterBuilder(procId: string): RegisterBuilder {
-    return new RegisterBuilder(procId);
-  }
-  private static instance: ToolbarControl;
-  private constructor() {}
-
-  private _systemCallbackParser(query: string) {
-    const q = query.toLowerCase().trim();
-    const qs = q.split(".");
-    const caller = qs.at(0); //must be system
-
-    const cmd = qs.at(1);
-    const func = qs.at(2);
-    const params = qs.at(3);
-
-    const procmgr = JamOS.procmgr;
-    // debugger;
-    if (cmd === "proc") {
-      switch (func) {
-        case "add":
-          procmgr.add(params);
-          return;
-        case "killall":
-          procmgr.killAll(params);
-          return;
-        case "kill":
-          procmgr.kill(params);
-          return;
-
-        case "toolbar":
-          if (params === "fix") {
-            JamOS.openToolbar();
-          }
-          if (params === "close") {
-            JamOS.closeToolbar();
-          }
-          return;
-        case "dock":
-          if (params === "fix") {
-            JamOS.openDock();
-          }
-          if (params === "close") {
-            JamOS.closeDock();
-          }
-          return;
-        default:
-          break;
-      }
-    }
-    Log.error(`ToolbarControl system command ${query} does not exist`);
-  }
-
-  public static getInstance() {
-    if (!this.instance) {
-      this.instance = new ToolbarControl();
-    }
-    return this.instance;
-  }
-  // callbacks[procId][menu][item]
-  // public static callbacks: {
-  //   [key: string]: { [key: string]: { [key: string]: () => void } };
-  // } = {};
-  public static callbacks: { [key: string]: () => void } = {};
-
-  public register(item: ToolbarItem, callback: () => void) {
-    const id = ToolbarItemId(item);
-    ToolbarControl.callbacks[id] = callback;
-    JamOS.procmgr.setToolbarItem(item.caller, item);
-  }
-
-  public unregister(procId: string) {
-    let deleteCount = 0;
-    for (let key in ToolbarControl.callbacks) {
-      if (key.startsWith(procId)) {
-        delete ToolbarControl.callbacks.key;
-        deleteCount++;
-      }
-    }
-    // Log.log(`Toolbar unregister id[${procId}] of ${deleteCount} toolbar items`);
-  }
-  public unregisterItem(item: ToolbarItem) {
-    for (let key in ToolbarControl.callbacks) {
-      if (key === ToolbarItemId(item)) {
-        delete ToolbarControl.callbacks.key;
-      }
-    }
-  }
-  public execute(item: ToolbarItem) {
-    const callback = ToolbarItemId(item);
-    // console.log("callback:", callback);
-    if (callback.startsWith("system")) {
-      this._systemCallbackParser(item.callback);
-      return;
-    }
-    ToolbarControl.callbacks[callback]?.();
-    if (!ToolbarControl.callbacks[callback]) {
-      Log.error(`Toolbar callback does not exist for : ${callback}`);
-    }
-  }
-}
 
 function ToolbarClock(props) {
   const [time, setTime] = useState("");
@@ -245,7 +120,7 @@ function MenuItem(props) {
       onClick={(e) => {
         // ProcMgr.getInstance().front()?.[item.callback]?.();
         // ToolbarControl.getInstance().execute("system", item.menu, item.item);
-        ToolbarControl.getInstance().execute(item);
+        CallbackStore.getById(item.callback)?.();
         props.uncollapse?.();
       }}
       onMouseEnter={() => {
@@ -413,6 +288,14 @@ export default function Toolbar(props) {
     //toggle toolbar
     {
       const tbIdx = systemMenu.indexOf(
+        systemMenu.find((menu) => menu.callback.includes("jamhub"))
+      );
+      systemMenu[tbIdx].item = jamUser.loggedin ? "JamHub" : "Sign in";
+    }
+
+    //toggle toolbar
+    {
+      const tbIdx = systemMenu.indexOf(
         systemMenu.find((menu) => menu.item.includes("toolbar"))
       );
       systemMenu[tbIdx].item = isToolbarFixed ? "Hide toolbar" : "Fix toolbar";
@@ -455,13 +338,14 @@ export default function Toolbar(props) {
 
     return retval;
   };
-  const tbproc = parseItems(frontMenus);
-  const [menus, setMenus] = useState(tbproc);
+  // let tbproc: TbProc = [{ menu: "🍞", items: [...systemMenu] }];
+  const [menus, setMenus] = useState([{ menu: "🍞", items: [...systemMenu] }]);
+  const jamUser: JamUser = JamOS.userReadable();
   useEffect(() => {
     // console.log("frontMenus update :", frontMenus);
     const _tbproc = parseItems(frontMenus);
     setMenus(_tbproc);
-  }, [frontMenus, isToolbarFixed, isDockFixed]);
+  }, [frontMenus, isToolbarFixed, isDockFixed, jamUser]);
 
   const uncollapse = (e) => {
     setHovered(false);

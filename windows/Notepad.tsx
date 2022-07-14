@@ -4,7 +4,6 @@ import Window from "../components/Window";
 import JamOS from "../features/JamOS/JamOS";
 import Process from "../features/procmgr/ProcTypes";
 import styles from "../styles/Notepad.module.css";
-import { ToolbarControl } from "../grounds/Toolbar";
 import Path from "../scripts/Path";
 
 export default function Notepad(props) {
@@ -102,22 +101,23 @@ export default function Notepad(props) {
   };
 
   useEffect(() => {
-    ToolbarControl.RegisterBuilder(proc.id)
-      .register("Notepad", "Open", () => {
+    JamOS.procmgr
+      .addToolbarItem(proc.id, "Notepad", "Open", () => {
         JamOS.procmgr.openFileDialogue(proc.id, "Load", {
           name: "Open text file",
           includes: ["text"],
           onOkay: onLoadDialogue,
         });
       })
-      .register("Notepad", "Save", () => {
+      .addToolbarItem(proc.id, "Notepad", "Save", () => {
         const fp = JamOS.procmgr.getValue(proc.id, "filePath");
         if (JamOS.filemgr.fileExists(fp)) {
           const val = JamOS.procmgr.getValue(proc.id, "textAreaValue") ?? "";
           JamOS.filemgr.updateFileData(fp, "text", val);
         }
       })
-      .register(
+      .addToolbarItem(
+        proc.id,
         "Notepad",
         "Save As",
         () => {

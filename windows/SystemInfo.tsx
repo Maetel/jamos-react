@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import PromptTableView, { TableData } from "../components/PromptTableView";
 import Window from "../components/Window";
-import CallbackStore from "../features/JamOS/Callbacks";
+import CallbackStore from "../features/JamOS/CallbackStore";
 import JamOS from "../features/JamOS/JamOS";
 import Process from "../features/procmgr/ProcTypes";
 

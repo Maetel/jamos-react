@@ -142,16 +142,48 @@ export const procSlice = createSlice({
       })
     },
 
-    setToolbarItem:(state, action:PayloadAction<{id:string,item:ToolbarItem}>)=>{
+    removeToolbarItem:(state, action:PayloadAction<{id:string,menu:string,item:string}>)=>{
       const proc = state.procs.find(proc=>proc.id===action.payload.id)
+      if(!proc){
+        return;
+      }
+      const menu = action.payload.menu;
+      const item = action.payload.item;
+      proc.toolbar = proc.toolbar.filter(_item=>_item.menu===menu && _item.item===item);
+    },
+
+    removeAllToolbarItems:(state, action:PayloadAction<string>)=>{
+      const proc = state.procs.find(proc=>proc.id===action.payload)
+      if(!proc){
+        return;
+      }
+      proc.toolbar=[];
+    },
       
+    
+    updateToolbarItem:(state, action:PayloadAction<{id:string,from:ToolbarItem,to:ToolbarItem}>)=>{
+      const proc = state.procs.find(proc=>proc.id===action.payload.id)
+      if(!proc){
+        return;
+      }
+      const from = action.payload.from;
+      const to = action.payload.to;
+      const foundIdx = proc.toolbar.findIndex(_item=>ToolbarItemId(_item)===ToolbarItemId(from));
+      if(foundIdx!==-1){
+        proc.toolbar[foundIdx] = {...to};
+      }
+    },
+
+      addToolbarItem:(state, action:PayloadAction<{id:string,item:ToolbarItem}>)=>{
+      const proc = state.procs.find(proc=>proc.id===action.payload.id)
       if(!proc){
         return;
       }
       const item = action.payload.item;
       const idx = proc.toolbar.map(_item=> ToolbarItemId(_item)).indexOf(ToolbarItemId(item))
       
-      if(idx!==-1){
+      const idxFound = idx!==-1;
+      if(idxFound){
         proc['toolbar'][idx]=item;
       } else {
         proc['toolbar']=[...proc['toolbar'], item];
@@ -383,4 +415,4 @@ export const selectProcessOfType = (procType:String)=>(state:AppState)=>{
 
 
 export default procSlice.reducer;
-export const { addProc, killProc, killAllProcs, increaseIndices, setActiveWindow,setProcProps, minimize, unMinimize,toggleMinimize,toggleMaximize,setToolbarItem, pushToLast, loadProcFromString, killAllofType} = procSlice.actions
+export const { addProc, killProc, killAllProcs, increaseIndices, setActiveWindow,setProcProps, minimize, unMinimize,toggleMinimize,toggleMaximize,addToolbarItem, removeToolbarItem, removeAllToolbarItems, updateToolbarItem, pushToLast, loadProcFromString, killAllofType, } = procSlice.actions

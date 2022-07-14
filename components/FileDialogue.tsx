@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import CallbackStore from "../features/JamOS/Callbacks";
+import CallbackStore from "../features/JamOS/CallbackStore";
 import Process from "../features/procmgr/ProcTypes";
 import { FinderCore } from "../windows/Finder";
 import Window from "./Window";

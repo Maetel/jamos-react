@@ -6,7 +6,6 @@ import ShimmerImage from "../components/ShimmerImage";
 import Window from "../components/Window";
 import JamOS from "../features/JamOS/JamOS";
 import Process from "../features/procmgr/ProcTypes";
-import { setCookie } from "../scripts/utils";
 import styles from "../styles/JamHub.module.css";
 
 export default function _(props) {
@@ -232,6 +231,23 @@ export default function _(props) {
   useEffect(() => {
     setStatus({ type: "standby", msg: "" });
   }, []);
+  useEffect(() => {
+    //TODO
+    return;
+    // if (jamUser.loggedin) {
+    //   console.log("signedIn:", signedIn);
+    //   ToolbarControl.RegisterBuilder(proc.id).register(
+    //     "JamHub",
+    //     "Sign out",
+    //     () => {
+    //       JamOS.signout();
+    //     }
+    //   );
+    // } else {
+    //   console.log("signedIn:", signedIn);
+    //   ToolbarControl.RegisterBuilder(proc.id).unregisterAll();
+    // }
+  }, [jamUser]);
   const statusColor =
     status.type === "standby"
       ? colors["1"]

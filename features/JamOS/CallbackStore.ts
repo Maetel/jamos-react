@@ -1,3 +1,4 @@
+import JamOS from "./JamOS";
 
 type Callback = (params?)=>any;
 type Callbacks = {[key:string]: Callback};
@@ -46,7 +47,50 @@ export default class CallbackStore {
       this.unregister(key);
     })
   }
+
+  private static systemCallbackBuilder(callback:string){
+    console.log("callback:",callback);
+    const args = callback.split('/');
+    if(args.at(0)!=='system'){
+      return;
+    }
+    if(args.at(1)==='Toolbar'){
+      const verb = args.at(2);
+      const param = args.at(3);
+      const p = JamOS.procmgr;
+      switch (verb) {
+        case 'add':
+          return ()=> {p.add(param)};
+        case 'kill':
+          return ()=>{p.kill(param)};
+        case 'killall':
+          return ()=>{p.killAll(param)};
+        case 'toolbar':
+          if(param==='open'){
+            return ()=>{JamOS.openToolbar()}
+          } else {
+            return ()=>{JamOS.closeToolbar()}
+          }
+        case 'dock':
+          if(param==='open'){
+            return ()=>{JamOS.openDock()}
+          } else {
+            return ()=>{JamOS.closeDock()}
+          }
+        default:
+          break;
+      }
+      return;
+    }
+  }
+
   public static getById(callbackId:string){
+    if(!callbackId){
+      return undefined;
+    }
+    if(callbackId.startsWith('system/Toolbar')){
+      return this.systemCallbackBuilder(callbackId);
+    }
     return this._callbacksById[callbackId];
   }
 }

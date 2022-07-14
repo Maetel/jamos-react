@@ -15,11 +15,10 @@ import { Dir } from "../features/file/FileTypes";
 import Log from "../features/log/Log";
 import Commands from "../scripts/CommandParser";
 import officialThemes, { themeExists } from "../features/settings/Themes";
-import { ToolbarControl } from "../grounds/Toolbar";
 import JamOS from "../features/JamOS/JamOS";
 import Process from "../features/procmgr/ProcTypes";
 import { dirExists } from "../features/file/fileSlice";
-import CallbackStore from "../features/JamOS/Callbacks";
+import CallbackStore from "../features/JamOS/CallbackStore";
 
 const viewMap = {
   PromptTextView: PromptTextView,
@@ -48,16 +47,17 @@ export default function Terminal(props) {
 
   /////////////////////////
   const registerToolbarCallback = () => {
-    ToolbarControl.RegisterBuilder(proc.id)
-      .register("Terminal", "About terminal", async () => {
+    JamOS.procmgr
+      .addToolbarItem(proc.id, "Terminal", "About terminal", async () => {
         // addHelp();
         await handleTerminalCmd(["terminal", "-h"]);
       })
-      .register("Terminal", "Help", async () => {
+      .addToolbarItem(proc.id, "Terminal", "Help", async () => {
         // addHelp();
         await handleTerminalCmd(["help"]);
       })
-      .register(
+      .addToolbarItem(
+        proc.id,
         "Terminal",
         "View process list",
         async () => {
@@ -66,7 +66,7 @@ export default function Terminal(props) {
         },
         { separator: true }
       )
-      .register("File", "New window ", () => {
+      .addToolbarItem(proc.id, "File", "New window ", () => {
         procmgr.add("terminal");
       });
   };

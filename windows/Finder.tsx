@@ -3,10 +3,9 @@ import { FileDialProps } from "../components/FileDialogue";
 import FinderIcon, { FinderIconProps } from "../components/FinderIcon";
 import Window from "../components/Window";
 import { Node } from "../features/file/FileTypes";
-import CallbackStore from "../features/JamOS/Callbacks";
+import CallbackStore from "../features/JamOS/CallbackStore";
 import JamOS from "../features/JamOS/JamOS";
 import Process from "../features/procmgr/ProcTypes";
-import { ToolbarControl } from "../grounds/Toolbar";
 import Path from "../scripts/Path";
 
 import styles from "../styles/Finder.module.css";
@@ -171,9 +170,9 @@ export function FinderCore(props) {
     if (proc.hideOnToolbar) {
       return;
     }
-    ToolbarControl.RegisterBuilder(proc.id)
-      .unregisterAll()
-      .register("Finder", "New directory", () => {
+    JamOS.procmgr
+      .removeAllToolbarItems(proc.id)
+      .addToolbarItem(proc.id, "Finder", "New directory", () => {
         filemgr.mkdir(Path.join(currentPath, "New directory").path);
       });
     procmgr.set(proc.id, { desc: currentPath });

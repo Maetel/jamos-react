@@ -2,16 +2,16 @@ import { useAppSelector } from "../../app/hooks";
 import store from "../../app/store";
 import { FileDialProps } from "../../components/FileDialogue";
 import { ModalProps } from "../../components/Modal";
-import { ToolbarControl } from "../../grounds/Toolbar";
 import Path, { addError } from "../../scripts/Path";
-import {  ToolbarItem } from "../../scripts/ToolbarTypes";
+import {  ToolbarItem, ToolbarItemId, ToolbarItemIdRaw } from "../../scripts/ToolbarTypes";
 import { dirValue, fileValue } from "../file/fileSlice";
 import { Node } from "../file/FileTypes";
-import CallbackStore from "../JamOS/Callbacks";
+import CallbackStore from "../JamOS/CallbackStore";
 import JamOS from "../JamOS/JamOS";
 
 import {
   addProc,
+  addToolbarItem,
   increaseIndices,
   killAllofType,
   killAllProcs,
@@ -20,6 +20,8 @@ import {
   minimize,
   processesValue,
   pushToLast,
+  removeAllToolbarItems,
+  removeToolbarItem,
   selectFront,
   selectFrontsParent,
   selectGroupedProcs,
@@ -32,10 +34,10 @@ import {
   selectProcProp,
   setActiveWindow,
   setProcProps,
-  setToolbarItem,
   toggleMaximize,
   toggleMinimize,
   unMinimize,
+  updateToolbarItem,
 } from "./procSlice";
 import Process, { ProcessCommand, ProcessCommands, _ProcessCommands } from "./ProcTypes";
 
@@ -61,7 +63,6 @@ export default class ProcMgr{
   public kill(procId:string){
     //kill first
     store.dispatch(killProc(procId));
-    ToolbarControl.getInstance().unregister(procId);
     CallbackStore.unregisterByProcID(procId);
   }
 
@@ -357,8 +358,66 @@ export default class ProcMgr{
     return store.getState().proc.procs.find(proc=>proc.id===procId)?.['toolbar'];
   }
 
-  public setToolbarItem (procId:string, item:ToolbarItem){
-    store.dispatch(setToolbarItem({id:procId, item:item}));
+  public addToolbarItem (procId:string, menu:string, item:string, cb:()=>void, args?:{separator?:boolean, disabled?:boolean,callback?:string, order?:number}){
+    const tbItem :ToolbarItem = {
+      caller:procId,
+      menu:menu,
+      item:item,
+      callback: args?.callback ?? ToolbarItemIdRaw(procId,menu,item),
+    }
+    if(args){
+      Object.assign(tbItem, args);
+    }
+    store.dispatch(addToolbarItem({id:procId, item:tbItem}));
+    CallbackStore.register(ToolbarItemId(tbItem), cb);
+    return this;
+  }
+
+  public updateToolbarItem (procId:string, fromMenu:string, fromItem:string, changeTo:{
+    menu?: string,
+    item?: string,
+    order?:number,
+    disabled?: boolean,
+    separator?: boolean,
+    cb?:()=>void,
+  }){
+    const toolbar:ToolbarItem[] = this.getValue(procId, 'toolbar');
+    const fromId = ToolbarItemIdRaw(procId, fromMenu, fromItem);
+    const toId = ToolbarItemIdRaw(procId, changeTo.menu??fromMenu, changeTo.item??fromItem);
+    const found:ToolbarItem = toolbar?.find(tb=>ToolbarItemId(tb)===fromId);
+    if(!found){
+      console.error('Failed to update toolbar item : '+ fromId);
+      return this;
+    }
+
+    const copied:ToolbarItem = {...found};
+    let cb:()=>void=null;
+    if(changeTo.cb){
+      cb = changeTo.cb;
+      delete changeTo.cb;
+    }
+    Object.assign(copied, changeTo);
+
+    if(fromId !== toId){
+      CallbackStore.unregister(fromId);
+    }
+    store.dispatch(updateToolbarItem({id:procId, from:found, to:copied}));
+    if(cb){
+      CallbackStore.register(toId, cb);
+    }
+    return this;
+  }
+
+  public removeToolbarItem (procId:string, menu:string, item:string){
+    store.dispatch(removeToolbarItem({id:procId, menu:menu, item:item}));
+    CallbackStore.unregister(ToolbarItemIdRaw(procId, menu, item));
+    return this;
+  }
+
+  public removeAllToolbarItems (procId:string){
+    store.dispatch(removeAllToolbarItems(procId));
+    CallbackStore.unregisterByProcID(`${procId}/Toolbar`);
+    return this;
   }
 
   public killAllofType(type:string){

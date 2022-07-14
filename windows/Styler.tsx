@@ -3,14 +3,14 @@ import Window from "../components/Window";
 import JamOS from "../features/JamOS/JamOS";
 import Process from "../features/procmgr/ProcTypes";
 import officialThemes, { defaultTheme } from "../features/settings/Themes";
-import { ToolbarControl } from "../grounds/Toolbar";
 import styles from "../styles/Styler.module.css";
 
 export default function Styler(props) {
   /////////////////////////
   const registerToolbarCallback = () => {
-    const builder = ToolbarControl.RegisterBuilder(proc.id)
-      .register(
+    const builder = JamOS.procmgr
+      .addToolbarItem(
+        proc.id,
         "Styler",
         "About",
         () => {
@@ -25,7 +25,8 @@ export default function Styler(props) {
         }
         // { separator: true, disabled: true }
       )
-      .register(
+      .addToolbarItem(
+        proc.id,
         "Edit",
         `Set to default style : ${defaultTheme.name}`,
         () => {
@@ -34,7 +35,7 @@ export default function Styler(props) {
         { separator: true }
       );
     officialThemes.forEach((theme) => {
-      builder.register("Edit", `Set to ${theme.name}`, () => {
+      builder.addToolbarItem(proc.id, "Edit", `Set to ${theme.name}`, () => {
         setmgr.setTheme(theme.name);
       });
     });

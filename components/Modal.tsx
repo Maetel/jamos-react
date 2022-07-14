@@ -3,9 +3,8 @@ import styles from "../styles/Modal.module.css";
 import JamOS from "../features/JamOS/JamOS";
 import Process from "../features/procmgr/ProcTypes";
 import { useEffect, useRef, useState } from "react";
-import { ToolbarControl } from "../grounds/Toolbar";
 import { clamp } from "../scripts/utils";
-import CallbackStore from "../features/JamOS/Callbacks";
+import CallbackStore from "../features/JamOS/CallbackStore";
 import useEffectOnce from "../scripts/useEffectOnce";
 
 export interface ModalProps {
@@ -45,7 +44,8 @@ export default function Modal(props) {
       const isLast = i === modal.buttons.length - 1;
       const additional = isLast ? { separator: true } : {};
 
-      ToolbarControl.RegisterBuilder(proc.id).register(
+      JamOS.procmgr.addToolbarItem(
+        proc.id,
         proc.name,
         btn,
         () => {

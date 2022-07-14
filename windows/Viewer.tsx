@@ -3,11 +3,10 @@ import ShimmerImage from "../components/ShimmerImage";
 import Window from "../components/Window";
 import JamOS from "../features/JamOS/JamOS";
 import Process from "../features/procmgr/ProcTypes";
-import { ToolbarControl } from "../grounds/Toolbar";
 import Path from "../scripts/Path";
 import styles from "../styles/Viewer.module.css";
 import type { File, Dir } from "../features/file/FileTypes";
-import CallbackStore from "../features/JamOS/Callbacks";
+import CallbackStore from "../features/JamOS/CallbackStore";
 
 const fallbackOnLoad = "/imgs/imageerror.svg";
 
@@ -103,7 +102,8 @@ export default function Viewer(props) {
     });
   };
   useEffect(() => {
-    ToolbarControl.RegisterBuilder(proc.id).register(
+    JamOS.procmgr.addToolbarItem(
+      proc.id,
       "Image viewer",
       "Open",
       openLoadFileDialogue
