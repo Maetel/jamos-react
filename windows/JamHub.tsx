@@ -358,22 +358,20 @@ export default function JamHub(props) {
   };
   useEffect(() => {
     setStatus({ type: "standby", msg: "" });
+    JamOS.procmgr.addToolbarItem(
+      proc.id,
+      "JamHub",
+      "Sign out",
+      () => {
+        JamOS.signout();
+      },
+      { separator: true }
+    );
   }, []);
   useEffect(() => {
-    if (jamUser.signedin) {
-      console.log("signedIn:", signedIn);
-      JamOS.procmgr.addToolbarItem(
-        proc.id,
-        "JamHub",
-        "Sign out",
-        () => {
-          JamOS.signout();
-        },
-        { separator: true }
-      );
-    } else {
-      JamOS.procmgr.removeToolbarItem(proc.id, "JamHub", "Sign out");
-    }
+    JamOS.procmgr.updateToolbarItem(proc.id, "JamHub", "Sign out", {
+      disabled: !jamUser.signedin,
+    });
   }, [jamUser]);
   const statusColor =
     status.type === "standby"

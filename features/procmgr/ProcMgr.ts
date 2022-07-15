@@ -4,6 +4,7 @@ import { FileDialProps } from "../../components/FileDialogue";
 import { ModalProps } from "../../components/Modal";
 import Path, { addError } from "../../scripts/Path";
 import {  ToolbarItem, ToolbarItemId, ToolbarItemIdRaw } from "../../scripts/ToolbarTypes";
+import { randomId } from "../../scripts/utils";
 import { dirValue, fileValue } from "../file/fileSlice";
 import { Node } from "../file/FileTypes";
 import CallbackStore from "../JamOS/CallbackStore";
@@ -50,10 +51,6 @@ export default class ProcMgr{
       this.instance = new ProcMgr();
     }
     return this.instance;
-  }
-  private id=1;
-  private get getId(){
-    return ''+this.id++;
   }
 
   private _prepareNewWindow(){
@@ -144,6 +141,8 @@ export default class ProcMgr{
     store.dispatch(addProc(proc));
   }
 
+  private static _id = 1;
+  private static get getId() { return ProcMgr._id++;}
   public add(procType:string, args:{}={}){
 
     if(!ProcessCommands.includes(procType)){
@@ -153,7 +152,8 @@ export default class ProcMgr{
 
     this._prepareNewWindow();
 
-    const _id = this.getId;
+    // const _id = ''+randomId();
+    const _id = ''+ProcMgr.getId;
     const proc:Process ={
       id:_id,
       comp:procType,
@@ -460,8 +460,7 @@ export default class ProcMgr{
     } catch (error) {
       console.error(error);
     }
-    pm.id = pm.processesValue().length+1;
-      console.log("Id after load: ",pm.id);
+    ProcMgr._id = pm.processesValue().filter(proc=>typeof proc.id ==="number").reduce((prev,next)=>{ const nextId:number = parseInt(next.id); return prev<nextId ? nextId : prev; },-1) + 1
   }
 
   public blink(procId:string, timeout_ms = 300){

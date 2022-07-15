@@ -81,12 +81,6 @@ export const procSlice = createSlice({
           console.error('System process cannot exist more than one.');
         }
       }
-      // const sameFound = state.procs.find(proc=>proc.id===actionId);
-      // if(sameFound){
-      //   throw new Error("Same id process found error. Requested id : " + actionId + ', Existing ids : '+ state.procs.map(proc=>proc.id).join(', '));
-      // }
-      
-      
 
       //if is a child proc
       const parentId = action.payload.parent;

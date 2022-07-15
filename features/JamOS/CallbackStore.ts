@@ -83,14 +83,14 @@ export default class CallbackStore {
           if(param==='local'){
             return ()=>{JamOS.saveStringified();}
           } else {
-            return ()=>{JamOS.saveWorld};
+            return ()=>{JamOS.saveWorld()};
           }
           break;
         case 'load':
           if(param==='local'){
-            return ()=>{JamOS.loadStringified};
+            return ()=>{JamOS.loadStringified()};
           } else {
-            return ()=>{JamOS.loadWorld};
+            return ()=>{JamOS.loadWorld()};
           }
         default:
           break;

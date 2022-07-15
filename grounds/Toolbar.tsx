@@ -115,8 +115,9 @@ function MenuItem(props) {
     }
     if (disabled) {
       // retval.color = colors["3"];
-      retval["textDecoration"] = "line-through";
+      // retval["textDecoration"] = "line-through";
       retval.color = colors["2"] + "99";
+      retval["cursor"] = "not-allowed";
       return retval;
     }
     if (hovered) {
@@ -131,6 +132,9 @@ function MenuItem(props) {
     <span
       className={styles.menuitem}
       onClick={(e) => {
+        if (disabled) {
+          return;
+        }
         // ProcMgr.getInstance().front()?.[item.callback]?.();
         // ToolbarControl.getInstance().execute("system", item.menu, item.item);
         CallbackStore.getById(item.callback)?.();

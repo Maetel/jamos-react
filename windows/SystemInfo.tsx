@@ -82,7 +82,7 @@ export default function SystemInfo(props) {
 
   const CallbacksList = (props) => {
     const rows = [];
-    console.log("CallbackStore.callbacks:", CallbackStore.callbacks);
+    // console.log("CallbackStore.callbacks:", CallbackStore.callbacks);
     for (let key in CallbackStore.callbacks) {
       rows.push([key, CallbackStore.callbacks[key].toString()]);
     }

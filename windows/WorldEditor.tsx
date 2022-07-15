@@ -17,7 +17,7 @@ const tryFetchWorlds = async (procId: string) => {
   const res = await axios
     .get(JamOS.apis.worldList, JamOS.authHeader)
     .then((res) => {
-      console.log("res:", res);
+      // console.log("res:", res);
       const worldList: WorldInfo[] = res.data?.content?.map((datum) => ({
         uid: datum.uid,
         wid: datum.wid,
@@ -48,7 +48,7 @@ export function WorldEditorCore(props: WorldEditorCoreProps) {
     tryFetchWorlds(proc.id);
   }, []);
   useEffect(() => {
-    console.log("mode:", mode);
+    // console.log("mode:", mode);
     switch (mode) {
       case "select":
         tryFetchWorlds(proc.id);
@@ -112,7 +112,7 @@ export function WorldEditorCore(props: WorldEditorCoreProps) {
       axios
         .post(JamOS.apis.worldCreate, { wid: wname }, JamOS.authHeader)
         .then((res) => {
-          console.log("res:", res);
+          // console.log("res:", res);
           const cont = res.data;
           if (cont) {
             setMsg(`Successfully created world ${cont.wid} for ${cont.uid}`);

@@ -261,7 +261,6 @@ return server;
       data:data,
       wid:wid
     }
-    console.log("Payload : ",payload);
     const res = axios.post(this.apis.worldSave, payload, this.authHeader).then(res=>{
       console.log(res);
     }).catch(console.error)

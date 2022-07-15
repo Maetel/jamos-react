@@ -141,7 +141,7 @@ export default function Notepad(props) {
     const f: File = filemgr.fileValue(filePath);
     // console.log("f?.data['text']:", f?.data["text"]);
     if (f) {
-      setTextAreaValue(f?.data["text"] ?? "");
+      setTextAreaValue(f?.data?.["text"] ?? "");
       JamOS.procmgr.set(proc.id, {
         name: `Notepad - ${new Path(filePath).last}`,
       });
