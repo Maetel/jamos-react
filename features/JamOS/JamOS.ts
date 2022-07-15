@@ -9,7 +9,7 @@ import {killAllofType} from "../procmgr/procSlice";
 import SetMgr from "../settings/SetMgr";
 import { Theme } from "../settings/Themes";
 import CallbackStore from "./CallbackStore";
-import { closeDock, closeToolbar, forceHideDock, forceHideToolbar, forceOpenDock, forceOpenToolbar, getUser, getWorld, JamUser, JamWorld, Notif, openDock, openToolbar, selectForceHideDock, selectForceHideToolbar, selectForceOpenDock, selectForceOpenToolbar, selectIsDockOpen, selectIsToolbarOpen, selectNotifDuration, selectNotifs, selectUser, selectWorld, setNotification, setUser, toggleDock, toggleToolbar, signout, setWorld, _initialWorld } from "./osSlice";
+import { closeDock, closeToolbar, forceHideDock, forceHideToolbar, forceOpenDock, forceOpenToolbar, getUser, getWorld, JamUser, JamWorld, Notif, openDock, openToolbar, selectForceHideDock, selectForceHideToolbar, selectForceOpenDock, selectForceOpenToolbar, selectIsDockOpen, selectIsToolbarOpen, selectNotifDuration, selectNotifs, selectUser, selectWorld, setNotification, setUser, toggleDock, toggleToolbar, signout, setWorld, _initialWorld, setWorldLoaded } from "./osSlice";
 
 export interface SerializedData {
   proc?:string,
@@ -28,7 +28,7 @@ export default class JamOS {
   public static toggle(procId:string, prop:string){
     const retval = {};
     const val = JamOS.procmgr.getValue(procId, prop);
-    if(!(val === 'boolean' || val === undefined)){
+    if(!(typeof val === 'boolean' || val === undefined)){
       console.log("val",val);
       return false;
     }
@@ -195,6 +195,7 @@ return server;
       worldCreate : 'world/create', // post 
       worldSave : 'world/data', //post
       worldLoad : 'world/data/', //get
+      worldDelete : 'world/delete', //delete
     }
     for ( let key in retval){
       retval[key] = this.server + retval[key];
@@ -236,6 +237,21 @@ return server;
 
   public static setWorld(wid:string) {
     store.dispatch(setWorld(wid));
+  }
+
+  public static deleteWorld(wid?:string) {
+    wid = wid ?? JamOS.worldValue().name;
+    axios.delete(JamOS.apis.worldDelete, { data:{wid:wid}, ...this.authHeader}).then(res=>{
+      console.log(res);
+      console.log("wid:",wid,", res.data?.wid:",res.data?.wid);
+      if(wid && wid === res.data?.wid){
+        const proc = JamOS.procmgr.processOfTypeValue('worldeditor');
+        console.log("deleteworld : proc",proc);
+        if(proc){
+          JamOS.toggle(proc.id, 'updateList');
+        }
+      }
+    }).catch(console.error);
   }
 
   public static saveWorld(type:SaveWorldType='os'){
@@ -290,6 +306,15 @@ return server;
     const home = JamOS.filemgr.dirValue('~');
     home.dirs.forEach(dir=>JamOS.filemgr.rmdir(dir.node.path));
     home.files.forEach(file=>JamOS.filemgr.rm(file.node.path));
+  }
+
+  public static setWorldLoaded(loaded:boolean=true){
+    const world = JamOS.worldValue();
+    if(world.loaded===loaded){
+      //skip
+    } else {
+      store.dispatch(setWorldLoaded(loaded))
+    }
   }
 }
 export type SaveWorldType = 'os' | 'file' | 'proc' | 'setting';

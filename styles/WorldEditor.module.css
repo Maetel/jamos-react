@@ -8,7 +8,7 @@
 }
 
 .title {
-  height:10%;
+  height:16%;
   margin:0;
   display:flex;
   justify-content: center;
@@ -17,7 +17,7 @@
 
 .body {
   width:100%;
-  height:90%;
+  height:84%;
 }
 
 .coreContainer {
@@ -32,6 +32,11 @@
   display:flex;
   justify-content: center;
   align-items: center;
+  gap:20px;
+}
+.topBtn {
+  border-radius: 15px;
+  cursor:pointer;
 }
 
 .content {
@@ -48,4 +53,76 @@
   padding:0;
   box-sizing: border-box;
   overflow:hidden;
+}
+
+.createWorldContainer {
+  display:flex;
+  flex-direction:column;
+  justify-content: center;
+  align-items: center;
+  overflow-y:auto;
+}
+
+.selectList {
+  list-style: none;
+  margin:0;
+  padding:0;
+  box-sizing: border-box;
+  display:flex;
+  flex-direction:column;
+  gap:20px;
+  /* overflow-y:auto; */
+  /* justify-content: center; */
+  align-items: center;
+}
+.selectItem {
+  width:90%;
+  display:grid;
+  justify-content: space-between;
+  box-sizing: border-box;
+  padding:20px;
+  grid-template-columns: 5fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  column-gap: 20px;
+  border-radius: 20px;;
+}
+
+.itemTitle {
+  margin:0;
+  padding:0;
+  grid-row: 1 / 2;
+  box-sizing: border-box;
+}
+
+.itemdesc {
+  margin:0;
+  padding:0;
+  grid-row: 2 / 3;
+  box-sizing: border-box;
+}
+
+.itemSelect {
+  margin:0;
+  padding:0;
+  grid-column: 2 / 3;
+  grid-row: 1 / 3;
+  box-sizing: border-box;
+}
+
+.selectButton {
+  width:100%;
+  height:100%;
+  margin:0;
+  padding:0;
+  box-sizing: border-box;
+  border-radius:15px;
+  cursor:pointer;
+}
+
+.itemDelete {
+  margin:0;
+  padding:0;
+  grid-column: 3 / 4;
+  grid-row: 1 / 3;
+  box-sizing: border-box;
 }

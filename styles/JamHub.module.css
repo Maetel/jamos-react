@@ -16,7 +16,7 @@
 }
 
 .hero {
-  height:40%;
+  height:30%;
   display:flex;
   justify-content: center;
   align-items: center;
@@ -29,17 +29,16 @@
 }
 
 .inputArea {
-  height:50%;
+  width:100%;
+  height:60%;
   display:flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  position:relative;
+  overflow:hidden;
 }
 
-
-.btns {
-  width:80%;
-}
 .loginForm{
   width:100%;
 
@@ -75,6 +74,7 @@
 
 
 .btns {
+  width:80%;
   display:flex;
   flex-direction: column;
 }
@@ -94,10 +94,6 @@
   flex-direction: column;
 }
 
-.inputArea {
-  position:relative;
-  overflow:hidden;
-}
 .info {
   text-align: center;
 }

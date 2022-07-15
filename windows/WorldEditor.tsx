@@ -25,7 +25,9 @@ const tryFetchWorlds = async (procId: string) => {
         created_time: datum.created_time,
         last_update_time: datum.last_update_time,
       }));
-      JamOS.procmgr.set(procId, { worldList: worldList });
+      console.log("worldList:", worldList);
+      console.log("Initted : ", res.data?.initted);
+      JamOS.procmgr.set(procId, { worldList: [...worldList] });
     })
     .catch((err) => {
       console.error(err);
@@ -37,75 +39,88 @@ export interface WorldEditorCoreProps {
 }
 export function WorldEditorCore(props: WorldEditorCoreProps) {
   const proc: Process = props.proc;
-  const jamUser = JamOS.userReadable();
-  const signedIn = jamUser.signedin;
-  type EditMode = "select" | "create" | "edit";
   const mode = JamOS.procmgr.getReadable(proc.id, "editorMode") ?? "select";
-  const setMode = (mode: string) => {
-    JamOS.procmgr.set(proc.id, { editorMode: mode });
-  };
   useEffect(() => {
     tryFetchWorlds(proc.id);
   }, []);
+  const updateList = JamOS.procmgr.getReadable(proc.id, "updateList");
   useEffect(() => {
-    // console.log("mode:", mode);
-    switch (mode) {
-      case "select":
-        tryFetchWorlds(proc.id);
-        break;
-      case "create":
-        //
-        break;
-      case "edit":
-        //
-        break;
-      default:
-        break;
-    }
-  }, [mode]);
-
+    console.log("updateList");
+    tryFetchWorlds(proc.id);
+  }, [updateList]);
+  const worldList: WorldInfo[] = JamOS.procmgr.getReadable(
+    proc.id,
+    "worldList"
+  );
   const SelectWorld = (props) => {
     const colors = JamOS.theme.colors;
-    const worldList: WorldInfo[] = JamOS.procmgr.getReadable(
-      proc.id,
-      "worldList"
-    );
+
     const world = JamOS.worldReadable();
     const selected = (wid: string) => {
       return world.name === wid;
     };
+    const buildItemStyle = (wid: string) => {
+      const retval = {
+        color: selected(wid) ? colors["2"] : colors["1"],
+        backgroundColor: selected(wid) ? colors["1"] : colors["2"],
+        boxShadow: colors.boxShadow,
+      };
+
+      return retval;
+    };
     return (
       <div className={styles.selectWorldContainer}>
-        <ul>
-          {worldList?.map((world) => (
-            <li
-              key={world.wid}
-              onClick={(e) => {
-                JamOS.setWorld(world.wid);
-              }}
-              style={{
-                color: selected(world.wid) ? colors["2"] : colors["1"],
-                backgroundColor: selected(world.wid)
-                  ? colors["1"]
-                  : colors["2"],
-                cursor: "pointer",
-              }}
-            >
-              {world.wid} by {world.uid}, created at{" "}
-              {new Date(world.created_time).toLocaleString()}
-            </li>
-          ))}
-        </ul>
+        {worldList && worldList.length > 0 ? (
+          <ul className={styles.selectList}>
+            {worldList.map((world, i) => (
+              <li
+                className={styles.selectItem}
+                key={world.wid}
+                style={buildItemStyle(world.wid)}
+              >
+                <h3 className={styles.itemTitle}>
+                  {i + 1}. {world.wid}
+                </h3>
+                <span className={styles.itemDesc}>
+                  by {world.uid}, created at{" "}
+                  {new Date(world.created_time).toLocaleString()}
+                </span>
+
+                <div className={styles.itemSelect}>
+                  <button
+                    className={styles.selectButton}
+                    onClick={(e) => {
+                      JamOS.setWorld(world.wid);
+                    }}
+                  >
+                    Select
+                  </button>
+                </div>
+                <div className={styles.itemDelete}>
+                  <button
+                    className={styles.selectButton}
+                    onClick={(e) => {
+                      JamOS.deleteWorld(world.wid);
+                    }}
+                  >
+                    Delete
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <div>Add a world to proceed!</div>
+        )}
       </div>
     );
   };
 
   const CreateWorld = (props) => {
     const [wname, setWname] = useState("");
-    const [msg, setMsg] = useState("Type world name");
+    const [msg, setMsg] = useState("Type world name to create");
     const onSubmit = (e) => {
       e.preventDefault();
-      console.log("onSubmit");
       if (wname.length === 0) {
         return false;
       }
@@ -121,8 +136,9 @@ export function WorldEditorCore(props: WorldEditorCoreProps) {
           }
           JamOS.format();
           JamOS.setWorld(wname);
-          JamOS.procmgr.killAll("system");
-          JamOS.procmgr.add("appstore");
+          // JamOS.procmgr.killAll("system");
+          // JamOS.procmgr.add("appstore");
+          // JamOS.saveWorld();
           return true;
         })
         .catch((err) => {
@@ -150,7 +166,7 @@ export function WorldEditorCore(props: WorldEditorCoreProps) {
               setWname(e.target.value);
             }}
           ></input>
-          <button>Submit</button>
+          <button>Create</button>
         </form>
       </div>
     );
@@ -160,20 +176,15 @@ export function WorldEditorCore(props: WorldEditorCoreProps) {
     <div className={styles.coreContainer}>
       <div className={styles.btns}>
         <button
+          className={styles.topBtn}
           onClick={(e) => {
-            setMode("select");
+            JamOS.toggle(proc.id, "updateList");
           }}
         >
-          Select world
+          Refresh
         </button>
         <button
-          onClick={(e) => {
-            setMode("create");
-          }}
-        >
-          Create world
-        </button>
-        <button
+          className={styles.topBtn}
           onClick={(e) => {
             JamOS.saveWorld();
           }}
@@ -181,24 +192,9 @@ export function WorldEditorCore(props: WorldEditorCoreProps) {
           Save world
         </button>
         <button
+          className={styles.topBtn}
           onClick={(e) => {
             JamOS.loadWorld();
-          }}
-        >
-          Load world
-        </button>
-        <button
-          onClick={(e) => {
-            console.log('JamOS.toggle("system", "saveWorldLocal")');
-            JamOS.toggle("system", "saveWorldLocal");
-          }}
-        >
-          Save world
-        </button>
-        <button
-          onClick={(e) => {
-            console.log('JamOS.toggle("system", "loadWorldLocal")');
-            JamOS.toggle("system", "loadWorldLocal");
           }}
         >
           Load world
@@ -206,11 +202,8 @@ export function WorldEditorCore(props: WorldEditorCoreProps) {
       </div>
 
       <div className={styles.content}>
-        {mode === "select" ? (
-          <SelectWorld></SelectWorld>
-        ) : (
-          <CreateWorld></CreateWorld>
-        )}
+        <CreateWorld></CreateWorld>
+        <SelectWorld></SelectWorld>
       </div>
     </div>
   );
@@ -220,6 +213,10 @@ export default function WorldEditor(props) {
   const proc: Process = { ...props.proc };
   proc.name = proc.name ?? "World Editor";
   proc.disableMaxBtn = proc.disableMaxBtn ?? true;
+  proc.rect = proc.rect ?? {
+    width: 640,
+    height: 480,
+  };
 
   const jamUser = JamOS.userReadable();
   const signedIn = jamUser.signedin;

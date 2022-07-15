@@ -30,6 +30,7 @@ import {
   selectIsMinimized,
   selectProcessById,
   selectProcesses,
+  selectProcessesOfType,
   selectProcessOfType,
   selectProcInIndexOrder,
   selectProcProp,
@@ -141,8 +142,16 @@ export default class ProcMgr{
     store.dispatch(addProc(proc));
   }
 
+  private static maxId():number{
+    return store.getState().proc.procs.filter(proc=>proc.id!=='system')?.reduce((prev,next)=>{
+      return prev < parseInt(next.id) ? parseInt(next.id) : prev;
+    },0) ?? 1;
+  }
+
   private static _id = 1;
-  private static get getId() { return ProcMgr._id++;}
+  private static get getId() { 
+    return ProcMgr.maxId()+1;
+  }
   public add(procType:string, args:{}={}){
 
     if(!ProcessCommands.includes(procType)){
@@ -153,6 +162,7 @@ export default class ProcMgr{
     this._prepareNewWindow();
 
     // const _id = ''+randomId();
+
     const _id = ''+ProcMgr.getId;
     const proc:Process ={
       id:_id,
@@ -470,14 +480,24 @@ export default class ProcMgr{
     }, timeout_ms);
   }
 
-  public processOfType(type:string):Process[]{
-    return useAppSelector(selectProcessOfType(type));
+  public processesOfType(type:string):Process[]{
+    return useAppSelector(selectProcessesOfType(type));
   }
 
-  public processReadable(procId:string){
-    return useAppSelector(selectProcessById('system'));
+  public processReadable(procId:string):Process{
+    return useAppSelector(selectProcessById(procId));
   }
-  public processValue(procId:string){
+  public processValue(procId:string):Process{
     return store.getState().proc.procs.find(_proc=>_proc.id===procId);
+  }
+
+  // returns first process found
+  public processOfTypeValue(type:string):Process{
+    return store.getState().proc.procs.find(_proc=>_proc.comp===type);
+  }
+
+  // returns first process found
+  public processOfTypeReadable(type:string):Process{
+    return useAppSelector(selectProcessOfType(type));
   }
 }

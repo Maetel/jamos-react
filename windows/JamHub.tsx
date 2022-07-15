@@ -15,12 +15,14 @@ export const onSigninCoreSubmit = (
   user: string,
   password: string,
   args?: {
-    onError?: (string) => void;
-    onSuccess?: (string) => void;
+    errorCallbackId?: string;
+    successCallbackId?: string;
+    errorMsg?: (string) => void;
+    successMsg?: (string) => void;
   }
 ) => {
-  const setError: (string) => void = args?.onError ?? console.error;
-  const setSuccess: (string) => void = args?.onSuccess;
+  const setError: (string) => void = args?.errorMsg ?? console.error;
+  const setSuccess: (string) => void = args?.successMsg;
   const validateFields = () => {
     const userValid = user.trim().length !== 0 && !user.includes(" ");
     const pwValid = password.trim().length !== 0 && !password.includes(" ");
@@ -71,9 +73,11 @@ export const onSigninCoreSubmit = (
                 if (stat === 200) {
                   // JamOS.setNotif("Signed in as " + JamOS.userValue().id);
                   setSuccess?.("Signed in as " + JamOS.userValue().id);
+                  CallbackStore.getById(args?.successCallbackId)?.();
                 } else {
                   JamOS.signout();
                   setError("Failed to sign in as " + userInput.user);
+                  CallbackStore.getById(args?.errorCallbackId)?.();
                   // JamOS.setNotif("Failed to sign in as " + userInput.user, "error");
                 }
               });
@@ -81,6 +85,7 @@ export const onSigninCoreSubmit = (
           await confirmSignIn();
         } else {
           setError("Failed to sign in as " + userInput.user);
+          CallbackStore.getById(args?.errorCallbackId)?.();
           // JamOS.setNotif("Failed to sign in as " + userInput.user, "error");
         }
       })
@@ -88,8 +93,10 @@ export const onSigninCoreSubmit = (
         const cont = err.response?.data?.content;
         if (cont) {
           setError(cont);
+          CallbackStore.getById(args?.errorCallbackId)?.();
         } else {
           setError("Failed to sign in with unknown error code");
+          CallbackStore.getById(args?.errorCallbackId)?.();
         }
       });
   };
@@ -134,9 +141,11 @@ export const onSigninCoreSubmit = (
 };
 
 interface SigninCoreProps {
-  onError?: (msg: string) => void;
-  onSuccess?: (msg: string) => void;
+  errorMsg?: (msg: string) => void;
+  successMsg?: (msg: string) => void;
   includeCreateUser?: boolean;
+  errorCallbackId?: string;
+  successCallbackId?: string;
 }
 export function SigninCore(props: { signinCoreProps?: SigninCoreProps }) {
   const coreProps: SigninCoreProps = props.signinCoreProps ?? {};
@@ -157,8 +166,10 @@ export function SigninCore(props: { signinCoreProps?: SigninCoreProps }) {
         onSubmit={(e) => {
           e.preventDefault();
           onSigninCoreSubmit("signin", user, password, {
-            onError: coreProps.onError,
-            onSuccess: coreProps.onSuccess,
+            errorCallbackId: coreProps.errorCallbackId,
+            successCallbackId: coreProps.successCallbackId,
+            errorMsg: coreProps.errorMsg,
+            successMsg: coreProps.successMsg,
           });
         }}
         className={styles.loginForm}
@@ -197,8 +208,10 @@ export function SigninCore(props: { signinCoreProps?: SigninCoreProps }) {
           style={btnStyle}
           onClick={(e) => {
             onSigninCoreSubmit("signup", user, password, {
-              onError: coreProps.onError,
-              onSuccess: coreProps.onSuccess,
+              errorCallbackId: coreProps.errorCallbackId,
+              successCallbackId: coreProps.successCallbackId,
+              errorMsg: coreProps.errorMsg,
+              successMsg: coreProps.successMsg,
             });
           }}
         >
@@ -209,7 +222,10 @@ export function SigninCore(props: { signinCoreProps?: SigninCoreProps }) {
   );
 }
 
-export function InnerSignin(props) {
+export function InnerSignin(props: {
+  errorCallbackId?: string;
+  successCallbackId?: string;
+}) {
   const [innerTitle, setInnerTitle] = useState("Sign in to proceed");
   type MsgState = "normal" | "success" | "error";
   const [msgState, setMsgState] = useState<MsgState>("normal");
@@ -220,6 +236,7 @@ export function InnerSignin(props) {
       : msgState === "error"
       ? colors.error
       : colors["1"];
+
   return (
     <div className={styles.innerContainer}>
       <div className={styles.coreContainer}>
@@ -233,11 +250,13 @@ export function InnerSignin(props) {
         </p>
         <SigninCore
           signinCoreProps={{
-            onError: (msg) => {
+            errorCallbackId: props.errorCallbackId,
+            successCallbackId: props.successCallbackId,
+            errorMsg: (msg) => {
               setInnerTitle(msg);
               setMsgState("error");
             },
-            onSuccess: (msg) => {
+            successMsg: (msg) => {
               setInnerTitle(msg);
               setMsgState("success");
             },
@@ -382,6 +401,17 @@ export default function JamHub(props) {
       ? colors.warn
       : colors.error;
 
+  const errorCallbackId = `${props.owner}/SigninCore/error`;
+  const successCallbackId = `${props.owner}/SigninCore/error`;
+  useEffect(() => {
+    CallbackStore.register(errorCallbackId, (err) => {
+      console.log("On sign in error callback");
+    }).register(successCallbackId, (suc) => {
+      JamOS.procmgr.add("worldeditor");
+      JamOS.procmgr.kill(proc.id);
+    });
+  }, []);
+
   return (
     <Window {...props} proc={proc}>
       <div className={styles.container}>
@@ -399,9 +429,11 @@ export default function JamHub(props) {
           <div className={styles.btns}>
             <SigninCore
               signinCoreProps={{
+                errorCallbackId: errorCallbackId,
+                successCallbackId: successCallbackId,
                 includeCreateUser: true,
-                onError: setError,
-                onSuccess: setSuccess,
+                errorMsg: setError,
+                successMsg: setSuccess,
               }}
             ></SigninCore>
             <button

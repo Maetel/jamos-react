@@ -41,7 +41,7 @@ export default function DockIcon(props) {
   const color1 = colors["1"];
   const color2 = colors["2"];
   const color3 = colors["3"];
-  const procsOfType: Process[] = procmgr.processOfType(type);
+  const procsOfType: Process[] = procmgr.processesOfType(type);
 
   const handleContext = (e) => {
     e.preventDefault();

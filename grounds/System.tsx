@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Process from "../features/procmgr/ProcTypes";
 import Daemon from "../components/Daemon";
 import { randomId } from "../scripts/utils";
-import { JamUser, JamWorld } from "../features/JamOS/osSlice";
+import { JamUser, JamWorld, _initialWorld } from "../features/JamOS/osSlice";
 
 let initted = false;
 let loadOnce = false;
@@ -25,9 +25,9 @@ export default function System(props) {
   const front = procmgr.front();
 
   const init = () => {
-    procmgr.add("terminal");
+    // procmgr.add("terminal");
     procmgr.add("jamhub");
-    procmgr.add("worldeditor");
+    // procmgr.add("worldeditor");
     // procmgr.add("testwindow");
     filemgr.mkdir("~/deep/deeeeeep/directory");
 
@@ -178,13 +178,12 @@ export default function System(props) {
   const world: JamWorld = JamOS.worldReadable();
   const jamUser: JamUser = JamOS.userReadable();
   useEffect(() => {
-    console.log("User change : ", jamUser.id);
-  }, [jamUser]);
-  useEffect(() => {
-    console.log("World change : ", world);
-    const fetchWorldData = async () => {};
-    fetchWorldData;
-  }, [world]);
+    console.log("world.loaded:", world.loaded);
+    if (!world.loaded) {
+      console.log("load world");
+      JamOS.loadWorld(world.name);
+    }
+  }, [jamUser, world]);
 
   // const saveWorldLocal = JamOS.procmgr.getReadable("system", "saveWorldLocal");
   // const loadWorldLocal = JamOS.procmgr.getReadable("system", "loadWorldLocal");

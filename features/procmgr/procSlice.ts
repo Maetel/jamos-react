@@ -406,13 +406,16 @@ export const selectFrontsParent = (state:AppState):Process=>{
   return topParent(state, front);
 }
 
-export const selectProcessOfType = (procType:String)=>(state:AppState)=>{
+export const selectProcessesOfType = (procType:String)=>(state:AppState)=>{
   return state.proc.procs.reduce((prev,next)=>{
     if(next.comp===procType){
       prev.push(next);
     }
     return prev;
   },[]);
+}
+export const selectProcessOfType = (procType:String)=>(state:AppState)=>{
+  return state.proc.procs.find(_proc=>_proc.comp===procType);
 }
 
 

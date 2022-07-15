@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import CallbackStore from "../features/JamOS/CallbackStore";
 import JamOS from "../features/JamOS/JamOS";
-import { JamUser } from "../features/JamOS/osSlice";
+import { JamUser, JamWorld, _initialWorld } from "../features/JamOS/osSlice";
 import Log from "../features/log/Log";
 import { ToolbarItem, ToolbarItemId } from "../scripts/ToolbarTypes";
 
@@ -302,7 +302,7 @@ export default function Toolbar(props) {
   const isDockFixed = JamOS.isDockFixed();
 
   const parseItems = (items: TbItem[]): TbProc => {
-    //toggle toolbar
+    //toggle jamhub
     {
       const tbIdx = systemMenu.indexOf(
         systemMenu.find((menu) => menu.callback.includes("jamhub"))
@@ -331,6 +331,19 @@ export default function Toolbar(props) {
         ? "system.proc.dock.close"
         : "system.proc.dock.fix";
     }
+    //toggle save/load world
+    {
+      const saveWorldIdx = systemMenu.indexOf(
+        systemMenu.find((menu) => menu.item.includes("Save world"))
+      );
+      const loadWorldIdx = systemMenu.indexOf(
+        systemMenu.find((menu) => menu.item.includes("Load world"))
+      );
+      const enableWorldSync =
+        jamUser.signedin && jamWorld.name !== _initialWorld.name;
+      systemMenu[saveWorldIdx].disabled = !enableWorldSync;
+      systemMenu[loadWorldIdx].disabled = !enableWorldSync;
+    }
 
     const retval: TbMenu[] = [{ menu: "🍞", items: systemMenu }];
     if (!items || items.length === 0) {
@@ -358,11 +371,12 @@ export default function Toolbar(props) {
   // let tbproc: TbProc = [{ menu: "🍞", items: [...systemMenu] }];
   const [menus, setMenus] = useState([{ menu: "🍞", items: [...systemMenu] }]);
   const jamUser: JamUser = JamOS.userReadable();
+  const jamWorld: JamWorld = JamOS.worldReadable();
   useEffect(() => {
     // console.log("frontMenus update :", frontMenus);
     const _tbproc = parseItems(frontMenus);
     setMenus(_tbproc);
-  }, [frontMenus, isToolbarFixed, isDockFixed, jamUser]);
+  }, [frontMenus, isToolbarFixed, isDockFixed, jamUser, jamWorld]);
 
   const uncollapse = (e) => {
     setHovered(false);

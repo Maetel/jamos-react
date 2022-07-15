@@ -65,6 +65,9 @@ const osSlice = createSlice({
     setWorld:(state,action:PayloadAction<string>)=>{
       state.jamWorld.name = action.payload;
     },
+    setWorldLoaded:(state,action:PayloadAction<boolean>)=>{
+      state.jamWorld.loaded = action.payload;
+    },
 
     signout:(state,action:PayloadAction<void>)=>{
       state.jamUser = {..._initialUser};
@@ -124,4 +127,4 @@ export const selectForceHideDock = (state:AppState)=>state.os.forceHideDock;
 export const selectNotifDuration = (state:AppState):number=>state.os.notifDuration;
 export const selectNotifs = (state:AppState):Notif[]=>state.os.notifs;
 export default osSlice.reducer;
-export const { setNotification, openToolbar, closeToolbar, toggleToolbar, openDock, closeDock,toggleDock,forceHideToolbar, forceHideDock,forceOpenToolbar, forceOpenDock, setUser, setWorld, signout } = osSlice.actions;
+export const { setNotification, openToolbar, closeToolbar, toggleToolbar, openDock, closeDock,toggleDock,forceHideToolbar, forceHideDock,forceOpenToolbar, forceOpenDock, setUser, setWorld, setWorldLoaded, signout } = osSlice.actions;
