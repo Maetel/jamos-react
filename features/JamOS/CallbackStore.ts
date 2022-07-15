@@ -49,7 +49,9 @@ export default class CallbackStore {
   }
 
   private static systemCallbackBuilder(callback:string){
-    console.log("callback:",callback);
+    if(this._debug){
+      console.log("callback:",callback);
+    }
     const args = callback.split('/');
     if(args.at(0)!=='system'){
       return;
@@ -76,6 +78,19 @@ export default class CallbackStore {
             return ()=>{JamOS.openDock()}
           } else {
             return ()=>{JamOS.closeDock()}
+          }
+        case 'save':
+          if(param==='local'){
+            return ()=>{JamOS.saveStringified();}
+          } else {
+            return ()=>{JamOS.saveWorld};
+          }
+          break;
+        case 'load':
+          if(param==='local'){
+            return ()=>{JamOS.loadStringified};
+          } else {
+            return ()=>{JamOS.loadWorld};
           }
         default:
           break;

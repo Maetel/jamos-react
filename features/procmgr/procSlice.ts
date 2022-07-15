@@ -1,7 +1,7 @@
 import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import type { AppState } from '../../app/store'
 import store from '../../app/store';
-import {  ToolbarItem, ToolbarItemId } from '../../scripts/ToolbarTypes';
+import {  ToolbarItem, ToolbarItemId, ToolbarItemIdRaw } from '../../scripts/ToolbarTypes';
 
 
 import Process, { ProcessCommands, Rect, runOnce, TotalCommands } from "./ProcTypes";
@@ -73,11 +73,18 @@ export const procSlice = createSlice({
         }
       }
 
-      const actionId = action.payload.id;
-      const sameFound = state.procs.find(proc=>proc.id===actionId);
-      if(sameFound){
-        throw new Error("Same id process found error. Requested id : " + actionId + ', Existing ids : '+ state.procs.map(proc=>proc.id).join(', '));
+      let actionId = action.payload.id;
+      while(state.procs.find(proc=>proc.id===actionId)){
+        try {
+          actionId = ""+parseInt(actionId)+1;
+        } catch (error) {
+          console.error('System process cannot exist more than one.');
+        }
       }
+      // const sameFound = state.procs.find(proc=>proc.id===actionId);
+      // if(sameFound){
+      //   throw new Error("Same id process found error. Requested id : " + actionId + ', Existing ids : '+ state.procs.map(proc=>proc.id).join(', '));
+      // }
       
       
 
@@ -149,7 +156,8 @@ export const procSlice = createSlice({
       }
       const menu = action.payload.menu;
       const item = action.payload.item;
-      proc.toolbar = proc.toolbar.filter(_item=>_item.menu===menu && _item.item===item);
+      const destId = ToolbarItemIdRaw(action.payload.id, menu, item);
+      proc.toolbar = proc.toolbar.filter(item=>ToolbarItemId(item)!=destId);
     },
 
     removeAllToolbarItems:(state, action:PayloadAction<string>)=>{

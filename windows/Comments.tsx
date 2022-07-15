@@ -108,7 +108,7 @@ function LeaveComment(props) {
   const jamUser: JamUser = JamOS.userReadable();
   const [user, setUser] = useState("");
   const [content, setContent] = useState("");
-  const isLoggedIn = jamUser.loggedin;
+  const isLoggedIn = jamUser.signedin;
 
   const onCommentSubmit = (e) => {
     e.preventDefault();

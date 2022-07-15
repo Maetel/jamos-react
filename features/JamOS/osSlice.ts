@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import store, { AppState } from "../../app/store";
 
 
@@ -9,12 +9,13 @@ export interface Notif {
 
 export interface JamUser {
   id : string,
-  loggedin:boolean,
+  signedin:boolean,
   token? : string,
 }
 
 export interface JamWorld {
   name:string,
+  loaded?:boolean,
 }
 
 export interface OSState {
@@ -33,8 +34,8 @@ export interface OSState {
   [key:string]:any;
 }
 
-const _initialUser = {id:'guest', loggedin:false};
-const _initialWorld = {name:'sample_world'}
+export const _initialUser:JamUser = {id:'guest', signedin:false};
+export const _initialWorld:JamWorld = {name:'sample_world', loaded:false}
 const initialState :OSState = {
   jamUser : {..._initialUser},
   jamWorld : {..._initialWorld},
@@ -58,7 +59,11 @@ const osSlice = createSlice({
     setUser:(state,action:PayloadAction<JamUser>)=>{
       const user:JamUser = action.payload;
       state.jamUser = {...user};
-      state.jamWorld.name = user.id+"-world";
+      // state.jamWorld.name = user.id+"-world";
+    },
+
+    setWorld:(state,action:PayloadAction<string>)=>{
+      state.jamWorld.name = action.payload;
     },
 
     signout:(state,action:PayloadAction<void>)=>{
@@ -119,4 +124,4 @@ export const selectForceHideDock = (state:AppState)=>state.os.forceHideDock;
 export const selectNotifDuration = (state:AppState):number=>state.os.notifDuration;
 export const selectNotifs = (state:AppState):Notif[]=>state.os.notifs;
 export default osSlice.reducer;
-export const { setNotification, openToolbar, closeToolbar, toggleToolbar, openDock, closeDock,toggleDock,forceHideToolbar, forceHideDock,forceOpenToolbar, forceOpenDock, setUser, signout } = osSlice.actions;
+export const { setNotification, openToolbar, closeToolbar, toggleToolbar, openDock, closeDock,toggleDock,forceHideToolbar, forceHideDock,forceOpenToolbar, forceOpenDock, setUser, setWorld, signout } = osSlice.actions;

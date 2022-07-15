@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Process from "../features/procmgr/ProcTypes";
 import Daemon from "../components/Daemon";
 import { randomId } from "../scripts/utils";
+import { JamUser, JamWorld } from "../features/JamOS/osSlice";
 
 let initted = false;
 let loadOnce = false;
@@ -25,6 +26,8 @@ export default function System(props) {
 
   const init = () => {
     procmgr.add("terminal");
+    procmgr.add("jamhub");
+    procmgr.add("worldeditor");
     // procmgr.add("testwindow");
     filemgr.mkdir("~/deep/deeeeeep/directory");
 
@@ -160,6 +163,9 @@ export default function System(props) {
   }, [saveOnExit, askOnExit, muteOptions]);
 
   useEffect(() => {
+    if (!front) {
+      return;
+    }
     if (front.isMaximized) {
       JamOS.forceHideToolbar();
       JamOS.forceHideDock();
@@ -168,6 +174,28 @@ export default function System(props) {
       JamOS.forceHideDock(false);
     }
   }, [front]);
+
+  const world: JamWorld = JamOS.worldReadable();
+  const jamUser: JamUser = JamOS.userReadable();
+  useEffect(() => {
+    console.log("User change : ", jamUser.id);
+  }, [jamUser]);
+  useEffect(() => {
+    console.log("World change : ", world);
+    const fetchWorldData = async () => {};
+    fetchWorldData;
+  }, [world]);
+
+  // const saveWorldLocal = JamOS.procmgr.getReadable("system", "saveWorldLocal");
+  // const loadWorldLocal = JamOS.procmgr.getReadable("system", "loadWorldLocal");
+  // useEffect(() => {
+  //   console.log("saveWorldLocal");
+  //   JamOS.saveStringified();
+  // }, [saveWorldLocal]);
+  // useEffect(() => {
+  //   console.log("loadWorldLocal");
+  //   JamOS.loadStringified();
+  // }, [loadWorldLocal]);
 
   return <Daemon {...props} proc={proc}></Daemon>;
 }

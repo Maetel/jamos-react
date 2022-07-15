@@ -452,17 +452,16 @@ export default class ProcMgr{
   }
 
   public async loadFromString(data:string) {
+    const pm = ProcMgr.getInstance();
     try {
       const parsed = await JSON.parse(data);
-      this.killAll();
+      pm.killAll();
       store.dispatch(loadProcFromString(parsed));
-      
-      
     } catch (error) {
       console.error(error);
     }
-    this.id = this.processesValue().length+1;
-      console.log("Id after load: ",this.id);
+    pm.id = pm.processesValue().length+1;
+      console.log("Id after load: ",pm.id);
   }
 
   public blink(procId:string, timeout_ms = 300){

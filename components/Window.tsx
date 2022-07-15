@@ -315,7 +315,12 @@ export default function Window(props) {
 
   useEffect(() => {
     if (isFront) {
-      CallbackStore.getById(procmgr.getValue(proc.id, "onFront"))?.();
+      const onfront = CallbackStore.getById(
+        procmgr.getValue(proc.id, "onFront")
+      );
+      if (onfront) {
+        onfront();
+      }
     } else {
       CallbackStore.getById(procmgr.getValue(proc.id, "onFocusOut"))?.();
     }

@@ -11,6 +11,7 @@ type TbItem = ToolbarItem;
 type TbMenu = { menu: string; items: TbItem[] };
 type TbProc = TbMenu[];
 
+//watch CallbackStore.systemCallbackBuilder
 const systemMenu: ToolbarItem[] = [
   {
     caller: "system",
@@ -36,6 +37,18 @@ const systemMenu: ToolbarItem[] = [
     menu: "🍞",
     item: "System Monitor",
     callback: "system/Toolbar/add/systeminfo",
+  },
+  {
+    caller: "system",
+    menu: "🍞",
+    item: "Save world",
+    callback: "system/Toolbar/save/world",
+  },
+  {
+    caller: "system",
+    menu: "🍞",
+    item: "Load world",
+    callback: "system/Toolbar/load/world",
     separator: true,
   },
   {
@@ -290,7 +303,7 @@ export default function Toolbar(props) {
       const tbIdx = systemMenu.indexOf(
         systemMenu.find((menu) => menu.callback.includes("jamhub"))
       );
-      systemMenu[tbIdx].item = jamUser.loggedin ? "JamHub" : "Sign in";
+      systemMenu[tbIdx].item = jamUser.signedin ? "JamHub" : "Sign in";
     }
 
     //toggle toolbar

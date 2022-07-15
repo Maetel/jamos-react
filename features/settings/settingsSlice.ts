@@ -54,7 +54,7 @@ const settingsSlice = createSlice({
       const loaded =action.payload;
       for ( let key in loaded){
         state[key] = loaded[key];
-        // console.log(' - loading : ',key);
+        // console.log(' - loading : ',key, " = ", loaded[key]);
       }
       // console.warn("Load settings finished");
     }

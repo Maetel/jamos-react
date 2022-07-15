@@ -3,6 +3,7 @@ import AppStoreIcon from "../components/AppStoreIcon";
 import Window from "../components/Window";
 import FileMgr from "../features/file/FileMgr";
 import { File } from "../features/file/FileTypes";
+import { AddOnAppstores } from "../features/procmgr/ProcTypes";
 import Path from "../scripts/Path";
 import styles from "../styles/AppStore.module.css";
 
@@ -17,87 +18,22 @@ export default function AppStore(props) {
   };
   const filemgr = FileMgr.getInstance();
   const makeFile = filemgr.makeFile;
-  const [_id, _setId] = useState(1);
-  let __id = 1;
-  const fetchAndIncrementId = () => {
-    return __id++;
-
-    let retval: number;
-    _setId((id) => {
-      retval = id;
-      return id + 1;
-    });
-    return retval;
-  };
-
   interface FileState {
     id: number;
     file: File;
     show: boolean;
   }
-  const initialFileState: FileState[] = [
-    // makeFile("~/JamHub", "hub"),
-    {
-      id: fetchAndIncrementId(),
-      file: makeFile("~/Terminal", "terminal"),
+  const defaultPath = "~";
+  const initialFileState: FileState[] = AddOnAppstores.map((cmd, i) => {
+    return {
+      id: i,
+      file: makeFile(
+        Path.join(defaultPath, cmd.defaultFileName).path,
+        cmd.comp
+      ),
       show: true,
-    },
-    {
-      id: fetchAndIncrementId(),
-      file: makeFile("~/System Info", "systeminfo"),
-      show: true,
-    },
-    {
-      id: fetchAndIncrementId(),
-      file: makeFile("~/Notepad", "notepad"),
-      show: true,
-    },
-    {
-      id: fetchAndIncrementId(),
-      file: makeFile("~/Postman", "postman"),
-      show: true,
-    },
-    {
-      id: fetchAndIncrementId(),
-      file: makeFile("~/Atelier", "atelier"),
-      show: true,
-    },
-    {
-      id: fetchAndIncrementId(),
-      file: makeFile("~/Logger", "logger"),
-      show: true,
-    },
-    {
-      id: fetchAndIncrementId(),
-      file: makeFile("~/About", "about"),
-      show: true,
-    },
-    {
-      id: fetchAndIncrementId(),
-      file: makeFile("~/Settings", "settings"),
-      show: true,
-    },
-    {
-      id: fetchAndIncrementId(),
-      file: makeFile("~/Styler", "styler"),
-      show: true,
-    },
-    {
-      id: fetchAndIncrementId(),
-      file: filemgr.makeFile("~/Finder", "finder", { exeCmd: "finder ~" }),
-      show: true,
-    },
-    {
-      id: fetchAndIncrementId(),
-      file: filemgr.makeFile("~/Comments", "comments"),
-      show: true,
-    },
-    {
-      id: fetchAndIncrementId(),
-      file: filemgr.makeFile("~/JamHub", "jamhub"),
-      show: true,
-    },
-  ];
+    };
+  });
 
   const foundAny = () => {
     return files.some((f) => f.show);

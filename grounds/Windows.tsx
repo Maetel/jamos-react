@@ -26,6 +26,7 @@ import ContextMenu from "../components/ContextMenu";
 import TextModal from "../components/TextModal";
 import Comments from "../windows/Comments";
 import JamHub from "../windows/JamHub";
+import WorldEditor from "../windows/WorldEditor";
 
 const winCmdMap: { [key: string]: (props) => JSX.Element } = {
   testwindow: TestWindow,
@@ -50,6 +51,7 @@ const winCmdMap: { [key: string]: (props) => JSX.Element } = {
   textmodal: TextModal,
   comments: Comments,
   jamhub: JamHub,
+  worldeditor: WorldEditor,
 };
 
 export default function Windows(props) {

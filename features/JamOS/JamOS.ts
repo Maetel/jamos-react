@@ -1,3 +1,4 @@
+import axios from "axios";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import store from "../../app/store";
 import { CtxMenuProps } from "../../components/ContextMenu";
@@ -8,7 +9,7 @@ import {killAllofType} from "../procmgr/procSlice";
 import SetMgr from "../settings/SetMgr";
 import { Theme } from "../settings/Themes";
 import CallbackStore from "./CallbackStore";
-import { closeDock, closeToolbar, forceHideDock, forceHideToolbar, forceOpenDock, forceOpenToolbar, getUser, getWorld, JamUser, JamWorld, Notif, openDock, openToolbar, selectForceHideDock, selectForceHideToolbar, selectForceOpenDock, selectForceOpenToolbar, selectIsDockOpen, selectIsToolbarOpen, selectNotifDuration, selectNotifs, selectUser, selectWorld, setNotification, setUser, toggleDock, toggleToolbar, signout } from "./osSlice";
+import { closeDock, closeToolbar, forceHideDock, forceHideToolbar, forceOpenDock, forceOpenToolbar, getUser, getWorld, JamUser, JamWorld, Notif, openDock, openToolbar, selectForceHideDock, selectForceHideToolbar, selectForceOpenDock, selectForceOpenToolbar, selectIsDockOpen, selectIsToolbarOpen, selectNotifDuration, selectNotifs, selectUser, selectWorld, setNotification, setUser, toggleDock, toggleToolbar, signout, setWorld, _initialWorld } from "./osSlice";
 
 export interface SerializedData {
   proc?:string,
@@ -24,6 +25,17 @@ export default class JamOS {
   public static get filemgr() {return FileMgr.getInstance()};
   public static get setmgr() {return SetMgr.getInstance()};
   public static get theme():Theme { return SetMgr.getInstance().themeReadable();}
+  public static toggle(procId:string, prop:string){
+    const retval = {};
+    const val = JamOS.procmgr.getValue(procId, prop);
+    if(!(val === 'boolean' || val === undefined)){
+      console.log("val",val);
+      return false;
+    }
+    retval[prop] = !val;
+    JamOS.procmgr.set(procId, retval);
+    return true;
+  }
   public static get notifs() {
     return useAppSelector(selectNotifs);
   }
@@ -75,6 +87,17 @@ export default class JamOS {
   }
   public static loadData(key:string):string{
     return localStorage.getItem(key);
+  }
+  public static saveStringified(){
+    console.log("saveStringified");
+    JamOS.saveData("stringifiedJamOS",  JamOS.stringify());
+  }
+  public static loadStringified(){
+    console.log("loadStringified");
+    const data = JamOS.loadData("stringifiedJamOS");
+    if(data){
+      JamOS.loadFromString(data);
+    }
   }
 
     public static reset(){
@@ -163,12 +186,20 @@ export default class JamOS {
 return server;
   }
   public static get apis() {
-    return {
-      posts : this.server + "post", //get,post
-      signup : this.server + "user/signup",  //post
-      signin : this.server + "user/signin",  //post
-      signincheck : this.server + "user/check",  //get
+    const retval = {
+      posts : "post", //get,post
+      signup : "user/signup",  //post
+      signin : "user/signin",  //post
+      signincheck : "user/check",  //get
+      worldList : 'world/list', //get
+      worldCreate : 'world/create', // post 
+      worldSave : 'world/data', //post
+      worldLoad : 'world/data/', //get
     }
+    for ( let key in retval){
+      retval[key] = this.server + retval[key];
+    }
+    return retval;
   }
 
   public static userValue():JamUser{
@@ -193,7 +224,7 @@ return server;
   public static signin(userId:string, accessToken:string, refreshToken:string){
     const user:JamUser = {
       id : userId,
-      loggedin:true,
+      signedin:true,
       token:accessToken
     }
     store.dispatch(setUser(user));
@@ -202,4 +233,64 @@ return server;
   public static signout(){
     store.dispatch(signout());
   }
+
+  public static setWorld(wid:string) {
+    store.dispatch(setWorld(wid));
+  }
+
+  public static saveWorld(type:SaveWorldType='os'){
+    const saveable = this.userValue().signedin && this.worldValue().name !==_initialWorld.name;
+    if(!saveable){
+      return;
+    }
+
+    const isOs = type==='os';
+    const data = {};
+    if(type==='file' || isOs){
+      data['file'] = JamOS.filemgr.stringify()
+    }
+    if(type==='proc' || isOs){
+      data['proc'] = JamOS.procmgr.stringify();
+    }
+    if(type==='setting' || isOs){
+      data['setting'] = JamOS.setmgr.stringify();
+    }
+    const wid = this.worldValue().name;
+    const payload = {
+      type:type,
+      data:data,
+      wid:wid
+    }
+    console.log("Payload : ",payload);
+    const res = axios.post(this.apis.worldSave, payload, this.authHeader).then(res=>{
+      console.log(res);
+    }).catch(console.error)
+  }
+  public static loadWorld(wid?:string){
+    wid = wid ?? this.worldValue().name;
+    axios.get(this.apis.worldLoad+wid,this.authHeader).then(res=>{
+      
+      const funcMap = {
+        file:JamOS.filemgr.loadFromString,
+        proc:JamOS.procmgr.loadFromString,
+        setting:JamOS.setmgr.loadFromString,
+      }
+      const content = res.data;
+      for(let key in funcMap){
+        if(content[key]){
+          console.log("Loading ",key);
+          funcMap[key](content[key]);
+        }
+      }
+    }).catch(err=>{
+      console.error(err);
+    });
+  }
+
+  public static format(){
+    const home = JamOS.filemgr.dirValue('~');
+    home.dirs.forEach(dir=>JamOS.filemgr.rmdir(dir.node.path));
+    home.files.forEach(file=>JamOS.filemgr.rm(file.node.path));
+  }
 }
+export type SaveWorldType = 'os' | 'file' | 'proc' | 'setting';

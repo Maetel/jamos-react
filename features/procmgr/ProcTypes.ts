@@ -70,6 +70,8 @@ export default interface Process {
   textAreaValue?:string,
   imageIdx?:number,
   finderIconDragging?:boolean,
+  saveWorldLocal?:boolean,
+  loadWorldLocal?:boolean,
 
   [key:string]:any
 }
@@ -93,6 +95,8 @@ export interface ProcessCommand {
   type?:'window'|'daemon'|'system', // if undefined, 'window'. 'system' cannot be called manually
   icon?:string, // if undefined, "/imgs/icon-default.svg"
   runOnce?:boolean, // if undefined, false
+  addOnAppstore?:boolean,
+  defaultFileName?:string,
 }
 
 export const ProcessTypeName = (type:string):string=>{
@@ -108,31 +112,32 @@ export const _ProcessCommands:ProcessCommand[] = [
   {comp:"textmodal", name:"TextModal",icon:"/imgs/circlequestion.svg"},
   {comp:"filedialogue", name:"FileDialogue",icon:"/imgs/circlequestion.svg"},
   {comp:"contextmenu", name:"Context Menu",icon:"/imgs/circlequestion.svg"},
-
-  {comp:"testwindow", name:'Test Window'},
-  {comp:"viewer",name:"Viewer", icon:"/imgs/viewer.svg"},
+  
+  {comp:"appstore", name:"AppStore",icon:"/imgs/appstore.svg", defaultFileName:"AppStore",addOnAppstore:true},
+  {comp:"testwindow", name:'Test Window', defaultFileName:"Test Window"},
+  {comp:"viewer",name:"Viewer", icon:"/imgs/viewer.svg", addOnAppstore:true, defaultFileName:"Viewer"},
   {comp:"editor",name:"Editor", },
   {comp:"browser",name:"Browser",},
-  {comp:"viewer", name:'Image Viewer'},
-  {comp:"notepad", name:"Notepad",icon:"/imgs/notepad.svg"},
-  {comp:"terminal", name:"Terminal",icon:"/imgs/terminal.svg"},
-  {comp:"logger",name:"Logger", icon:"/imgs/logger.svg", runOnce:true},
-  {comp:"finder",name:"Finder", icon:"/imgs/dir.svg"},
-  {comp:"atelier",name:"Atelier", icon:"/imgs/atelier.svg"},
-  {comp:"postman", name:"Postman",icon:"/imgs/postman.svg", runOnce:true},
-  {comp:"appstore", name:"AppStore",icon:"/imgs/appstore.svg"},
-  {comp:"about",name:"About", icon:"/imgs/jamos.png"},
-  {comp:"settings", name:"Settings",icon:"/imgs/settings.svg", runOnce:true},
-  {comp:"styler", name:"Styler",icon:"/imgs/styler.svg", runOnce:true},
-  {comp:"systeminfo",name:"SystemInfo", icon:"/imgs/systeminfo.svg", runOnce:true},
+  {comp:"notepad", name:"Notepad",icon:"/imgs/notepad.svg", addOnAppstore:true, defaultFileName:"Notepad"},
+  {comp:"terminal", name:"Terminal",icon:"/imgs/terminal.svg", addOnAppstore:true, defaultFileName:"Terminal"},
+  {comp:"logger",name:"Logger", icon:"/imgs/logger.svg", runOnce:true, addOnAppstore:true, defaultFileName:"Logger"},
+  {comp:"finder",name:"Finder", icon:"/imgs/dir.svg", addOnAppstore:true, defaultFileName:"Finder"},
+  {comp:"atelier",name:"Atelier", icon:"/imgs/atelier.svg", addOnAppstore:true, defaultFileName:"Atelier"},
+  {comp:"postman", name:"Postman",icon:"/imgs/postman.svg", runOnce:true, addOnAppstore:true, defaultFileName:"Postman"},
+  {comp:"about",name:"About", icon:"/imgs/jamos.png", addOnAppstore:true, defaultFileName:"About"},
+  {comp:"settings", name:"Settings",icon:"/imgs/settings.svg", runOnce:true, addOnAppstore:true, defaultFileName:"Settings"},
+  {comp:"styler", name:"Styler",icon:"/imgs/styler.svg", runOnce:true, addOnAppstore:true, defaultFileName:"Styler"},
+  {comp:"systeminfo",name:"SystemInfo", icon:"/imgs/systeminfo.svg", runOnce:true, addOnAppstore:true, defaultFileName:"System Monitor"},
   {comp:'simpleabout',name:"About", icon:"/imgs/circlequestion.svg"},
   {comp:'toolbar',name:"Toolbar", icon:"/imgs/circlequestion.svg", type:'system'},
 
   //network usage
-  {comp:'comments',name:"Leave comments!", icon:"/imgs/comments.svg", runOnce:true},
-  {comp:'jamhub',name:"JamHub", icon:"/imgs/jamos.png", runOnce:true},
+  {comp:'comments',name:"Leave comments!", icon:"/imgs/comments.svg", runOnce:true, addOnAppstore:true, defaultFileName:"Comments"},
+  {comp:'jamhub',name:"JamHub", icon:"/imgs/jamos.png", runOnce:true, addOnAppstore:true, defaultFileName:"JamHub"},
+  {comp:'worldeditor',name:"WorldEditor", icon:"/imgs/worldeditor.svg", runOnce:true, addOnAppstore:true, defaultFileName:"World Editor"},
 
 ]
+export const AddOnAppstores = _ProcessCommands.filter(cmd=>cmd.addOnAppstore);
 export const ProcessCommands = _ProcessCommands.filter(cmd=>((cmd.type === 'window') || (cmd.type === undefined))).map(cmd=>cmd.comp);
 
 export const SystemCommands = _ProcessCommands.filter(cmd=>cmd.type === 'system').map(cmd=>cmd.comp);

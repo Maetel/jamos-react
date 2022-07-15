@@ -37,9 +37,12 @@
 }
 
 
-.loginForm,
 .btns {
-  width:95%;
+  width:80%;
+}
+.loginForm{
+  width:100%;
+
 }
 
 .label {
@@ -51,27 +54,35 @@
   margin-bottom:10px;
 }
 
-.inputArea input{
+.loginForm input{
   width:100%;
   margin:0;
   box-sizing: border-box;
-  padding:8px;
-  border-radius: 8px;
-  margin-bottom: 8px;
+  padding:6px;
+  border-radius: 6px;
+  margin-bottom: 6px;
 }
 
 .btn {
   width:100%;
   margin:0px;
   box-sizing: border-box;
-  padding:8px;
-  border-radius: 8px;
-  margin-bottom: 8px;;
+  padding:6px;
+  border-radius: 6px;
+  margin-bottom: 6px;;
   cursor:pointer;
 }
 
+
 .btns {
   display:flex;
+  flex-direction: column;
+}
+.signinContainer {
+  display:flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 .half {
@@ -79,12 +90,13 @@
 }
 
 .loginForm {
-
+  display:flex;
+  flex-direction: column;
 }
 
 .inputArea {
   position:relative;
-
+  overflow:hidden;
 }
 .info {
   text-align: center;
@@ -92,11 +104,60 @@
 .signoutArea {
   position:absolute;
   width:100%;
-  height:100%;
+  left:0%;
+  bottom:0%;
   display:flex;
   flex-direction: column;
   justify-content: space-evenly;
   align-items: center;
   box-sizing: border-box;
+  overflow:hidden;
+
+  /* inactive */
+  padding:0px;
+  height:0%;
+}
+
+.signoutArea.active {
+  height:100%;
   padding:20px;
+}
+
+@keyframes scrollup {
+  from {
+    height:0%;
+    padding:0px;
+  }
+  to {
+    height:100%;
+    padding:20px;
+  }
+}
+
+.signoutBtn {
+  margin:0;
+}
+
+.innerContainer {
+  width:100%;
+  height:100%;
+  display:flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.coreContainer {
+  display:flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.innerTitle {
+  text-align: center;
+  margin:0;
+  margin-bottom:10px;
+}
+.coreContainer {
+  width:200px;
+  height:200px;
 }
