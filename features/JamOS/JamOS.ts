@@ -289,7 +289,15 @@ return server;
       data['setting'] = JamOS.setmgr.stringify();
     }
     if(type==='os' || isWhole){
-      data['os'] = JSON.stringify(store.getState().os);
+      const osData = store.getState().os;
+      const retval = {};
+      const skips = ['jamUser', 'jamWorld'];
+      for ( let key in osData){
+        if(!skips.includes(key)){
+          retval[key] = osData[key];
+        }
+      }
+      data['os'] = JSON.stringify(retval);
     }
     const wid = this.worldValue().name;
     const payload = {
