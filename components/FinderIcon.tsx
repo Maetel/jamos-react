@@ -102,10 +102,31 @@ export default function FinderIcon(props) {
     JamOS.openContextMenu(
       e.pageX,
       e.pageY,
-      ["Open", "__separator__", "Rename"],
+      ["Open", "__separator__", "Remove", "Rename"],
       [
         () => {
           onClick(node);
+        },
+        () => {
+          const _path = new Path(nodepath);
+          procmgr.openConfirm(
+            owner,
+            () => {
+              console.log("Node:", node.type);
+              if (node.type === "dir") {
+                console.log("isdir");
+                JamOS.filemgr.rmdir(_path.path);
+              } else {
+                console.log("else");
+                JamOS.filemgr.rm(_path.path);
+              }
+            },
+            {
+              title: `Confirm remove`,
+              descs: [`Remove ${_path.last}?`],
+              buttons: ["Remove", "Cancel"],
+            }
+          );
         },
         () => {
           const _path = new Path(nodepath);

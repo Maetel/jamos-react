@@ -317,8 +317,8 @@ export default function Toolbar(props) {
       );
       systemMenu[tbIdx].item = isToolbarFixed ? "Hide toolbar" : "Fix toolbar";
       systemMenu[tbIdx].callback = isToolbarFixed
-        ? "system.proc.toolbar.close"
-        : "system.proc.toolbar.fix";
+        ? "system/Toolbar/toolbar/close"
+        : "system/Toolbar/toolbar/open";
     }
 
     //toggle dock
@@ -328,8 +328,8 @@ export default function Toolbar(props) {
       );
       systemMenu[dockIdx].item = isDockFixed ? "Hide dock" : "Fix dock";
       systemMenu[dockIdx].callback = isDockFixed
-        ? "system.proc.dock.close"
-        : "system.proc.dock.fix";
+        ? "system/Toolbar/dock/close"
+        : "system/Toolbar/dock/open";
     }
     //toggle save/load world
     {

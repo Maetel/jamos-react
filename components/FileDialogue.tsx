@@ -36,8 +36,6 @@ export default function FileDialogue(props) {
   proc.blockExeFile = true;
   proc.callbackId = `FileDialogue-${proc.id}`;
   proc.onBackgroundClick = `${proc.id}/FileDialogue/onBackgroundClick`;
-  proc.hideOnDock = true;
-  proc.hideOnToolbar = true;
   proc.disableMaxBtn = true;
   proc.disableMinBtn = true;
 

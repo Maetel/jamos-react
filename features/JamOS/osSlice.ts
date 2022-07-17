@@ -35,7 +35,7 @@ export interface OSState {
 }
 
 export const _initialUser:JamUser = {id:'guest', signedin:false};
-export const _initialWorld:JamWorld = {name:'sample_world', loaded:false}
+export const _initialWorld:JamWorld = {name:'__pending__', loaded:false}
 const initialState :OSState = {
   jamUser : {..._initialUser},
   jamWorld : {..._initialWorld},
@@ -109,6 +109,23 @@ const osSlice = createSlice({
     toggleDock:(state, action:PayloadAction<void>)=>{
       state.openDock = !state.openDock;
     },
+
+    loadOsFromString:(state, action:PayloadAction<{}>)=>{
+      console.warn("Load os params...")
+      if(0){
+        for(let key in state){
+          // console.warn(' - deleting : ',key);
+          delete state[key];
+        }
+      }
+      
+      const loaded =action.payload;
+      for ( let key in loaded){
+        state[key] = loaded[key];
+        // console.log(' - loading : ',key);
+      }
+      // console.warn("Load files finished");
+    }
   }
 });
 
@@ -127,4 +144,4 @@ export const selectForceHideDock = (state:AppState)=>state.os.forceHideDock;
 export const selectNotifDuration = (state:AppState):number=>state.os.notifDuration;
 export const selectNotifs = (state:AppState):Notif[]=>state.os.notifs;
 export default osSlice.reducer;
-export const { setNotification, openToolbar, closeToolbar, toggleToolbar, openDock, closeDock,toggleDock,forceHideToolbar, forceHideDock,forceOpenToolbar, forceOpenDock, setUser, setWorld, setWorldLoaded, signout } = osSlice.actions;
+export const { setNotification, openToolbar, closeToolbar, toggleToolbar, openDock, closeDock,toggleDock,forceHideToolbar, forceHideDock,forceOpenToolbar, forceOpenDock, setUser, setWorld, setWorldLoaded, signout, loadOsFromString } = osSlice.actions;

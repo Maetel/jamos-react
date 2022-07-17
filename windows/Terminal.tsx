@@ -476,6 +476,12 @@ export default function Terminal(props) {
     switch (cmd) {
       //   case "atelier":
       // case "markdown":
+      case "signin":
+        procmgr.add("jamhub");
+        break;
+      case "signout":
+        JamOS.signout();
+        break;
       case "test":
         // procmgr.openTextModal(proc.id, { title: "Terminal test" });
         break;
@@ -489,6 +495,7 @@ export default function Terminal(props) {
       case "systeminfo":
       case "comments":
       case "jamhub":
+      case "worldeditor":
         procmgr.add(cmd);
         break;
 

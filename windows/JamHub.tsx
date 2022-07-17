@@ -1,7 +1,5 @@
 import axios from "axios";
-import { syncBuiltinESMExports } from "module";
 import { useEffect, useRef, useState } from "react";
-import Loading from "../components/Loading";
 import ShimmerImage from "../components/ShimmerImage";
 import Window from "../components/Window";
 import CallbackStore from "../features/JamOS/CallbackStore";
@@ -15,6 +13,7 @@ export const onSigninCoreSubmit = (
   user: string,
   password: string,
   args?: {
+    procId?: string;
     errorCallbackId?: string;
     successCallbackId?: string;
     errorMsg?: (string) => void;
@@ -52,7 +51,7 @@ export const onSigninCoreSubmit = (
   };
 
   const trySignIn = async () => {
-    const res = await axios
+    axios
       .post(JamOS.apis.signin, userInput, config)
       .then(async (res) => {
         const stat = res.status;
@@ -102,7 +101,7 @@ export const onSigninCoreSubmit = (
   };
 
   const trySignup = async () => {
-    await axios
+    axios
       .post(JamOS.apis.signup, userInput, config)
       .then(async (res) => {
         const stat = res.status;
@@ -110,7 +109,8 @@ export const onSigninCoreSubmit = (
         if (stat === 200) {
           // JamOS.setNotif("Signed up as " + userInput.user);
           setSuccess?.("Signed up as " + JamOS.userValue().id);
-          await trySignIn();
+          if (args?.procId)
+            JamOS.procmgr.set(args.procId, { onSignupSuccess: true });
         } else {
           if (cont) {
             setError(cont);
@@ -141,6 +141,7 @@ export const onSigninCoreSubmit = (
 };
 
 interface SigninCoreProps {
+  owner: string;
   errorMsg?: (msg: string) => void;
   successMsg?: (msg: string) => void;
   includeCreateUser?: boolean;
@@ -148,11 +149,15 @@ interface SigninCoreProps {
   successCallbackId?: string;
 }
 export function SigninCore(props: { signinCoreProps?: SigninCoreProps }) {
-  const coreProps: SigninCoreProps = props.signinCoreProps ?? {};
+  const coreProps: SigninCoreProps = props.signinCoreProps;
   const includeCreateUser = coreProps.includeCreateUser;
   const [user, setUser] = useState("");
   const [password, setPassword] = useState("");
   const colors = JamOS.theme.colors;
+  const onSignupSuccess = JamOS.procmgr.getReadable(
+    coreProps.owner,
+    "onSignupSuccess"
+  );
   const buildButtonStyle = () => {
     return {
       color: colors["2"],
@@ -160,12 +165,23 @@ export function SigninCore(props: { signinCoreProps?: SigninCoreProps }) {
     };
   };
   const btnStyle = buildButtonStyle();
+  useEffect(() => {
+    if (onSignupSuccess) {
+      onSigninCoreSubmit("signin", user, password, {
+        errorCallbackId: coreProps.errorCallbackId,
+        successCallbackId: coreProps.successCallbackId,
+        errorMsg: coreProps.errorMsg,
+        successMsg: coreProps.successMsg,
+      });
+    }
+  }, [onSignupSuccess]);
   return (
     <div className={styles.signinContainer}>
       <form
         onSubmit={(e) => {
           e.preventDefault();
           onSigninCoreSubmit("signin", user, password, {
+            procId: coreProps.owner,
             errorCallbackId: coreProps.errorCallbackId,
             successCallbackId: coreProps.successCallbackId,
             errorMsg: coreProps.errorMsg,
@@ -208,6 +224,7 @@ export function SigninCore(props: { signinCoreProps?: SigninCoreProps }) {
           style={btnStyle}
           onClick={(e) => {
             onSigninCoreSubmit("signup", user, password, {
+              procId: coreProps.owner,
               errorCallbackId: coreProps.errorCallbackId,
               successCallbackId: coreProps.successCallbackId,
               errorMsg: coreProps.errorMsg,
@@ -223,6 +240,7 @@ export function SigninCore(props: { signinCoreProps?: SigninCoreProps }) {
 }
 
 export function InnerSignin(props: {
+  owner: string;
   errorCallbackId?: string;
   successCallbackId?: string;
 }) {
@@ -250,6 +268,7 @@ export function InnerSignin(props: {
         </p>
         <SigninCore
           signinCoreProps={{
+            owner: props.owner,
             errorCallbackId: props.errorCallbackId,
             successCallbackId: props.successCallbackId,
             errorMsg: (msg) => {
@@ -276,6 +295,21 @@ export default function JamHub(props) {
   };
   proc.disableMaxBtn = proc.disableMaxBtn ?? true;
   proc.hideNav = proc.hideNav ?? true;
+  const isInitial = JamOS.procmgr.getReadable(proc.id, "isInitial");
+  useEffect(() => {
+    if (isInitial) {
+      JamOS.procmgr.set(proc.id, {
+        rect: {
+          top: "50%",
+          left: "50%",
+          width: 360,
+          height: 520,
+          transform: "translate( -50%, -50%)",
+        },
+        disableDrag: true,
+      });
+    }
+  }, [isInitial]);
   const isFront = JamOS.procmgr.isFront(proc.id);
 
   const jamUser = JamOS.userReadable();
@@ -290,6 +324,9 @@ export default function JamHub(props) {
   const btnStyle = buildButtonStyle();
 
   const handleCancel = (e) => {
+    if (JamOS.worldValue().name === "__pending__") {
+      JamOS.setWorld("sample_world");
+    }
     JamOS.procmgr.kill(proc.id);
   };
   const handleKey = (e) => {
@@ -401,8 +438,8 @@ export default function JamHub(props) {
       ? colors.warn
       : colors.error;
 
-  const errorCallbackId = `${props.owner}/SigninCore/error`;
-  const successCallbackId = `${props.owner}/SigninCore/error`;
+  const errorCallbackId = `${proc.id}/SigninCore/error`;
+  const successCallbackId = `${proc.id}/SigninCore/success`;
   useEffect(() => {
     CallbackStore.register(errorCallbackId, (err) => {
       console.log("On sign in error callback");
@@ -429,6 +466,7 @@ export default function JamHub(props) {
           <div className={styles.btns}>
             <SigninCore
               signinCoreProps={{
+                owner: proc.id,
                 errorCallbackId: errorCallbackId,
                 successCallbackId: successCallbackId,
                 includeCreateUser: true,
@@ -440,6 +478,7 @@ export default function JamHub(props) {
               className={`${styles.btn}`}
               style={btnStyle}
               onClick={(e) => {
+                JamOS.setWorld("sample_world");
                 JamOS.procmgr.kill(proc.id);
               }}
             >

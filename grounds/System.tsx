@@ -24,9 +24,21 @@ export default function System(props) {
   const muteOptions = setmgr.getReadable("muteAllOptions");
   const front = procmgr.front();
 
-  const init = () => {
-    // procmgr.add("terminal");
-    procmgr.add("jamhub");
+  const onSampleInit = () => {
+    procmgr.add("jamhub", { isInitial: true });
+    if (1) {
+      JamOS.forceOpenToolbar();
+      JamOS.forceOpenDock();
+      setTimeout(() => {
+        JamOS.forceOpenToolbar(false);
+        JamOS.forceOpenDock(false);
+      }, 1500);
+    } else {
+      JamOS.openToolbar();
+      JamOS.openDock();
+    }
+    // return;
+
     // procmgr.add("worldeditor");
     // procmgr.add("testwindow");
     filemgr.mkdir("~/deep/deeeeeep/directory");
@@ -78,13 +90,16 @@ export default function System(props) {
     }
 
     filemgr.addFiles(f);
-    JamOS.forceOpenToolbar();
-    JamOS.forceOpenDock();
+
     JamOS.setNotif("Welcome to JamOS", "system");
-    setTimeout(() => {
-      JamOS.forceOpenToolbar(false);
-      JamOS.forceOpenDock(false);
-    }, 1500);
+  };
+
+  const init = () => {
+    // procmgr.add("terminal");
+    procmgr.add("jamhub", { isInitial: true });
+    JamOS.openToolbar();
+    JamOS.setNotif("Press ESC to continue as a guest", "system");
+    return;
   };
 
   useEffect(() => {
@@ -178,12 +193,18 @@ export default function System(props) {
   const world: JamWorld = JamOS.worldReadable();
   const jamUser: JamUser = JamOS.userReadable();
   useEffect(() => {
-    console.log("world.loaded:", world.loaded);
-    if (!world.loaded) {
-      console.log("load world");
+    if (!world.loaded && world.name !== "__pending__") {
       JamOS.loadWorld(world.name);
     }
   }, [jamUser, world]);
+
+  const sampleInit = JamOS.getReadable("sampleInit");
+  useEffect(() => {
+    if (sampleInit === undefined) {
+      return;
+    }
+    onSampleInit();
+  }, [sampleInit]);
 
   // const saveWorldLocal = JamOS.procmgr.getReadable("system", "saveWorldLocal");
   // const loadWorldLocal = JamOS.procmgr.getReadable("system", "loadWorldLocal");

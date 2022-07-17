@@ -4,8 +4,8 @@ export default function Meta() {
   return (
     <Head>
       <title>JamOS</title>
-      <meta name="description" content="JamOS" />
-      <link rel="icon" href="/favicon.ico" />
+      <meta name="description" content="JamOS in next.js" />
+      <link rel="icon" href="/favicon.png" />
       <link rel="preconnect" href="https://fonts.googleapis.com" />
       <link
         rel="preconnect"

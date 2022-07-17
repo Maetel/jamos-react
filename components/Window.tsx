@@ -202,10 +202,6 @@ export default function Window(props) {
     {
       // console.log(proc.name, ": disableBackground:", disableBackground);
     }
-
-    if (proc.hideOnDock) {
-      procmgr.set(proc.id, { hideOnDock: true });
-    }
   }, []);
 
   useEffectOnce(() => {

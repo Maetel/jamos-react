@@ -363,23 +363,22 @@ export const selectGroupedProcs = (state:AppState)=>{
 }
 export const selectGroupedProcsForDock = (state:AppState)=>{
   const procs:Process[] = state.proc.procs;
-    const grouped:{[key:string]:Process[]} = procs.reduce((prev,proc)=>{
-      if(proc.hideOnDock){
-        return prev;
-      }
-      if(!prev[proc.comp]) {
-        prev[proc.comp] = [];
-      }
-      prev[proc.comp].push(proc)
-      return prev;
-    },{});
-
-    //sort
-    for(let key in grouped){
-      grouped[key].sort((l,r)=>{return parseInt(l.zIndex) - parseInt(r.zIndex)})
+  const grouped:{[key:string]:Process[]} = procs.filter(proc=>!proc.hideOnDock).reduce((prev,proc)=>{
+    // if(proc.hideOnDock){
+    //   return prev;
+    // }
+    if(!prev[proc.comp]) {
+      prev[proc.comp] = [];
     }
-    // console.log("selectGroupedProcsForDock, grouped:",grouped);
-    return grouped;
+    prev[proc.comp].push(proc)
+    return prev;
+  },{});
+
+  //sort
+  for(let key in grouped){
+    grouped[key].sort((l,r)=>{return parseInt(l.zIndex) - parseInt(r.zIndex)})
+  }
+  return grouped;
 }
 
 export const selectIsMinimized = (procId:String)=>(state:AppState)=>{

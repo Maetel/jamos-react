@@ -16,7 +16,6 @@ export default function TextModal(props) {
   const procmgr = JamOS.procmgr;
   const proc: Process = { ...props.proc };
   const modal: ModalProps = proc.modal;
-  proc.hideOnDock = true;
   proc.rect = {
     width: 500,
     height: 320,

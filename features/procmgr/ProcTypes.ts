@@ -97,6 +97,8 @@ export interface ProcessCommand {
   runOnce?:boolean, // if undefined, false
   addOnAppstore?:boolean,
   defaultFileName?:string,
+  hideOnDock?:boolean,
+  hideOnToolbar?:boolean,
 }
 
 export const ProcessTypeName = (type:string):string=>{
@@ -104,14 +106,14 @@ export const ProcessTypeName = (type:string):string=>{
 }
 
 export const _ProcessCommands:ProcessCommand[] = [
-  {comp:"system", name:"JamOS System", icon:"/imgs/bootloader.svg", runOnce:true, type:'system'},
-  {comp:"dir",name:"Directory", icon:"/imgs/dir.svg", type:'system'},
-  {comp:"text",name:"Text", icon:"/imgs/text.svg", type:'system'},
+  {comp:"system", name:"JamOS System", icon:"/imgs/bootloader.svg", runOnce:true, type:'system', hideOnDock:true, hideOnToolbar:true},
+  {comp:"dir",name:"Directory", icon:"/imgs/dir.svg", type:'system', hideOnDock:true, hideOnToolbar:true},
+  {comp:"text",name:"Text", icon:"/imgs/text.svg", type:'system', hideOnDock:true, hideOnToolbar:true},
   
-  {comp:"modal",name:"Modal", icon:"/imgs/circlequestion.svg"},
-  {comp:"textmodal", name:"TextModal",icon:"/imgs/circlequestion.svg"},
-  {comp:"filedialogue", name:"FileDialogue",icon:"/imgs/circlequestion.svg"},
-  {comp:"contextmenu", name:"Context Menu",icon:"/imgs/circlequestion.svg"},
+  {comp:"modal",name:"Modal", icon:"/imgs/circlequestion.svg", hideOnDock:true, hideOnToolbar:true},
+  {comp:"textmodal", name:"TextModal",icon:"/imgs/circlequestion.svg", hideOnDock:true, hideOnToolbar:true},
+  {comp:"filedialogue", name:"FileDialogue",icon:"/imgs/circlequestion.svg", hideOnDock:true, hideOnToolbar:true},
+  {comp:"contextmenu", name:"Context Menu",icon:"/imgs/circlequestion.svg", hideOnDock:true, hideOnToolbar:true},
   
   {comp:"appstore", name:"AppStore",icon:"/imgs/appstore.svg", defaultFileName:"AppStore",addOnAppstore:true},
   {comp:"testwindow", name:'Test Window', defaultFileName:"Test Window"},

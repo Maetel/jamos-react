@@ -23,8 +23,6 @@ export default function ContextMenu(props) {
   proc.closeOnBackgroundClick = true;
   proc.hideNav = true;
   proc.hideNavButtons = true;
-  proc.hideOnDock = true;
-  proc.hideOnToolbar = true;
   proc.disableDrag = true;
   useEffect(() => {
     CallbackStore.getById(proc.onMount)?.();

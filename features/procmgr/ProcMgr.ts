@@ -148,9 +148,11 @@ export default class ProcMgr{
     },0) ?? 1;
   }
 
-  private static _id = 1;
+  private static _id = 0;
   private static get getId() { 
-    return ProcMgr.maxId()+1;
+    const maxId = Math.max(ProcMgr._id, ProcMgr.maxId()) + 1;
+    ProcMgr._id = maxId;
+    return maxId;
   }
   public add(procType:string, args:{}={}){
 
@@ -214,16 +216,11 @@ export default class ProcMgr{
       descs:args?.descs??[],
       buttons:args?.buttons??['Okay', 'Cancel']
     };
-    this.add('modal', {parent:procId, modal:modalProps});
+    const callbackId = `${procId}/Modal/${modalProps.title}`;
+    modalProps.callbackIds=[callbackId];
+    CallbackStore.register(callbackId,onConfirm);
 
-    //TODO
-    // ModalCallbacks.register(procId, (val)=>{
-    //   if(val==='Okay'){
-    //     onConfirm();
-    //   } else {
-    //     args?.onCancel?.();
-    //   }
-    // });
+    this.add('modal', {parent:procId, modal:modalProps});
   }
 
   public openModal(procId:string, args?: {title?:string,descs?:string[], buttons?:string[], callbacks?:((params?:any)=>void)[], type?:'modal'|'textmodal'}){

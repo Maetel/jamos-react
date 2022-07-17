@@ -134,7 +134,7 @@ export function WorldEditorCore(props: WorldEditorCoreProps) {
           } else {
             setMsg("Successfully created world");
           }
-          JamOS.format();
+          // JamOS.format();
           JamOS.setWorld(wname);
           // JamOS.procmgr.killAll("system");
           // JamOS.procmgr.add("appstore");
@@ -182,6 +182,14 @@ export function WorldEditorCore(props: WorldEditorCoreProps) {
           }}
         >
           Refresh
+        </button>
+        <button
+          className={styles.topBtn}
+          onClick={(e) => {
+            JamOS.procmgr.set("system", { sampleInit: true });
+          }}
+        >
+          Sample init
         </button>
         <button
           className={styles.topBtn}
@@ -234,7 +242,7 @@ export default function WorldEditor(props) {
               className={styles.coverParent}
               style={{ backgroundColor: colors["2"] }}
             >
-              <InnerSignin></InnerSignin>
+              <InnerSignin owner={proc.id}></InnerSignin>
             </div>
           )}
         </div>
