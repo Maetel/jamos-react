@@ -1,7 +1,13 @@
 .container {
   position: relative;
   width: 100%;
-  /* height: 100%; */
+  height: 100%;
+}
+
+.coreContainer {
+  position: relative;
+  width: 100%;
+  min-height: 100%;
 }
 .browser {
   display: flex;

@@ -218,67 +218,73 @@ export function FinderCore(props) {
   }, []);
 
   const handleContext = (e) => {
-    e.preventDefault();
-    JamOS.closeAllContextMenus();
-    JamOS.openContextMenu(
-      e.pageX,
-      e.pageY,
-      ["New directory", "__separator__", "Properties"],
-      [
-        () => {
-          const curPath = JamOS.procmgr.getValue(proc.id, "currentPath");
-          if (!curPath) {
-            return;
-          }
-          JamOS.filemgr.mkdir(Path.join(curPath, "New directory").path);
-        },
-        () => {
-          const curPath = JamOS.procmgr.getValue(proc.id, "currentPath");
-          if (!curPath) {
-            return;
-          }
-          const dir: Dir = JamOS.filemgr.dirValue(currentPath);
-          if (!dir) {
-            return;
-          }
+    const cl = (e.target as HTMLElement).classList;
+    if (
+      cl.contains(styles.coreContainer) ||
+      cl.contains(styles.iconContainer)
+    ) {
+      e.preventDefault();
+      JamOS.closeAllContextMenus();
+      JamOS.openContextMenu(
+        e.pageX,
+        e.pageY,
+        ["New directory", "__separator__", "Properties"],
+        [
+          () => {
+            const curPath = JamOS.procmgr.getValue(proc.id, "currentPath");
+            if (!curPath) {
+              return;
+            }
+            JamOS.filemgr.mkdir(Path.join(curPath, "New directory").path);
+          },
+          () => {
+            const curPath = JamOS.procmgr.getValue(proc.id, "currentPath");
+            if (!curPath) {
+              return;
+            }
+            const dir: Dir = JamOS.filemgr.dirValue(currentPath);
+            if (!dir) {
+              return;
+            }
 
-          let totalDirs = 0;
-          let totalFiles = 0;
-          const dirsInDir = (dir: Dir) => {
-            dir.files.forEach((_file) => {
-              totalFiles += 1;
-            });
-            dir.dirs.forEach((_dir) => {
-              //exclude self
-              totalDirs += 1;
-              dirsInDir(_dir);
-            });
-          };
-          dirsInDir(dir);
+            let totalDirs = 0;
+            let totalFiles = 0;
+            const dirsInDir = (dir: Dir) => {
+              dir.files.forEach((_file) => {
+                totalFiles += 1;
+              });
+              dir.dirs.forEach((_dir) => {
+                //exclude self
+                totalDirs += 1;
+                dirsInDir(_dir);
+              });
+            };
+            dirsInDir(dir);
 
-          JamOS.procmgr.openModal(proc.id, {
-            title: `Directory properties`,
-            descs: [
-              `Path : '${currentPath}'`,
-              `${dir.dirs.length > 1 ? "Directories" : "Directory"} : ${
-                dir.dirs.length
-              }`,
-              `${dir.files.length > 1 ? "Files" : "File"} : ${
-                dir.files.length
-              }`,
-              `${
-                totalDirs > 1 ? "Total directories" : "Total directory"
-              } : ${totalDirs}`,
-              `${
-                totalFiles > 1 ? "Total files" : "Total file"
-              } : ${totalFiles}`,
-            ],
-            buttons: ["Close"],
-            rect: { width: "480px", height: "480px" },
-          });
-        },
-      ]
-    );
+            JamOS.procmgr.openModal(proc.id, {
+              title: `Directory properties`,
+              descs: [
+                `Path : '${currentPath}'`,
+                `${dir.dirs.length > 1 ? "Directories" : "Directory"} : ${
+                  dir.dirs.length
+                }`,
+                `${dir.files.length > 1 ? "Files" : "File"} : ${
+                  dir.files.length
+                }`,
+                `${
+                  totalDirs > 1 ? "Total directories" : "Total directory"
+                } : ${totalDirs}`,
+                `${
+                  totalFiles > 1 ? "Total files" : "Total file"
+                } : ${totalFiles}`,
+              ],
+              buttons: ["Close"],
+              rect: { width: "480px", height: "480px" },
+            });
+          },
+        ]
+      );
+    }
   };
 
   useEffect(() => {
@@ -293,7 +299,7 @@ export function FinderCore(props) {
     nodes && (
       <div
         ref={contElem}
-        className={styles.container}
+        className={styles.coreContainer}
         onDragOver={(e) => {
           e.preventDefault();
         }}
@@ -353,7 +359,9 @@ export default function Finder(props) {
 
   return (
     <Window {...props} proc={proc}>
-      <FinderCore proc={proc}></FinderCore>
+      <div className={styles.container}>
+        <FinderCore proc={proc}></FinderCore>
+      </div>
     </Window>
   );
 }

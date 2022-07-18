@@ -110,6 +110,8 @@ export default function Features(props) {
     JamOS.toggle(proc.id, "doScroll");
   };
 
+  // 여기, 그리고 Finder.contextmenu 손볼것 - 데스크탑우클릭은 되는데 파인더 우클릭은 파인더아이콘에 대해 유효하지 않음
+
   return (
     <Window {...props} proc={proc}>
       <div className={styles.container}>
