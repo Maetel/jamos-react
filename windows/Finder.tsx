@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { FileDialProps } from "../components/FileDialogue";
 import FinderIcon, { FinderIconProps } from "../components/FinderIcon";
 import Window from "../components/Window";
-import { Node } from "../features/file/FileTypes";
+import { Dir, Node } from "../features/file/FileTypes";
 import CallbackStore from "../features/JamOS/CallbackStore";
 import JamOS from "../features/JamOS/JamOS";
 import Process from "../features/procmgr/ProcTypes";
@@ -217,9 +217,82 @@ export function FinderCore(props) {
     });
   }, []);
 
+  const handleContext = (e) => {
+    e.preventDefault();
+    JamOS.closeAllContextMenus();
+    JamOS.openContextMenu(
+      e.pageX,
+      e.pageY,
+      ["New directory", "__separator__", "Properties"],
+      [
+        () => {
+          const curPath = JamOS.procmgr.getValue(proc.id, "currentPath");
+          if (!curPath) {
+            return;
+          }
+          JamOS.filemgr.mkdir(Path.join(curPath, "New directory").path);
+        },
+        () => {
+          const curPath = JamOS.procmgr.getValue(proc.id, "currentPath");
+          if (!curPath) {
+            return;
+          }
+          const dir: Dir = JamOS.filemgr.dirValue(currentPath);
+          if (!dir) {
+            return;
+          }
+
+          let totalDirs = 0;
+          let totalFiles = 0;
+          const dirsInDir = (dir: Dir) => {
+            dir.files.forEach((_file) => {
+              totalFiles += 1;
+            });
+            dir.dirs.forEach((_dir) => {
+              //exclude self
+              totalDirs += 1;
+              dirsInDir(_dir);
+            });
+          };
+          dirsInDir(dir);
+
+          JamOS.procmgr.openModal(proc.id, {
+            title: `Directory properties`,
+            descs: [
+              `Path : '${currentPath}'`,
+              `${dir.dirs.length > 1 ? "Directories" : "Directory"} : ${
+                dir.dirs.length
+              }`,
+              `${dir.files.length > 1 ? "Files" : "File"} : ${
+                dir.files.length
+              }`,
+              `${
+                totalDirs > 1 ? "Total directories" : "Total directory"
+              } : ${totalDirs}`,
+              `${
+                totalFiles > 1 ? "Total files" : "Total file"
+              } : ${totalFiles}`,
+            ],
+            buttons: ["Close"],
+            rect: { width: "480px", height: "480px" },
+          });
+        },
+      ]
+    );
+  };
+
+  useEffect(() => {
+    if (contElem.current) {
+      contElem.current.oncontextmenu = handleContext;
+    }
+  }, [currentPath]);
+
+  const contElem = useRef<HTMLDivElement>(null);
+
   return (
     nodes && (
       <div
+        ref={contElem}
         className={styles.container}
         onDragOver={(e) => {
           e.preventDefault();

@@ -92,6 +92,7 @@ export default function System(props) {
     filemgr.addFiles(f);
 
     JamOS.setNotif("Welcome to JamOS", "system");
+    JamOS.set({ sampleInit: undefined });
   };
 
   const init = () => {
@@ -194,7 +195,18 @@ export default function System(props) {
   const jamUser: JamUser = JamOS.userReadable();
   useEffect(() => {
     if (!world.loaded && world.name !== "__pending__") {
+      console.log("Loading world : ", world.name);
       JamOS.loadWorld(world.name);
+    } else {
+      console.log(
+        "NO world. world.loaded:",
+        world.loaded,
+        ", world.name:",
+        world.name
+      );
+      JamOS.procmgr.killAll("system");
+      JamOS.format();
+      JamOS.procmgr.add("jamhub", { isInitial: true });
     }
   }, [jamUser, world]);
 

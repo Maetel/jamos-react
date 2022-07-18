@@ -126,3 +126,14 @@
   grid-row: 1 / 3;
   box-sizing: border-box;
 }
+
+.signout {
+  position:absolute;
+  bottom:32px;
+  right:32px;
+  overflow:hidden;
+  display:flex;
+  justify-content: center;
+  align-items: center;
+  cursor:pointer;
+}

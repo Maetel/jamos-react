@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useEffect, useRef, useState } from "react";
+import ShimmerImage from "../components/ShimmerImage";
 import Window from "../components/Window";
 import JamOS from "../features/JamOS/JamOS";
 import Process from "../features/procmgr/ProcTypes";
@@ -230,6 +231,7 @@ export default function WorldEditor(props) {
   const signedIn = jamUser.signedin;
   const colors = JamOS.theme.colors;
 
+  const signoutSize = 32;
   return (
     <Window {...props} proc={proc}>
       <div className={styles.container}>
@@ -247,6 +249,43 @@ export default function WorldEditor(props) {
           )}
         </div>
       </div>
+      {signedIn && (
+        <div
+          className={styles.signout}
+          style={{
+            backgroundColor: colors["1"],
+            boxShadow: colors.boxShadow,
+            width: signoutSize,
+            height: signoutSize,
+            borderRadius: signoutSize / 2,
+          }}
+          onClick={(e) => {
+            //confirm signout
+            JamOS.procmgr.openConfirm(
+              proc.id,
+              () => {
+                JamOS.signout();
+              },
+              {
+                title: "Sign out",
+                descs: [
+                  "Do you wish to sign out?",
+                  "All unsaved changes will be lost.",
+                ],
+                buttons: ["Sign out", "Cancel"],
+              }
+            );
+          }}
+        >
+          <ShimmerImage
+            src={"/imgs/signout.svg"}
+            alt={"Sign out button"}
+            width={signoutSize * 0.7}
+            height={signoutSize * 0.7}
+            // layout="fill"
+          ></ShimmerImage>
+        </div>
+      )}
     </Window>
   );
 }

@@ -240,6 +240,7 @@ return server;
       token:accessToken
     }
     store.dispatch(setUser(user));
+    JamOS.setWorld("__pending__")
   }
 
   public static signout(){

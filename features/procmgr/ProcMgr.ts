@@ -41,7 +41,7 @@ import {
   unMinimize,
   updateToolbarItem,
 } from "./procSlice";
-import Process, { ProcessCommand, ProcessCommands, _ProcessCommands } from "./ProcTypes";
+import Process, { ProcessCommand, ProcessCommands, Rect, _ProcessCommands } from "./ProcTypes";
 
 
 export default class ProcMgr{
@@ -223,13 +223,17 @@ export default class ProcMgr{
     this.add('modal', {parent:procId, modal:modalProps});
   }
 
-  public openModal(procId:string, args?: {title?:string,descs?:string[], buttons?:string[], callbacks?:((params?:any)=>void)[], type?:'modal'|'textmodal'}){
+  public openModal(procId:string, args?: {title?:string,descs?:string[], buttons?:string[], callbacks?:((params?:any)=>void)[], type?:'modal'|'textmodal', rect?:Rect}){
     let modalProps :ModalProps = {parent:procId};
+
     if(args){
       modalProps = {...modalProps, ...args};
-      if(modalProps['callbacks']){
-        delete modalProps['callbacks'];
-      }
+      const skips = ['callbacks', 'rect'];
+      skips.forEach(skip=>{
+        if(modalProps[skip]){
+          delete modalProps[skip];
+        }
+      })
     }
 
     const callbackIds:string[] = [];
@@ -242,7 +246,12 @@ export default class ProcMgr{
       callbackIds.push(id);
     })
     modalProps = {...modalProps, ...{callbackIds:callbackIds}};
-    this.add(args?.type ?? 'modal', {parent:procId, modal:modalProps});
+    const addArgs = {parent:procId, modal:modalProps};
+    if(args?.rect){
+      addArgs['rect'] = args.rect;
+    }
+    console.log("addArgs:",addArgs);
+    this.add(args?.type ?? 'modal', addArgs);
     // Object.assign(modalProps, {callbackIds:callbackIds})
     // modalProps['callbackIds'] = callbackIds;
 

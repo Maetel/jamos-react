@@ -24,6 +24,12 @@ const systemMenu: ToolbarItem[] = [
     menu: "🍞",
     item: "Sign in",
     callback: "system/Toolbar/add/jamhub",
+  },
+  {
+    caller: "system",
+    menu: "🍞",
+    item: "World Editor",
+    callback: "system/Toolbar/add/worldeditor",
     separator: true,
   },
   {
@@ -37,20 +43,21 @@ const systemMenu: ToolbarItem[] = [
     menu: "🍞",
     item: "System Monitor",
     callback: "system/Toolbar/add/systeminfo",
-  },
-  {
-    caller: "system",
-    menu: "🍞",
-    item: "Save world",
-    callback: "system/Toolbar/save/world",
-  },
-  {
-    caller: "system",
-    menu: "🍞",
-    item: "Load world",
-    callback: "system/Toolbar/load/world",
     separator: true,
   },
+  // {
+  //   caller: "system",
+  //   menu: "🍞",
+  //   item: "Save world",
+  //   callback: "system/Toolbar/save/world",
+  // },
+  // {
+  //   caller: "system",
+  //   menu: "🍞",
+  //   item: "Load world",
+  //   callback: "system/Toolbar/load/world",
+  //   separator: true,
+  // },
   {
     caller: "system",
     menu: "🍞",
@@ -332,7 +339,7 @@ export default function Toolbar(props) {
         : "system/Toolbar/dock/open";
     }
     //toggle save/load world
-    {
+    if (0) {
       const saveWorldIdx = systemMenu.indexOf(
         systemMenu.find((menu) => menu.item.includes("Save world"))
       );
