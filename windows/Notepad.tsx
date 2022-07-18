@@ -79,6 +79,23 @@ export default function Notepad(props) {
     }
   };
 
+  const trySaveAs = () => {
+    JamOS.procmgr.openFileDialogue(proc.id, "Save", {
+      name: "Save as",
+      includes: ["text"],
+      onOkay: onSaveDialogue,
+    });
+  };
+  const trySave = () => {
+    const fp = JamOS.procmgr.getValue(proc.id, "filePath");
+    const fv = JamOS.filemgr.fileValue(fp);
+    if (fv && fv?.node.type === "text") {
+      const val = JamOS.procmgr.getValue(proc.id, "textAreaValue") ?? "";
+      JamOS.filemgr.updateFileData(fp, "text", val);
+    } else {
+      trySaveAs();
+    }
+  };
   useEffect(() => {
     JamOS.procmgr
       .addToolbarItem(proc.id, "Notepad", "Open", () => {
@@ -88,32 +105,10 @@ export default function Notepad(props) {
           onOkay: onLoadDialogue,
         });
       })
-      .addToolbarItem(
-        proc.id,
-        "Notepad",
-        "Save",
-        () => {
-          const fp = JamOS.procmgr.getValue(proc.id, "filePath");
-          if (JamOS.filemgr.fileExists(fp)) {
-            const val = JamOS.procmgr.getValue(proc.id, "textAreaValue") ?? "";
-            JamOS.filemgr.updateFileData(fp, "text", val);
-          }
-        },
-        { disabled: true }
-      )
-      .addToolbarItem(
-        proc.id,
-        "Notepad",
-        "Save As",
-        () => {
-          JamOS.procmgr.openFileDialogue(proc.id, "Save", {
-            name: "Save as",
-            includes: ["text"],
-            onOkay: onSaveDialogue,
-          });
-        },
-        { separator: true }
-      );
+      .addToolbarItem(proc.id, "Notepad", "Save", trySave, { disabled: true })
+      .addToolbarItem(proc.id, "Notepad", "Save As", trySaveAs, {
+        separator: true,
+      });
   }, []);
 
   useEffect(() => {
@@ -126,7 +121,12 @@ export default function Notepad(props) {
   const differs =
     filemgr.fileReadable(filePath)?.data?.["text"] !== textAreaValue;
 
-  const buildName = filemgr.fileValue(filePath)
+  const fileOpened = () => {
+    const fp = JamOS.procmgr.getValue(proc.id, "filePath");
+    const fv = filemgr.fileValue(fp);
+    return fv && fv?.node.type === "text";
+  };
+  const buildName = fileOpened()
     ? `Notepad - ${new Path(filePath).last}${differs ? " (edited)" : ""}`
     : "Notepad";
   useEffect(() => {
@@ -135,7 +135,7 @@ export default function Notepad(props) {
     if (f && f?.node.type === "text") {
       setTextAreaValue(f?.data?.["text"] ?? "");
       JamOS.procmgr.set(proc.id, {
-        name: `Notepad - ${new Path(filePath).last}`,
+        name: buildName,
       });
       JamOS.procmgr.updateToolbarItem(proc.id, "Notepad", "Save", {
         disabled: false,
@@ -146,6 +146,22 @@ export default function Notepad(props) {
       });
     }
   }, [filePath]);
+
+  const isFront = JamOS.procmgr.isFront(proc.id);
+  const handleCmdS = (e) => {
+    //https://codewithhugo.com/detect-ctrl-click-js-react-vue/
+    if (!isFront) {
+      return;
+    }
+    if ((e.metaKey || e.cmdKey) && e.key === "s") {
+      e.preventDefault();
+      trySave();
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener("keydown", handleCmdS);
+  }, [isFront]);
 
   useEffect(() => {
     JamOS.procmgr.set(proc.id, {
