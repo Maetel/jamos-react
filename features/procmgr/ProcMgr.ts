@@ -58,10 +58,19 @@ export default class ProcMgr{
     store.dispatch(increaseIndices());
   }
 
-  public kill(procId:string){
+  public kill(procId:string, force:boolean=false){
     //kill first
-    store.dispatch(killProc(procId));
-    CallbackStore.unregisterByProcID(procId);
+    const doKill = ()=>{
+      store.dispatch(killProc(procId));
+      CallbackStore.unregisterByProcID(procId);
+    }
+
+    const cb = CallbackStore.getById(`${procId}/onDestroy`);
+    if(cb && !force){
+      cb?.(doKill);
+    } else {
+      doKill();
+    }
   }
 
   public killAll(procId?:string){
@@ -327,8 +336,14 @@ export default class ProcMgr{
   public front(){
     return useAppSelector(selectFront);
   }
+  public frontValue():Process{
+    return store.getState().proc.procs.find(proc=>proc.zIndex==='0');
+  }
   public isFront(procId:string):boolean{
     return this.front()?.id === procId;
+  }
+  public isFrontValue(procId:string):boolean{
+    return this.frontValue()?.id === procId;
   }
 
   public get procs(){

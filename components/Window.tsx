@@ -553,6 +553,30 @@ export default function Window(props) {
   const bgColor = opaqueBackground ? _colors["2"] + "77" : "transparent";
 
   const contentBgSrc = undefined;
+
+  const handleKeyCombination = (e) => {
+    //https://codewithhugo.com/detect-ctrl-click-js-react-vue/
+    const isFront = JamOS.procmgr.isFrontValue(proc.id);
+    if (!isFront) {
+      return;
+    }
+    //combination
+    const combination = (key: string) =>
+      (e.metaKey || e.cmdKey) && e.key === key;
+    if (combination("e") && !JamOS.getValue("disableCmdE")) {
+      e.preventDefault();
+      JamOS.procmgr.kill(proc.id);
+      JamOS.set({ disableCmdE: true }); //watched by System, will be toggled back to false in 250ms
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener("keydown", handleKeyCombination);
+    return () => {
+      document.removeEventListener("keydown", handleKeyCombination);
+    };
+  }, []);
+
   return (
     <>
       {disableBackground && (

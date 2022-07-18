@@ -218,6 +218,15 @@ export default function System(props) {
     onSampleInit();
   }, [sampleInit]);
 
+  const disableCmdE = JamOS.getReadable("disableCmdE");
+  useEffect(() => {
+    if (disableCmdE) {
+      setTimeout(() => {
+        JamOS.set({ disableCmdE: false });
+      }, 250);
+    }
+  }, [disableCmdE]);
+
   // const saveWorldLocal = JamOS.procmgr.getReadable("system", "saveWorldLocal");
   // const loadWorldLocal = JamOS.procmgr.getReadable("system", "loadWorldLocal");
   // useEffect(() => {
