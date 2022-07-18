@@ -17,32 +17,9 @@ export default function Notepad(props) {
     JamOS.procmgr.set(proc.id, { filePath: path });
   };
   const textAreaValue = JamOS.procmgr.getReadable(proc.id, "textAreaValue");
+
   const setTextAreaValue = (val: string) => {
     JamOS.procmgr.set(proc.id, { textAreaValue: val });
-  };
-
-  const setFile = (e) => {};
-  const loadFile = (e) => {
-    //test
-    interface FileModalProps {
-      hint?: string; //file or dir path, okay to be undefined
-      type?: string; // ex) 'dir', 'text', ...
-      extension?: string; // '.txt', '.jpg', ... , regardless of case
-    }
-    const fileProps: FileModalProps = undefined;
-    // JamOS.openFileModal(fileProps);
-    console.warn("Todo : update loadFile() with modal");
-    setFilePath("~/Sample text1.txt");
-  };
-  const saveFile = (e) => {
-    if (filePath.length) {
-      console.log("Save file @" + filePath + ", :", textAreaValue);
-      JamOS.procmgr.openConfirmSave(proc.id, () => {
-        filemgr.updateFileData(filePath, "text", textAreaValue);
-      });
-    } else {
-      console.error("Filepath not designated path:", filePath);
-    }
   };
 
   const onLoadDialogue = (params) => {
@@ -88,6 +65,7 @@ export default function Notepad(props) {
           //on save
           console.log(`saving to ${params} => ${textAreaValue}`);
           JamOS.filemgr.updateFileData(params, "text", textAreaValue);
+          JamOS.procmgr.set(proc.id, { filePath: params });
         },
         { buttons: ["Overwrite", "Cancel"] }
       );
@@ -97,6 +75,7 @@ export default function Notepad(props) {
         data: { text: textAreaValue },
       });
       JamOS.filemgr.addFile(f);
+      JamOS.procmgr.set(proc.id, { filePath: params });
     }
   };
 
@@ -109,13 +88,19 @@ export default function Notepad(props) {
           onOkay: onLoadDialogue,
         });
       })
-      .addToolbarItem(proc.id, "Notepad", "Save", () => {
-        const fp = JamOS.procmgr.getValue(proc.id, "filePath");
-        if (JamOS.filemgr.fileExists(fp)) {
-          const val = JamOS.procmgr.getValue(proc.id, "textAreaValue") ?? "";
-          JamOS.filemgr.updateFileData(fp, "text", val);
-        }
-      })
+      .addToolbarItem(
+        proc.id,
+        "Notepad",
+        "Save",
+        () => {
+          const fp = JamOS.procmgr.getValue(proc.id, "filePath");
+          if (JamOS.filemgr.fileExists(fp)) {
+            const val = JamOS.procmgr.getValue(proc.id, "textAreaValue") ?? "";
+            JamOS.filemgr.updateFileData(fp, "text", val);
+          }
+        },
+        { disabled: true }
+      )
       .addToolbarItem(
         proc.id,
         "Notepad",
@@ -137,31 +122,46 @@ export default function Notepad(props) {
     }
     setTextAreaValue(proc.text ?? "");
   }, []);
+
+  const differs =
+    filemgr.fileReadable(filePath)?.data?.["text"] !== textAreaValue;
+
+  const buildName = filemgr.fileValue(filePath)
+    ? `Notepad - ${new Path(filePath).last}${differs ? " (edited)" : ""}`
+    : "Notepad";
   useEffect(() => {
     const f: File = filemgr.fileValue(filePath);
     // console.log("f?.data['text']:", f?.data["text"]);
-    if (f) {
+    if (f && f?.node.type === "text") {
       setTextAreaValue(f?.data?.["text"] ?? "");
       JamOS.procmgr.set(proc.id, {
         name: `Notepad - ${new Path(filePath).last}`,
       });
+      JamOS.procmgr.updateToolbarItem(proc.id, "Notepad", "Save", {
+        disabled: false,
+      });
+    } else {
+      JamOS.procmgr.updateToolbarItem(proc.id, "Notepad", "Save", {
+        disabled: true,
+      });
     }
   }, [filePath]);
+
+  useEffect(() => {
+    JamOS.procmgr.set(proc.id, {
+      name: buildName,
+    });
+    JamOS.procmgr.set(proc.id, {
+      desc:
+        buildName === "Notepad"
+          ? "Notepad"
+          : buildName.replace("Notepad - ", ""),
+    });
+  }, [buildName]);
 
   return (
     <Window {...props} proc={proc}>
       <div className={styles.container}>
-        <div className={styles.btns} style={{ display: "none" }}>
-          <button title="Reload" className={styles.btn} onClick={setFile}>
-            &darr;
-          </button>
-          <button title="Reload" className={styles.btn} onClick={loadFile}>
-            &#8634;
-          </button>
-          <button title="Save" className={styles.btn} onClick={saveFile}>
-            &darr;
-          </button>
-        </div>
         <div
           className={styles.notepadAlert}
           // bind:this={alertElem}
