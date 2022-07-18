@@ -137,6 +137,8 @@ export const _ProcessCommands:ProcessCommand[] = [
   {comp:'comments',name:"Leave comments!", icon:"/imgs/comments.svg", runOnce:true, addOnAppstore:true, defaultFileName:"Comments"},
   {comp:'jamhub',name:"JamHub", icon:"/imgs/jamos.png", runOnce:true, addOnAppstore:true, defaultFileName:"JamHub"},
   {comp:'worldeditor',name:"WorldEditor", icon:"/imgs/worldeditor.svg", runOnce:true, addOnAppstore:true, defaultFileName:"World Editor"},
+  {comp:'features',name:"Features", icon:"/imgs/features.svg", runOnce:true, addOnAppstore:true, defaultFileName:"Features"},
+
 
 ]
 export const AddOnAppstores = _ProcessCommands.filter(cmd=>cmd.addOnAppstore);

@@ -9,10 +9,6 @@ import { JamUser, JamWorld, _initialWorld } from "../features/JamOS/osSlice";
 let initted = false;
 let loadOnce = false;
 
-export class BootMgr {
-  public static reinit() {}
-}
-
 export default function System(props) {
   const proc: Process = { ...props.proc };
 
@@ -96,8 +92,16 @@ export default function System(props) {
   };
 
   const init = () => {
+    if (1) {
+      //test purpose
+      procmgr.add("features");
+      return;
+    }
+
     // procmgr.add("terminal");
-    procmgr.add("jamhub", { isInitial: true });
+    JamOS.procmgr.killAll("system");
+    JamOS.format();
+    JamOS.procmgr.add("jamhub", { isInitial: true });
     JamOS.openToolbar();
     JamOS.setNotif("Press ESC to continue as a guest", "system");
     return;
@@ -195,18 +199,16 @@ export default function System(props) {
   const jamUser: JamUser = JamOS.userReadable();
   useEffect(() => {
     if (!world.loaded && world.name !== "__pending__") {
-      console.log("Loading world : ", world.name);
+      // console.log("Loading world : ", world.name);
       JamOS.loadWorld(world.name);
     } else {
-      console.log(
-        "NO world. world.loaded:",
-        world.loaded,
-        ", world.name:",
-        world.name
-      );
-      JamOS.procmgr.killAll("system");
-      JamOS.format();
-      JamOS.procmgr.add("jamhub", { isInitial: true });
+      // console.log(
+      //   "NO world. world.loaded:",
+      //   world.loaded,
+      //   ", world.name:",
+      //   world.name
+      // );
+      init();
     }
   }, [jamUser, world]);
 

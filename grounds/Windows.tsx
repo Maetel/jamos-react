@@ -27,6 +27,7 @@ import TextModal from "../components/TextModal";
 import Comments from "../windows/Comments";
 import JamHub from "../windows/JamHub";
 import WorldEditor from "../windows/WorldEditor";
+import Features from "../windows/Features";
 
 const winCmdMap: { [key: string]: (props) => JSX.Element } = {
   testwindow: TestWindow,
@@ -52,11 +53,13 @@ const winCmdMap: { [key: string]: (props) => JSX.Element } = {
   comments: Comments,
   jamhub: JamHub,
   worldeditor: WorldEditor,
+  features: Features,
 };
 
 export default function Windows(props) {
   const procmgr = JamOS.procmgr;
   const processes = procmgr.procsInOrder;
+  // console.log(processes.map((proc) => proc.name));
 
   return (
     <div className={styles.container}>

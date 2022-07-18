@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import Window from "../components/Window";
 import JamOS from "../features/JamOS/JamOS";
-import { Rect } from "../features/procmgr/ProcTypes";
+import Process, { Rect } from "../features/procmgr/ProcTypes";
 import styles from "../styles/About.module.css";
 
 export default function About(props) {
-  const proc = { ...props.proc };
+  const proc: Process = { ...props.proc };
   proc.name = proc.name ?? "About";
   const rect: Rect = {
     top: "20%",
@@ -15,6 +15,9 @@ export default function About(props) {
   };
   proc.rect = rect;
   proc.resize = "none";
+  proc.hideNav = true;
+  proc.disableDrag = true;
+  proc.disableMaxBtn = true;
   const bgTopElem = useRef(null);
   const bgBottomElem = useRef(null);
   const textElem = useRef(null);

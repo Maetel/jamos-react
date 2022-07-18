@@ -61,6 +61,10 @@ export const procSlice = createSlice({
         return;
       }
 
+      if(0 && action.payload.comp==='features'){
+        debugger;
+      }
+
       //filter run-onces
       {
         const comp = action.payload.comp;
