@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import ShimmerImage from "../components/ShimmerImage";
 import CallbackStore from "../features/JamOS/CallbackStore";
 import JamOS from "../features/JamOS/JamOS";
 import { JamUser, JamWorld, _initialWorld } from "../features/JamOS/osSlice";
@@ -12,74 +13,75 @@ type TbMenu = { menu: string; items: TbItem[] };
 type TbProc = TbMenu[];
 
 //watch CallbackStore.systemCallbackBuilder
+// 🍞
 const systemMenu: ToolbarItem[] = [
   {
     caller: "system",
-    menu: "🍞",
+    menu: "osicon",
     item: "About JamOS",
     callback: "system/Toolbar/add/about",
   },
   {
     caller: "system",
-    menu: "🍞",
+    menu: "osicon",
     item: "Sign in",
     callback: "system/Toolbar/add/jamhub",
   },
   {
     caller: "system",
-    menu: "🍞",
+    menu: "osicon",
     item: "World Editor",
     callback: "system/Toolbar/add/worldeditor",
     separator: true,
   },
   {
     caller: "system",
-    menu: "🍞",
+    menu: "osicon",
     item: "Settings",
     callback: "system/Toolbar/add/settings",
   },
   {
     caller: "system",
-    menu: "🍞",
+    menu: "osicon",
     item: "System Monitor",
     callback: "system/Toolbar/add/systeminfo",
     separator: true,
   },
   // {
   //   caller: "system",
-  //   menu: "🍞",
+  //   menu: "osicon",
   //   item: "Save world",
   //   callback: "system/Toolbar/save/world",
   // },
   // {
   //   caller: "system",
-  //   menu: "🍞",
+  //   menu: "osicon",
   //   item: "Load world",
   //   callback: "system/Toolbar/load/world",
   //   separator: true,
   // },
   {
     caller: "system",
-    menu: "🍞",
+    menu: "osicon",
     item: "Fix toolbar",
     callback: "system/Toolbar/toolbar/open",
   },
   {
     caller: "system",
-    menu: "🍞",
+    menu: "osicon",
     item: "Fix dock",
     callback: "system/Toolbar/dock/open",
     separator: true,
   },
   {
     caller: "system",
-    menu: "🍞",
+    menu: "osicon",
     item: "AppStore",
     callback: "system/Toolbar/add/appstore",
   },
   {
     caller: "system",
-    menu: "🍞",
+    menu: "osicon",
     item: "Terminal",
     callback: "system/Toolbar/add/terminal",
     separator: true,
@@ -87,7 +89,7 @@ const systemMenu: ToolbarItem[] = [
 
   {
     caller: "system",
-    menu: "🍞",
+    menu: "osicon",
     item: "Close all windows",
     callback: "system/Toolbar/killall/system",
   },
@@ -186,7 +188,7 @@ function CollapsibleMenu(props) {
 
   const [posX, setPosX] = useState(undefined);
   const onTitleClick = (e) => {
-    setPosX(`${e.target.getBoundingClientRect().x}px`);
+    setPosX(`${e.currentTarget.getBoundingClientRect().x}px`);
     if (0) {
       props.menuActivate?.();
       setCollActive(true);
@@ -248,7 +250,15 @@ function CollapsibleMenu(props) {
         ref={collMenuElem}
         style={titleStyle}
       >
-        {menu.menu}
+        {menu.menu === "osicon" ? (
+          <ShimmerImage
+            src={"/imgs/jamos.png"}
+            width={20}
+            height={20}
+          ></ShimmerImage>
+        ) : (
+          <>{menu.menu}</>
+        )}
       </span>
       <div className={`${styles.items} ${itemClassName}`} style={itemsStyle}>
         {_items.map((item, i) => (
@@ -352,7 +362,7 @@ export default function Toolbar(props) {
       systemMenu[loadWorldIdx].disabled = !enableWorldSync;
     }
 
-    const retval: TbMenu[] = [{ menu: "🍞", items: systemMenu }];
+    const retval: TbMenu[] = [{ menu: "osicon", items: systemMenu }];
     if (!items || items.length === 0) {
       if (!front || !front.name) {
         return retval;
@@ -375,8 +385,10 @@ export default function Toolbar(props) {
 
     return retval;
   };
-  // let tbproc: TbProc = [{ menu: "🍞", items: [...systemMenu] }];
-  const [menus, setMenus] = useState([{ menu: "🍞", items: [...systemMenu] }]);
+  // let tbproc: TbProc = [{ menu: "osicon", items: [...systemMenu] }];
+  const [menus, setMenus] = useState([
+    { menu: "osicon", items: [...systemMenu] },
+  ]);
   const jamUser: JamUser = JamOS.userReadable();
   const jamWorld: JamWorld = JamOS.worldReadable();
   useEffect(() => {

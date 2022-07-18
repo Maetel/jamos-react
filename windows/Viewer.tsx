@@ -80,6 +80,37 @@ export default function Viewer(props) {
     });
   }, []);
 
+  const openLoadDirDialogue = () => {
+    JamOS.procmgr.openFileDialogue(proc.id, "Load", {
+      name: "Open Directory",
+      pathHint: new Path(nodePathReadable).parent,
+      includes: ["dir"],
+      onOkay: (params) => {
+        if (!params) {
+          return;
+        }
+        if (typeof params === "string") {
+          params = params.trim();
+          const d = filemgr.dirValue(params);
+          let errorMessage = null;
+          if (d) {
+            const f: File = d.files.find((file) => file.node.type === "image");
+            if (f) {
+              setNodePath(f.node.path);
+            } else {
+              errorMessage = "No image file found in " + Path.fromFile(d).last;
+            }
+          } else {
+            errorMessage = Path.fromFile(d).last + " is not a directory";
+          }
+          if (errorMessage) {
+            JamOS.setNotif(errorMessage, "error");
+          }
+        }
+      },
+    });
+  };
+
   const openLoadFileDialogue = () => {
     JamOS.procmgr.openFileDialogue(proc.id, "Load", {
       name: "Open image",
@@ -247,6 +278,24 @@ export default function Viewer(props) {
     });
   }, [nodePathReadable]);
 
+  const handleContext = (e) => {
+    if (!JamOS.procmgr.isFrontValue(proc.id)) {
+      return;
+    }
+
+    e.preventDefault();
+    JamOS.openContextMenu(
+      e.pageX,
+      e.pageY,
+      ["Open Image", "Open Directory"],
+      [openLoadFileDialogue, openLoadDirDialogue]
+    );
+  };
+
+  useEffect(() => {
+    contElem.current.oncontextmenu = handleContext;
+  }, []);
+
   return (
     <Window {...props} proc={proc}>
       <div className={`${styles.container}`} ref={contElem}>
@@ -255,9 +304,6 @@ export default function Viewer(props) {
             <div className="noImage">No image found!</div>
           ) : (
             <ShimmerImage
-              onClick={() => {
-                openLoadFileDialogue();
-              }}
               src={src}
               alt={alt}
               layout="fill"

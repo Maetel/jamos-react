@@ -134,7 +134,7 @@ export default function FileDialogue(props) {
             <span className={styles.pathIndicator}>
               {(fileDialProps.includes
                 ? fileDialProps.includes.map((ext) => `${ext}`).join(", ") +
-                  " file path :"
+                  " :"
                 : "File path :"
               ).trim()}
             </span>

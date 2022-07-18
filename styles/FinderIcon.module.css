@@ -56,8 +56,8 @@
   box-sizing: border-box;
   border-radius: 5px;
   font-size: 1.2rem;
-  font-weight: 500;
-  font-family: "Noto Sans", sans-serif;
+  /* font-weight: 300; */
+  /* font-family: "Noto Sans", sans-serif; */
   text-align: center;
   /* text-shadow: 1px 1px 1px #888; */
   direction: ltr;

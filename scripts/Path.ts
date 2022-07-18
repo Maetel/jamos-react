@@ -2,6 +2,9 @@ export const addError = (err)=>console.error(err)
 export const addLog = (l)=>console.log(l)
 
 export default class Path {
+  public static fromFile(file) {
+    return new Path(file?.node?.path);
+  }
   public static splitter = "/";
   public paths: string[];
   public parentArray: string[];
