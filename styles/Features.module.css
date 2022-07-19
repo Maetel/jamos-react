@@ -35,10 +35,11 @@
   border-radius: 20px;
   box-sizing: border-box;
   padding:20px;
+  margin : 10px 0px;
 }
 
 .section:first-child {
-  margin-top:10px;
+  margin-top:20px;
 }
 
 
@@ -62,6 +63,7 @@
 }
 .desc {
   width:100%;
+  margin : 10px 0px;
 }
 
 .sectionListContainer{
@@ -173,4 +175,7 @@
 
 .clear {
   cursor:pointer;
+}
+.trackable {
+  
 }

@@ -24,7 +24,7 @@ interface FeatData {
 const data: FeatData = {
   system: {
     title: "JamOS",
-    desc: "Basic functions of JamOS",
+    desc: "You can either sign up or proceed as a guest. A user can own multiple worlds of different environment inside. Invite other users to my world(to be updated).",
     items: [
       {
         type: "toolbar",
@@ -38,14 +38,6 @@ const data: FeatData = {
       },
     ],
   },
-  jamhub: {
-    title: "JamHub",
-    desc: "Sign in and Sign up",
-  },
-  worldeditor: {
-    title: "World Editor",
-    desc: "You can create/update/delete your worlds here.",
-  },
   appstore: {
     title: "AppStore",
     desc: "Add/Remove apps on your desktop.",
@@ -55,12 +47,28 @@ const data: FeatData = {
     desc: "Command Line Interface(CLI) for JamOS",
     items: [
       {
+        type: "ls",
+        name: "list files",
+        desc: "Interactive list of files and directories.",
+      },
+      {
+        type: "browse",
+        name: "browse",
+        desc: "Browse throughout the file system using 'cd' command.",
+      },
+
+      {
+        type: "rm",
+        name: "remove",
+        desc: "Remove files and directories",
+      },
+      {
         type: "toolbar",
-        name: "Toggle toolbar",
+        name: "toggle toolbar",
       },
       {
         type: "dock",
-        name: "Toggle dock",
+        name: "toggle dock",
       },
     ],
   },
@@ -68,6 +76,11 @@ const data: FeatData = {
     title: "Finder",
     desc: "File system explorer",
     items: [
+      {
+        type: "newfolder",
+        name: "Add/Remove",
+        desc: "Right click to interact with directory",
+      },
       {
         type: "browse",
         name: "Browse",
@@ -80,9 +93,17 @@ const data: FeatData = {
       },
     ],
   },
+  jamhub: {
+    title: "JamHub",
+    desc: "Sign in and Sign up",
+  },
+  worldeditor: {
+    title: "World Editor",
+    desc: "You can create/update/delete your worlds here.",
+  },
   styler: {
     title: "Styler",
-    desc: "Set OS theme",
+    desc: "Set OS theme and style. Type 'styler -h' to use on Terminal app.",
   },
   notepad: {
     title: "Notepad",
@@ -91,6 +112,13 @@ const data: FeatData = {
   viewer: {
     title: "Image viewer",
     desc: "JamOS image viewer",
+    items: [
+      {
+        type: "dragndrop",
+        name: "Drag and drop",
+        desc: "Drag and drop an image file or a directory",
+      },
+    ],
   },
   features: {
     title: "Features",
@@ -103,6 +131,10 @@ const data: FeatData = {
   comments: {
     title: "Comments",
     desc: "A board where visitors can leave a comment.",
+  },
+  systeminfo: {
+    title: "SystemInfo",
+    desc: "Monitor variables of the system and its following processes.",
   },
 };
 

@@ -22,8 +22,7 @@ export default function PromptGridView(props) {
         retval["backgroundColor"] = _colors["1"];
         break;
       case "Application":
-        retval["color"] = _colors["3"];
-        retval["backgroundColor"] = _colors["2"];
+        retval["color"] = _colors["1"];
         break;
       case "Text file":
         retval["color"] = _colors["1"];

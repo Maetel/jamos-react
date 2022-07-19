@@ -237,14 +237,7 @@ export default function Terminal(props) {
       "easy and simple text editor",
       "easy and simple text editor",
     ],
-    [
-      "markdown",
-      "markdown [$path]",
-      "markdown editor and viewer",
-      "markdown editor and viewer",
-    ],
     ["browser", "browser [$url]", "JamBrowser", "JamBrowser"],
-    ["broom", "broom", "Process cleaner", "close all open processes"],
     ["settings", "settings", "OS settings", "open user settings"],
     [
       "styler",
@@ -817,6 +810,7 @@ export default function Terminal(props) {
         }
         addText((f.data as any)?.text);
         break;
+      case "open":
       case "finder":
         dest = Path.join(pwd.path, cmds.at(1)).path;
         // procmgr.add("finder", { path: dest });
