@@ -133,7 +133,7 @@ export default function Features(props) {
 
   // const arrayOfRefs = useRef([])
   const src = (category: string, type: string) =>
-    `/clips/${category}-${type}.webp`;
+    `/clips/${category}-${type}.webm`;
 
   const doScrollTo = (id: string) => {
     JamOS.procmgr.set(proc.id, { scrollTo: id });
@@ -305,11 +305,13 @@ export default function Features(props) {
                 <h1 className={styles.categoryTitle}>{category.title}</h1>
                 <div className={styles.categoryDesc}>{category.desc}</div>
                 <div className={styles.imageWrapper}>
-                  <ShimmerImage
-                    src={`/clips/${key}-overall.webp`}
-                    alt={key}
-                    layout="fill"
-                  ></ShimmerImage>
+                  <video
+                    controls
+                    muted
+                    autoPlay
+                    loop
+                    src={`/clips/${key}-overall.webm`}
+                  ></video>
                 </div>
                 {category?.items?.map((item: FeatItem) => (
                   <article
@@ -326,11 +328,13 @@ export default function Features(props) {
                       <span className={styles.desc}>{item.desc}</span>
                     )}
                     <div className={styles.imageWrapper}>
-                      <ShimmerImage
+                      <video
+                        controls
+                        muted
+                        autoPlay
+                        loop
                         src={src(key, item.type)}
-                        alt={item.name}
-                        layout="fill"
-                      ></ShimmerImage>
+                      ></video>
                     </div>
                   </article>
                 ))}
