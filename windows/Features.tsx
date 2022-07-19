@@ -92,6 +92,10 @@ const data: FeatData = {
     title: "Image viewer",
     desc: "JamOS image viewer",
   },
+  features: {
+    title: "Features",
+    desc: "Documentation for JamOS usage",
+  },
   atelier: {
     title: "Atelier",
     desc: "Generative art canvas",
@@ -180,6 +184,40 @@ export default function Features(props) {
     }
     return "";
   };
+  const [highlighted, setHighlighted] = useState(null);
+  const handleScroll = (e) => {
+    const trackables = document.querySelectorAll(`.${styles.trackable}`);
+    interface IdTopPair {
+      id: string;
+      top: number;
+      el: any;
+    }
+    const pairs: IdTopPair[] = [];
+    for (let i = 0; i < trackables.length; ++i) {
+      const el = trackables[i] as HTMLElement;
+      pairs.push({
+        id: el.id,
+        top: el.getBoundingClientRect().top - 107,
+        el: el,
+      });
+    }
+    pairs.sort((l, r) => Math.abs(l.top) - Math.abs(r.top));
+    setHighlighted(pairs[0].id);
+  };
+
+  const trackableStyle = (id: string) => {
+    const retval = {
+      color: colors["1"],
+      backgroundColor: "transparent",
+      fontWeight: 300,
+    };
+    if (highlighted === id) {
+      retval["color"] = colors["2"];
+      retval["backgroundColor"] = colors["1"];
+      retval["fontWeight"] = 400;
+    }
+    return retval;
+  };
 
   return (
     <Window {...props} proc={proc}>
@@ -203,21 +241,24 @@ export default function Features(props) {
               }}
               placeholder="Search Features"
             />
+            <div
+              className={styles.clear}
+              onClick={(e) => {
+                setSearchValue("");
+              }}
+            >
+              <ShimmerImage
+                src={"/imgs/circlex.svg"}
+                layout="fill"
+              ></ShimmerImage>
+            </div>
           </div>
           <ol className={styles.sectionList}>
             {Object.keys(data).map((key, i) => (
-              <li
-                key={i}
-                style={
-                  {
-                    // fontWeight: thisHovered(i) ? "500" : "300",
-                    // textDecoration: thisHovered(i) ? "underline" : "none",
-                  }
-                }
-                className={`${styles.listItem} ${isInvisible(i)}`}
-              >
+              <li key={i} className={`${styles.listItem} ${isInvisible(i)}`}>
                 <span
-                  className={styles.liTitle}
+                  style={trackableStyle(buildId(key))}
+                  className={`${styles.liTitle} ${styles.tracker}`}
                   onClick={(e) => {
                     doScrollTo(buildId(key));
                   }}
@@ -230,12 +271,17 @@ export default function Features(props) {
                     {data[key].items.map((_item, j) => (
                       <li
                         key={j}
-                        className={styles.subListItem}
+                        className={`${styles.subListItem}`}
                         onClick={(e) => {
                           doScrollTo(buildId(key, _item.type));
                         }}
                       >
-                        {_item.name}
+                        <span
+                          className={styles.tracker}
+                          style={trackableStyle(buildId(key, _item.type))}
+                        >
+                          {_item.name}
+                        </span>
                       </li>
                     ))}
                   </ol>
@@ -244,13 +290,13 @@ export default function Features(props) {
             ))}
           </ol>
         </div>
-        <div className={styles.sectionCore}>
+        <div className={styles.sectionCore} onScroll={handleScroll}>
           {Object.keys(data).map((key, i) => {
             const category = data[key];
             return (
               <section
                 key={i}
-                className={styles.section}
+                className={`${styles.trackable} ${styles.section}`}
                 id={buildId(key)}
                 style={{
                   boxShadow: colors.boxShadow,
@@ -268,7 +314,7 @@ export default function Features(props) {
                 {category?.items?.map((item: FeatItem) => (
                   <article
                     key={buildId(key, item.type)}
-                    className={styles.article}
+                    className={`${styles.trackable} ${styles.article}`}
                     id={buildId(key, item.type)}
                   >
                     <div
