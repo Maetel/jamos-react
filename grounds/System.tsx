@@ -22,7 +22,7 @@ export default function System(props) {
 
   const onSampleInit = () => {
     procmgr.add("jamhub", { isInitial: true });
-    if (1) {
+    if (!1) {
       JamOS.forceOpenToolbar();
       JamOS.forceOpenDock();
       setTimeout(() => {
@@ -92,7 +92,7 @@ export default function System(props) {
   };
 
   const init = () => {
-    if (!1) {
+    if (1) {
       //test purpose
       procmgr.add("features");
       return;
