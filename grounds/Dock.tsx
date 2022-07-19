@@ -1,9 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import styles from "../styles/Dock.module.css";
 
 import DockIcon, { DockIconProp } from "../components/DockIcon";
 import React from "react";
 import JamOS from "../features/JamOS/JamOS";
+import CallbackStore from "../features/JamOS/CallbackStore";
 
 const DockIconSeparator: DockIconProp = {
   type: "",
@@ -146,9 +147,60 @@ export default function Dock(props) {
   };
   const containerStyle = buildContainerStyle();
 
+  const handleContext = (e) => {
+    const cl = (e.target as HTMLElement).classList;
+    if (cl.contains(styles.dock)) {
+      e.preventDefault();
+      JamOS.closeAllContextMenus();
+      const isDockOpen = JamOS.isDockFixedValue();
+
+      const rect = contElem.current.getBoundingClientRect();
+      const topOffset = 10;
+      const y = rect.top - topOffset;
+
+      const cbMount = "system/DockIcon/onContextMenuMount";
+      const cbDestroy = "system/DockIcon/onContextMenuDestroy";
+      CallbackStore.register(cbMount, () => {
+        JamOS.forceOpenDock(true);
+      });
+      CallbackStore.register(cbDestroy, () => {
+        JamOS.forceOpenDock(false);
+      });
+
+      JamOS.openContextMenu(
+        e.pageX,
+        y,
+        [isDockOpen ? "Hide dock" : "Fix dock"],
+        [
+          () => {
+            if (isDockOpen) {
+              JamOS.closeDock();
+            } else {
+              JamOS.openDock();
+            }
+          },
+        ],
+        {
+          onMount: cbMount,
+          onDestroy: cbDestroy,
+        }
+      );
+    }
+  };
+
+  useEffect(() => {
+    if (contElem.current) {
+      console.log("registered");
+      contElem.current.oncontextmenu = handleContext;
+    }
+  }, []);
+
+  const contElem = useRef<HTMLDivElement>(null);
+
   return (
     <div
       className={`${styles.container} ${className}`}
+      ref={contElem}
       style={containerStyle}
       onMouseEnter={(e) => {
         setHovered(true);

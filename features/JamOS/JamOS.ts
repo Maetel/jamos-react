@@ -149,6 +149,9 @@ export default class JamOS {
   public static isDockFixed(){
     return useAppSelector(selectIsDockOpen);
   }
+  public static isDockFixedValue(){
+    return store.getState().os.openDock;
+  }
   public static isDockOpenForced(){
     return useAppSelector(selectForceOpenDock);
   }
