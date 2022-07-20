@@ -103,34 +103,44 @@ export default class ProcMgr{
       return;
     }
     const cmd = _cmds.at(0);
-    if (cmdCount === 1) {
-      this.add(_cmds.at(0), args);
-      return;
-    }
-
-    //parse commands with multiple arguments
+    const multiArgs = cmdCount > 1;
+      //parse commands with multiple arguments
     switch (cmd) {
       case "finder":
-        const dirpath = _cmds.slice(1).join(" ");
-        const dirnode:Node = dirValue(dirpath)?.node;
-        this.add(cmd, { path: dirpath, node:dirnode, ...args });
-        break;
+        if(multiArgs){
+          const dirpath = _cmds.slice(1).join(" ");
+          const dirnode:Node = dirValue(dirpath)?.node;
+          this.add(cmd, { path: dirpath, node:dirnode, ...args });
+        } else {
+          this.add(cmd)
+        }
+        return;
       case "notepad":
       case "markdown":
       case "browser":
       case "viewer":
-        const path = _cmds.slice(1).join(" ");
+        if(multiArgs){
+          const path = _cmds.slice(1).join(" ");
         const node:Node = dirValue(path)?.node ?? fileValue(path)?.node;
         this.add(cmd, { path: path, node:node, ...args });
-        break;
+        } else {
+          this.add(cmd);
+        }
+        return;        
       case "styler":
-        const style = _cmds.slice(1).join(" ");
-        JamOS.setmgr.setTheme(style);
-        // this.add(cmd, { style: style, ...args });
-        break;
+        if(multiArgs){
+          const style = _cmds.slice(1).join(" ");
+          JamOS.setmgr.setTheme(style);
+        } else {
+          this.add(cmd);
+        }
+        return;
       default:
         break;
     }
+
+    this.add(_cmds.at(0), args);
+      return;
   }
 
   public bootload(silently:boolean = false){

@@ -12,19 +12,22 @@ import { ProcessCommands } from "../../../features/procmgr/ProcTypes";
 
 const App = () => {
   const router = useRouter();
-  const { appname, param } = router.query;
+  const { appname, args } = router.query;
 
   useEffect(() => {
     if (!router.isReady) {
       return;
     }
     JamOS.procmgr.bootload(true);
-    // console.log("appname:", appname);
-    // console.log("param:", param);
 
     const app: string = appname as string;
     if (app && ProcessCommands.includes(app)) {
-      JamOS.procmgr.add(appname as string);
+      if (args && args.length > 0) {
+        const cmd = `${app} ${args}`;
+        JamOS.procmgr.exeCmd(cmd);
+      } else {
+        JamOS.procmgr.add(appname as string);
+      }
     } else {
       JamOS.setNotif(`${app} is not executable`);
       setTimeout(() => {
