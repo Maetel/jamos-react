@@ -255,11 +255,17 @@ return server;
     JamOS.openToolbar();
   }
 
-  public static setWorld(wid:string) {
+  public static setWorld(wid:string, onLoad?:()=>void) {
     store.dispatch(setWorld(wid));
+    if(onLoad){
+      const cbid = 'system/World/onLoad'
+      JamOS.set({onWorldLoad:cbid})
+      CallbackStore.register('system/World/onload', onLoad);
+    }
   }
 
   public static deleteWorld(wid?:string) {
+    JamOS.setLoading();
     wid = wid ?? JamOS.worldValue().name;
     axios.delete(JamOS.apis.worldDelete, { data:{wid:wid}, ...this.authHeader}).then(res=>{
       console.log(res);
@@ -271,7 +277,11 @@ return server;
           JamOS.toggle(proc.id, 'updateList');
         }
       }
-    }).catch(console.error);
+      JamOS.setLoading(false);
+    }).catch(err=>{
+      console.error(err);
+      JamOS.setLoading(false);
+    });
   }
 
   public static saveWorld(type:SaveWorldType='whole'){
@@ -280,6 +290,7 @@ return server;
     if(!saveable){
       return;
     }
+    JamOS.setLoading();
 
     const isWhole = type==='whole';
     const data = {};
@@ -310,32 +321,40 @@ return server;
       wid:wid
     }
     const res = axios.post(this.apis.worldSave, payload, this.authHeader).then(res=>{
-      console.log(res);
-    }).catch(console.error)
+      // console.log(res);
+    JamOS.setLoading(false);
+  }).catch(err=>{
+    console.error(err);
+    JamOS.setLoading(false);
+  })
+  }
+  public static setLoading(isLoading:boolean=true){
+    JamOS.set({isLoading:isLoading});
+  }
+  public static isLoading(){
+    return JamOS.getReadable('isLoading');
   }
   public static loadWorld(wid?:string){
     wid = wid ?? this.worldValue().name;
-    axios.get(this.apis.worldLoad+wid,this.authHeader).then(res=>{
+    JamOS.setLoading();
+    return axios.get(this.apis.worldLoad+wid,this.authHeader).then(res=>{
       const content = res.data;
-      if(1) {
-        const funcMap = {
-          file:JamOS.filemgr.loadFromString,
-          proc:JamOS.procmgr.loadFromString,
-          setting:JamOS.setmgr.loadFromString,
-          os:(data)=>{store.dispatch(loadOsFromString(data));}
-        }
-        for(let key in funcMap){
-          if(content[key]){
-            funcMap[key](content[key]);
-          }
-        }
-      } else {
-        JamOS.loadFromString(JSON.stringify(content));
+      const funcMap = {
+        file:JamOS.filemgr.loadFromString,
+        proc:JamOS.procmgr.loadFromString,
+        setting:JamOS.setmgr.loadFromString,
+        os:(data)=>{store.dispatch(loadOsFromString(data));}
       }
-      
-    }).catch(err=>{
+      for(let key in funcMap){
+        if(content[key]){
+          funcMap[key](content[key]);
+        }
+      }
+    JamOS.setLoading(false);
+  }).catch(err=>{
       console.error(err);
-    });
+    JamOS.setLoading(false);
+  });
   }
 
   public static format(){

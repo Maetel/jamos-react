@@ -8,6 +8,7 @@ import {
 } from "../windows/Finder";
 import Path from "../scripts/Path";
 import { Dir } from "../features/file/FileTypes";
+import ShimmerImage from "../components/ShimmerImage";
 
 const backgroundImg = "/imgs/wall2.jpg";
 const broomImg = "/imgs/broom.svg";
@@ -91,6 +92,9 @@ export default function Desktop(props) {
     }
   }, []);
 
+  const isLoading = JamOS.getReadable("isLoading");
+  const colors = JamOS.theme.colors;
+
   return (
     <div
       id="desktop"
@@ -114,6 +118,15 @@ export default function Desktop(props) {
       </div>
       <div className={styles.iconContainer}>
         <NodesView nodesViewProps={nodesViewProps}></NodesView>
+      </div>
+      <div
+        className={styles.loadingWrapper}
+        style={{
+          display: isLoading ? "block" : "none",
+          boxShadow: colors.boxShadow,
+        }}
+      >
+        <ShimmerImage src={"/imgs/loading.svg"} layout="fill"></ShimmerImage>
       </div>
     </div>
   );

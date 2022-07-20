@@ -74,6 +74,7 @@
   /* overflow-y:auto; */
   /* justify-content: center; */
   align-items: center;
+  padding:20px;
 }
 .selectItem {
   width:90%;
@@ -136,4 +137,15 @@
   justify-content: center;
   align-items: center;
   cursor:pointer;
+}
+.selectWorldContainer {}
+
+.selectWorldNone,
+.selectWorldTitle {
+  text-align:center;
+  margin:10px 30px;
+}
+.selectWorldNone {
+  margin-top:30px;
+  font-style:italic;
 }

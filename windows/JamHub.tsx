@@ -50,7 +50,8 @@ export const onSigninCoreSubmit = (
     withCredentials: true,
   };
 
-  const trySignIn = async () => {
+  const trySignIn = () => {
+    JamOS.setLoading();
     axios
       .post(JamOS.apis.signin, userInput, config)
       .then(async (res) => {
@@ -63,30 +64,12 @@ export const onSigninCoreSubmit = (
         const signedIn = stat === 200 && acc && ref;
         if (signedIn) {
           JamOS.signin(userInput.user, acc, ref);
-          const confirmSignIn = async () => {
-            await axios
-              .get(JamOS.apis.signincheck, JamOS.authHeader)
-              .then((_res) => {
-                const stat = _res.status;
-                const cont = _res.data?.content;
-                if (stat === 200) {
-                  // JamOS.setNotif("Signed in as " + JamOS.userValue().id);
-                  setSuccess?.("Signed in as " + JamOS.userValue().id);
-                  CallbackStore.getById(args?.successCallbackId)?.();
-                } else {
-                  JamOS.signout();
-                  setError("Failed to sign in as " + userInput.user);
-                  CallbackStore.getById(args?.errorCallbackId)?.();
-                  // JamOS.setNotif("Failed to sign in as " + userInput.user, "error");
-                }
-              });
-          };
-          await confirmSignIn();
         } else {
           setError("Failed to sign in as " + userInput.user);
           CallbackStore.getById(args?.errorCallbackId)?.();
           // JamOS.setNotif("Failed to sign in as " + userInput.user, "error");
         }
+        JamOS.setLoading(false);
       })
       .catch((err) => {
         const cont = err.response?.data?.content;
@@ -97,10 +80,12 @@ export const onSigninCoreSubmit = (
           setError("Failed to sign in with unknown error code");
           CallbackStore.getById(args?.errorCallbackId)?.();
         }
+        JamOS.setLoading(false);
       });
   };
 
-  const trySignup = async () => {
+  const trySignup = () => {
+    JamOS.setLoading();
     axios
       .post(JamOS.apis.signup, userInput, config)
       .then(async (res) => {
@@ -108,7 +93,7 @@ export const onSigninCoreSubmit = (
         const cont = res.data?.content;
         if (stat === 200) {
           // JamOS.setNotif("Signed up as " + userInput.user);
-          setSuccess?.("Signed up as " + JamOS.userValue().id);
+          setSuccess?.("Signed up as " + userInput.user);
           if (args?.procId)
             JamOS.procmgr.set(args.procId, { onSignupSuccess: true });
         } else {
@@ -120,6 +105,7 @@ export const onSigninCoreSubmit = (
             // JamOS.setNotif("Failed to sign up as " + userInput.user, "error");
           }
         }
+        JamOS.setLoading(false);
       })
       .catch((err) => {
         console.error(err);
@@ -129,6 +115,7 @@ export const onSigninCoreSubmit = (
         } else {
           setError("Failed to sign up with unknown error code");
         }
+        JamOS.setLoading(false);
       });
   };
 

@@ -5,6 +5,7 @@ import Process from "../features/procmgr/ProcTypes";
 import Daemon from "../components/Daemon";
 import { randomId } from "../scripts/utils";
 import { JamUser, JamWorld, _initialWorld } from "../features/JamOS/osSlice";
+import CallbackStore from "../features/JamOS/CallbackStore";
 
 let initted = false;
 let loadOnce = false;
@@ -108,6 +109,9 @@ export default function System(props) {
   };
 
   useEffect(() => {
+    if (proc.silently) {
+      return;
+    }
     if (muteOptions) {
       if (!initted) {
         init();
@@ -200,7 +204,13 @@ export default function System(props) {
   useEffect(() => {
     if (!world.loaded && world.name !== "__pending__") {
       // console.log("Loading world : ", world.name);
-      JamOS.loadWorld(world.name);
+      const _load = async () => {
+        await JamOS.loadWorld(world.name);
+        const cbid = JamOS.getValue("onWorldLoad");
+        console.log("cbid:", cbid);
+        CallbackStore.getById(cbid)?.();
+      };
+      _load();
     } else {
       // console.log(
       //   "NO world. world.loaded:",
@@ -208,7 +218,9 @@ export default function System(props) {
       //   ", world.name:",
       //   world.name
       // );
-      init();
+      if (!proc.silently) {
+        init();
+      }
     }
   }, [jamUser, world]);
 
@@ -228,17 +240,6 @@ export default function System(props) {
       }, 250);
     }
   }, [disableCmdE]);
-
-  // const saveWorldLocal = JamOS.procmgr.getReadable("system", "saveWorldLocal");
-  // const loadWorldLocal = JamOS.procmgr.getReadable("system", "loadWorldLocal");
-  // useEffect(() => {
-  //   console.log("saveWorldLocal");
-  //   JamOS.saveStringified();
-  // }, [saveWorldLocal]);
-  // useEffect(() => {
-  //   console.log("loadWorldLocal");
-  //   JamOS.loadStringified();
-  // }, [loadWorldLocal]);
 
   return <Daemon {...props} proc={proc}></Daemon>;
 }

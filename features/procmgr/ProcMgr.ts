@@ -133,7 +133,7 @@ export default class ProcMgr{
     }
   }
 
-  public bootload(){
+  public bootload(silently:boolean = false){
     this._prepareNewWindow();
     const proc:Process ={
       id:'system',
@@ -142,6 +142,7 @@ export default class ProcMgr{
       zIndex:'0',
       toolbar:[],
       hideOnDock:true,
+      silently:silently
     }
     const byDefault:ProcessCommand = _ProcessCommands.find(proc=>proc.comp==='system');
     byDefault.icon = byDefault.icon ?? "/imgs/icon-default.svg";
@@ -263,12 +264,6 @@ export default class ProcMgr{
     this.add(args?.type ?? 'modal', addArgs);
     // Object.assign(modalProps, {callbackIds:callbackIds})
     // modalProps['callbackIds'] = callbackIds;
-
-    if(false && args?.buttons?.length !== args?.callbacks?.length){
-      console.warn("openModal : button and callback count do not match. ")
-      console.warn(' - args?.buttons?.length : ',args?.buttons?.length)
-      console.warn(' - args?.callbacks?.length : ',args?.callbacks?.length);
-    }
   }
 
   public openTextModal(procId:string, args?:{title?:string, placeholder?:string, descs?:string[], buttons?:string[], callbacks?:((params?:any)=>void)[]}) {
@@ -278,7 +273,7 @@ export default class ProcMgr{
       buttons:args?.buttons ?? ['Okay', 'Cancel'],
       callbacks:args?.callbacks,
       type:'textmodal' as ('modal'|'textmodal'),
-      placeholder:args?.placeholder
+      placeholder:args?.placeholder,
     }
 
     this.openModal(procId, defaultArgs)

@@ -26,12 +26,19 @@ const systemMenu: ToolbarItem[] = [
     menu: "osicon",
     item: "Sign in",
     callback: "system/Toolbar/add/jamhub",
+    separator: true,
   },
   {
     caller: "system",
     menu: "osicon",
     item: "World Editor",
     callback: "system/Toolbar/add/worldeditor",
+  },
+  {
+    caller: "system",
+    menu: "osicon",
+    item: "Format",
+    callback: "system/Toolbar/format",
     separator: true,
   },
   {

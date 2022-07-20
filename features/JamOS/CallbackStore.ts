@@ -92,6 +92,12 @@ export default class CallbackStore {
           } else {
             return ()=>{JamOS.loadWorld()};
           }
+        case 'format':
+          return ()=>{
+            JamOS.procmgr.openConfirm('system', ()=>{
+              JamOS.format()
+            }, {title:"Format", descs:['Are you sure to format all files? This action cannot be undone.'], buttons:['Format', 'Cancel']});
+          }
         default:
           break;
       }

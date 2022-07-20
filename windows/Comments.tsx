@@ -7,21 +7,6 @@ import { JamUser } from "../features/JamOS/osSlice";
 import Process from "../features/procmgr/ProcTypes";
 import styles from "../styles/Comments.module.css";
 
-export async function getServerSideProps(context) {
-  const comments = await axios
-    .get(JamOS.apis.posts)
-    .then((res) => {
-      console.log(res);
-      return res;
-    })
-    .catch((err) => console.error("Axios error : " + err));
-  console.log("Received : ", comments);
-  const content = comments["content"];
-  return {
-    props: { content }, // will be passed to the page component as props
-  };
-}
-
 export interface CommentData {
   id: number;
   uid: string;
@@ -118,7 +103,7 @@ function LeaveComment(props) {
       return;
     }
 
-    const postAndWait = async () => {
+    const postAndWait = () => {
       // const _user = user.trim();
       const _user = jamUser.id;
       const _content = content.trim();
@@ -131,7 +116,8 @@ function LeaveComment(props) {
         return;
       }
 
-      const res = await axios
+      JamOS.setLoading();
+      axios
         .post(
           JamOS.apis.posts,
           {
@@ -155,6 +141,7 @@ function LeaveComment(props) {
             setContent("");
             fetchAndUpdate();
           }
+          JamOS.setLoading(false);
         })
         .catch((err) => {
           JamOS.setNotif(
@@ -162,6 +149,7 @@ function LeaveComment(props) {
             "error"
           );
           fetchAndUpdate();
+          JamOS.setLoading(false);
         });
     };
     postAndWait();
@@ -243,23 +231,23 @@ export default function Comments(props) {
   const colors = JamOS.theme.colors;
 
   const fetchAndUpdate = () => {
-    const fetchContents = async () => {
-      const res = await axios.get(JamOS.apis.posts);
-      const content = res?.["data"]?.["content"];
-      return content;
-    };
-    fetchContents()
+    JamOS.setLoading();
+    axios
+      .get(JamOS.apis.posts, JamOS.authHeader)
       .then((res) => {
-        JamOS.procmgr.set(proc.id, { comments: res ?? [] });
+        const content = res?.["data"]?.["content"];
+        JamOS.procmgr.set(proc.id, { comments: content ?? [] });
+        JamOS.setLoading(false);
       })
       .catch((err) => {
         JamOS.setNotif("Comments error : " + err, "error");
+        JamOS.setLoading(false);
       });
   };
 
   useEffect(() => {
     fetchAndUpdate();
-    JamOS.setNotif(`Connecting to ${JamOS.apis.posts}...`);
+    // JamOS.setNotif(`Connecting to ${JamOS.apis.posts}...`);
   }, []);
   useEffect(() => {
     if (commentUpdate) {

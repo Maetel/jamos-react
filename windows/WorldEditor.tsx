@@ -14,8 +14,9 @@ interface WorldInfo {
   created_time: string;
   last_update_time: string;
 }
-const tryFetchWorlds = async (procId: string) => {
-  const res = await axios
+const tryFetchWorlds = (procId: string) => {
+  JamOS.setLoading();
+  axios
     .get(JamOS.apis.worldList, JamOS.authHeader)
     .then((res) => {
       // console.log("res:", res);
@@ -26,12 +27,14 @@ const tryFetchWorlds = async (procId: string) => {
         created_time: datum.created_time,
         last_update_time: datum.last_update_time,
       }));
-      console.log("worldList:", worldList);
-      console.log("Initted : ", res.data?.initted);
+      // console.log("worldList:", worldList);
+      // console.log("Initted : ", res.data?.initted);
       JamOS.procmgr.set(procId, { worldList: [...worldList] });
+      JamOS.setLoading(false);
     })
     .catch((err) => {
       console.error(err);
+      JamOS.setLoading(false);
     });
 };
 
@@ -71,6 +74,7 @@ export function WorldEditorCore(props: WorldEditorCoreProps) {
     };
     return (
       <div className={styles.selectWorldContainer}>
+        <h3 className={styles.selectWorldTitle}>Select world</h3>
         {worldList && worldList.length > 0 ? (
           <ul className={styles.selectList}>
             {worldList.map((world, i) => (
@@ -101,7 +105,25 @@ export function WorldEditorCore(props: WorldEditorCoreProps) {
                   <button
                     className={styles.selectButton}
                     onClick={(e) => {
-                      JamOS.deleteWorld(world.wid);
+                      JamOS.procmgr.openTextModal(proc.id, {
+                        title: `Delete world`,
+                        descs: [
+                          `Are you sure you want to delete world '${world.wid}'? Type ${world.wid} to confirm.`,
+                        ],
+                        buttons: ["Delete", "Cancel"],
+                        callbacks: [
+                          (input) => {
+                            if (world.wid === input) {
+                              JamOS.deleteWorld(world.wid);
+                            } else {
+                              JamOS.setNotif(
+                                "Delete world failed. Input was not correct.",
+                                "error"
+                              );
+                            }
+                          },
+                        ],
+                      });
                     }}
                   >
                     Delete
@@ -111,7 +133,7 @@ export function WorldEditorCore(props: WorldEditorCoreProps) {
             ))}
           </ul>
         ) : (
-          <div>Add a world to proceed!</div>
+          <div className={styles.selectWorldNone}>Add a world to proceed!</div>
         )}
       </div>
     );
@@ -125,6 +147,7 @@ export function WorldEditorCore(props: WorldEditorCoreProps) {
       if (wname.length === 0) {
         return false;
       }
+      JamOS.setLoading();
       axios
         .post(JamOS.apis.worldCreate, { wid: wname }, JamOS.authHeader)
         .then((res) => {
@@ -136,10 +159,12 @@ export function WorldEditorCore(props: WorldEditorCoreProps) {
             setMsg("Successfully created world");
           }
           // JamOS.format();
-          JamOS.setWorld(wname);
+          // JamOS.setWorld(wname);
           // JamOS.procmgr.killAll("system");
           // JamOS.procmgr.add("appstore");
           // JamOS.saveWorld();
+          JamOS.setLoading(false);
+          tryFetchWorlds(proc.id);
           return true;
         })
         .catch((err) => {
@@ -150,6 +175,7 @@ export function WorldEditorCore(props: WorldEditorCoreProps) {
           } else {
             setMsg("Unknown error occured. Please try again.");
           }
+          JamOS.setLoading(false);
           return false;
         });
       return false;
