@@ -5,6 +5,7 @@ import store, { AppState } from "../../app/store";
 export interface Notif {
   msg:string,
   type: 'log' | 'success' | 'warn' | 'error' | 'system',
+  timestamp:number, //Date.now()
 }
 
 export interface JamUser {

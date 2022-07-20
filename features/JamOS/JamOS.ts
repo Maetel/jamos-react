@@ -52,11 +52,17 @@ export default class JamOS {
     return useAppSelector(selectNotifDuration);
   }
   public static setNotif(msg:string, type?:'log'|'success'|'warn'|'error'|'system'){
+    const notifsVal =  store.getState().os.notifs;
+    const lastElem = notifsVal.at(notifsVal.length-1);
+    const now = Date.now();
+    if(notifsVal.length>0 && Math.abs(lastElem?.timestamp - now) < 50 && lastElem?.msg === msg){
+      //ignore same msg within 50ms
+      return;
+    }
     const notif:Notif = {
-      msg:msg, type:(type??'log')
+      msg:msg, type:(type??'log'), timestamp:now
     };
     store.dispatch(setNotification(notif))
-
 
     if(type==='error'){
       console.error('[Error] ' +msg);

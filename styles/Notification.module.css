@@ -1,18 +1,23 @@
 .container {
+  max-height:50%;
   position:absolute;
-  bottom:5%;
-  right:5%;
-  box-sizing: border-box;
-  padding:8px 14px;
-  border-radius:14px;
-  opacity: 0;
-  transform:translateY(-8px);
-  transition:0.4s;
-  min-width: 40px;
-  min-height:20px;
+  bottom:50px;
+  right:50px;
+  opacity: 1;
+  /* transform:translateY(-8px); */
+  /* background-color: red; */
+  overflow-y:scroll;
+}
+
+.list{
   display:flex;
+  flex-direction:column;
   justify-content: center;
-  align-items: center;
+  align-items: flex-end;
+  list-style:none;
+  gap:20px;
+  padding:0;
+  max-height:100%;
 }
 
 .active{
@@ -20,6 +25,26 @@
   transform:translateY(0px);
 }
 
-.notif {
-  font-size:1.8rem;
+.item {
+  position:relative;
+  transition:1s;
+  font-size:1.5rem;
+  transition:0.4s;
+  min-width: 40px;
+  min-height:20px;
+  box-sizing: border-box;
+  padding:8px 14px;
+  border-radius:14px;
+  display:flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+.item .timestamp {
+  /* text-align: right; */
+  font-size:0.9rem;
+  background-color: #f4f2f0;
+  color:#333;
+  box-sizing: border-box;
+  padding: 1px 5px;
+  border-radius: 8px;
 }
