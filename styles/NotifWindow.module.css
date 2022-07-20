@@ -1,0 +1,103 @@
+.container {
+  position: relative;
+  width:100%;
+  /* min-height:calc( 100% - 30px); */
+  height:100%;
+  box-sizing: border-box;
+  margin:0;
+  padding:10px;
+  display:flex;
+  flex-direction: column;
+  /* align-items: center; */
+  /* overflow:hidden; */
+}
+
+.header {
+  position: absolute;
+  width:100%;
+  height:140px;
+  top:0;
+  left:0;
+  box-sizing: border-box;
+  padding: 10px 10px 0px 10px;
+}
+
+.btnList {
+  width:100%;
+  display:flex;
+  justify-content: space-around;
+  padding:0;
+  margin:0;
+  box-sizing: border-box;  
+  gap:10px;
+  padding-bottom:20px;
+  margin-bottom:20px;
+}
+
+.table {
+  display:block;
+  position: absolute;
+  width:100%;
+  height: calc(100% - 140px);
+  overflow-y:auto;
+  bottom:0;
+  left:0;
+  padding : 10px;
+}
+
+.table th {
+  font-weight: 300;
+}
+.table thead th {
+  font-weight: 500;
+  margin-bottom:10px;
+}
+.th1 {
+  width:1%;
+}
+.th2 {
+  width:1%;
+}
+.th3 {
+  width:30%;
+}
+/* .th4 {
+  width:68%;
+} */
+
+.btn {
+  flex:1;
+  position: relative;
+  /* width:80px; */
+  margin:0;
+  padding:3px 10px;
+  box-sizing: border-box;
+  border-radius: 10px;
+  /* text-align: left; */
+  display:flex;
+  justify-content: space-between;
+  align-items: center;
+  height:100%;
+  font-size: 0.9rem;
+  cursor:pointer;
+  transition:0.3s;
+}
+.btn:hover {
+  transform:translate(-2px, -2px);
+}
+.btn:active {
+  transition:0.05s;
+  transform:translate(0px, 0px);
+}
+.btnName {
+}
+.iconWrapper {
+  position: absolute;
+  right:3px;
+  top:50%;
+  transform:translateY(-50%);
+
+  width:20px;
+  height:20px;
+  border-radius: 10px;
+}

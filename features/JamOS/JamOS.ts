@@ -1,15 +1,14 @@
 import axios from "axios";
-import { useAppDispatch, useAppSelector } from "../../app/hooks";
+import { useAppSelector } from "../../app/hooks";
 import store from "../../app/store";
 import { CtxMenuProps } from "../../components/ContextMenu";
-import { getCookie } from "../../scripts/utils";
 import FileMgr from "../file/FileMgr";
 import ProcMgr from "../procmgr/ProcMgr";
 import {killAllofType} from "../procmgr/procSlice";
 import SetMgr from "../settings/SetMgr";
 import { Theme } from "../settings/Themes";
 import CallbackStore from "./CallbackStore";
-import { closeDock, closeToolbar, forceHideDock, forceHideToolbar, forceOpenDock, forceOpenToolbar, getUser, getWorld, JamUser, JamWorld, Notif, openDock, openToolbar, selectForceHideDock, selectForceHideToolbar, selectForceOpenDock, selectForceOpenToolbar, selectIsDockOpen, selectIsToolbarOpen, selectNotifDuration, selectNotifs, selectUser, selectWorld, setNotification, setUser, toggleDock, toggleToolbar, signout, setWorld, _initialWorld, setWorldLoaded, loadOsFromString } from "./osSlice";
+import { closeDock, closeToolbar, forceHideDock, forceHideToolbar, forceOpenDock, forceOpenToolbar, getUser, getWorld, JamUser, JamWorld, Notif, openDock, openToolbar, selectForceHideDock, selectForceHideToolbar, selectForceOpenDock, selectForceOpenToolbar, selectIsDockOpen, selectIsToolbarOpen, selectNotifDuration, selectNotifs, selectUser, selectWorld, setNotification, setUser, toggleDock, toggleToolbar, signout, setWorld, _initialWorld, setWorldLoaded, loadOsFromString, setArgs, selectArgs } from "./osSlice";
 
 export interface SerializedData {
   proc?:string,
@@ -26,13 +25,13 @@ export default class JamOS {
   public static get setmgr() {return SetMgr.getInstance()};
   public static get theme():Theme { return SetMgr.getInstance().themeReadable();}
   public static set(props){
-    JamOS.procmgr.set('system', props);
+    store.dispatch(setArgs(props));
   }
   public static getReadable(prop:string){
-    return JamOS.procmgr.getReadable('system', prop);
+    return useAppSelector(selectArgs(prop));
   }
   public static getValue(prop:string){
-    return JamOS.procmgr.getValue('system', prop);
+    return store.getState().os.args[prop];
   }
   public static toggle(procId:string, prop:string){
     const retval = {};

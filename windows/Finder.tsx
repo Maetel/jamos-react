@@ -180,7 +180,7 @@ export function FinderCore(props) {
 
   const handleDragLeave = (e) => {};
   const handleDragEnter = (e) => {
-    const isDragging = procmgr.getValue("system", "finderIconDragging");
+    const isDragging = JamOS.getValue("finderIconDragging");
     procmgr.setFront(proc.id);
     procmgr.blink(proc.id);
   };

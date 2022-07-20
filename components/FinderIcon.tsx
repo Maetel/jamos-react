@@ -28,12 +28,12 @@ export default function FinderIcon(props) {
   const file: File = JamOS.filemgr.fileReadable(nodepath);
 
   const handleDragStart = (e) => {
-    procmgr.set("system", { finderIconDragging: true });
+    JamOS.set({ finderIconDragging: true });
     e.dataTransfer.setData("text/plain", node.path);
     e.dataTransfer.effectAllowed = "copy";
   };
   const handleDragEnd = (e) => {
-    procmgr.set("system", { finderIconDragging: false });
+    JamOS.set({ finderIconDragging: false });
   };
 
   const handleDrop = (e) => {

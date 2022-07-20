@@ -126,7 +126,11 @@ export default function Desktop(props) {
           boxShadow: colors.boxShadow,
         }}
       >
-        <ShimmerImage src={"/imgs/loading.svg"} layout="fill"></ShimmerImage>
+        <ShimmerImage
+          priority
+          src={"/imgs/loading.svg"}
+          layout="fill"
+        ></ShimmerImage>
       </div>
     </div>
   );

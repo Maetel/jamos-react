@@ -213,7 +213,7 @@ export function WorldEditorCore(props: WorldEditorCoreProps) {
         <button
           className={styles.topBtn}
           onClick={(e) => {
-            JamOS.procmgr.set("system", { sampleInit: true });
+            JamOS.set({ sampleInit: true });
           }}
         >
           Sample init

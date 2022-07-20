@@ -127,6 +127,7 @@ export const _ProcessCommands:ProcessCommand[] = [
   {comp:"atelier",name:"Atelier", icon:"/imgs/atelier.svg", addOnAppstore:true, defaultFileName:"Atelier"},
   {comp:"postman", name:"Postman",icon:"/imgs/postman.svg", runOnce:true, addOnAppstore:true, defaultFileName:"Postman"},
   {comp:"about",name:"About", icon:"/imgs/jamos.png", addOnAppstore:true, defaultFileName:"About"},
+  {comp:"notif",name:"Notifications", icon:"/imgs/notif.png", addOnAppstore:true, defaultFileName:"Notifications", runOnce:true},
   {comp:"settings", name:"Settings",icon:"/imgs/settings.svg", runOnce:true, addOnAppstore:true, defaultFileName:"Settings"},
   {comp:"styler", name:"Styler",icon:"/imgs/styler.svg", runOnce:true, addOnAppstore:true, defaultFileName:"Styler"},
   {comp:"systeminfo",name:"SystemInfo", icon:"/imgs/systeminfo.svg", runOnce:true, addOnAppstore:true, defaultFileName:"System Monitor"},

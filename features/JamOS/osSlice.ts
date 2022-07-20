@@ -32,6 +32,8 @@ export interface OSState {
 
   notifs:Notif[],
   notifDuration:number,
+
+  args:{},
   [key:string]:any;
 }
 
@@ -50,6 +52,8 @@ const initialState :OSState = {
 
   notifs:[],
   notifDuration:4000,
+
+  args:{},
 }
 
 const osSlice = createSlice({
@@ -110,6 +114,9 @@ const osSlice = createSlice({
     toggleDock:(state, action:PayloadAction<void>)=>{
       state.openDock = !state.openDock;
     },
+    setArgs:(state, action:PayloadAction<{}>)=>{
+      state.args = {...state.args, ...action.payload};
+    },
 
     loadOsFromString:(state, action:PayloadAction<{}>)=>{
       console.warn("Load os params...")
@@ -144,5 +151,6 @@ export const selectForceHideDock = (state:AppState)=>state.os.forceHideDock;
 
 export const selectNotifDuration = (state:AppState):number=>state.os.notifDuration;
 export const selectNotifs = (state:AppState):Notif[]=>state.os.notifs;
+export const selectArgs = (prop:string)=>(state:AppState)=>state.os.args[prop];
 export default osSlice.reducer;
-export const { setNotification, openToolbar, closeToolbar, toggleToolbar, openDock, closeDock,toggleDock,forceHideToolbar, forceHideDock,forceOpenToolbar, forceOpenDock, setUser, setWorld, setWorldLoaded, signout, loadOsFromString } = osSlice.actions;
+export const { setNotification, openToolbar, closeToolbar, toggleToolbar, openDock, closeDock,toggleDock,forceHideToolbar, forceHideDock,forceOpenToolbar, forceOpenDock, setUser, setWorld, setWorldLoaded, signout, loadOsFromString, setArgs } = osSlice.actions;
