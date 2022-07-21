@@ -272,20 +272,25 @@ return server;
   public static deleteWorld(wid?:string) {
     JamOS.setLoading();
     wid = wid ?? JamOS.worldValue().name;
+    JamOS.setNotif(`Deleting ${wid}...`);
     axios.delete(JamOS.apis.worldDelete, { data:{wid:wid}, ...this.authHeader}).then(res=>{
-      console.log(res);
-      console.log("wid:",wid,", res.data?.wid:",res.data?.wid);
+      // console.log(res);
+      // console.log("wid:",wid,", res.data?.wid:",res.data?.wid);
       if(wid && wid === res.data?.wid){
         const proc = JamOS.procmgr.processOfTypeValue('worldeditor');
-        console.log("deleteworld : proc",proc);
+        // console.log("deleteworld : proc",proc);
         if(proc){
           JamOS.toggle(proc.id, 'updateList');
         }
+        JamOS.setNotif(`${wid} deleted`, 'success');
+      } else {
+        JamOS.setNotif(`Failed to delete ${wid}${res.data?.content ?? ""}`, 'error');
       }
       JamOS.setLoading(false);
     }).catch(err=>{
       console.error(err);
       JamOS.setLoading(false);
+      JamOS.setNotif(`Failed to delete ${wid} : ${err}`, 'error');
     });
   }
 
@@ -295,6 +300,8 @@ return server;
     if(!saveable){
       return;
     }
+    const wid = this.worldValue().name;
+    JamOS.setNotif(`Saving ${wid}...`)
     JamOS.setLoading();
 
     const isWhole = type==='whole';
@@ -319,7 +326,6 @@ return server;
       }
       data['os'] = JSON.stringify(retval);
     }
-    const wid = this.worldValue().name;
     const payload = {
       type:type,
       data:data,
@@ -328,9 +334,11 @@ return server;
     const res = axios.post(this.apis.worldSave, payload, this.authHeader).then(res=>{
       // console.log(res);
     JamOS.setLoading(false);
+    JamOS.setNotif(`${wid} saved`, 'success');
   }).catch(err=>{
     console.error(err);
     JamOS.setLoading(false);
+    JamOS.setNotif(`Faild to save ${wid} : ${err}`, 'error');
   })
   }
   public static setLoading(isLoading:boolean=true){
@@ -341,6 +349,7 @@ return server;
   }
   public static loadWorld(wid?:string){
     wid = wid ?? this.worldValue().name;
+    JamOS.setNotif(`Loading ${wid}...`)
     JamOS.setLoading();
     return axios.get(this.apis.worldLoad+wid,this.authHeader).then(res=>{
       const content = res.data;
@@ -356,9 +365,11 @@ return server;
         }
       }
     JamOS.setLoading(false);
+    JamOS.setNotif(`${wid} loaded`, 'success');
   }).catch(err=>{
       console.error(err);
     JamOS.setLoading(false);
+    JamOS.setNotif(`Faild to load ${wid}`, 'error');
   });
   }
 

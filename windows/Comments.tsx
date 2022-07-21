@@ -279,8 +279,8 @@ export default function Comments(props) {
           >
             <ShimmerImage
               src={"/imgs/loading.svg"}
-              width={30}
-              height={30}
+              width={40}
+              height={40}
             ></ShimmerImage>
           </button>
         </h1>

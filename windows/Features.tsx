@@ -36,6 +36,11 @@ const data: FeatData = {
         name: "Dock",
         desc: "Dock is where you can place favorite apps and find minimized apps. You can toggle dock either by right-clicking on the Dock menu or via Toolbar menu.",
       },
+      {
+        type: "notification",
+        name: "Notification",
+        desc: "Notifies system messages. Hover on right bottom of the page to see notification history. Click on a notification to open the collection.",
+      },
     ],
   },
   appstore: {

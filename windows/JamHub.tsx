@@ -52,6 +52,7 @@ export const onSigninCoreSubmit = (
 
   const trySignIn = () => {
     JamOS.setLoading();
+    JamOS.setNotif(`Signing in as ${userInput.user}...`);
     axios
       .post(JamOS.apis.signin, userInput, config)
       .then(async (res) => {
@@ -64,6 +65,7 @@ export const onSigninCoreSubmit = (
         const signedIn = stat === 200 && acc && ref;
         if (signedIn) {
           JamOS.signin(userInput.user, acc, ref);
+          JamOS.setNotif(`Welcome ${userInput.user}`, "success");
         } else {
           setError("Failed to sign in as " + userInput.user);
           CallbackStore.getById(args?.errorCallbackId)?.();
@@ -86,6 +88,7 @@ export const onSigninCoreSubmit = (
 
   const trySignup = () => {
     JamOS.setLoading();
+    JamOS.setNotif(`Signing up as ${userInput.user}...`);
     axios
       .post(JamOS.apis.signup, userInput, config)
       .then(async (res) => {

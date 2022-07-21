@@ -155,8 +155,8 @@ export default function NotifWindow(props) {
                   }}
                 >
                   <ShimmerImage
-                    width={30}
-                    height={30}
+                    width={40}
+                    height={40}
                     src={iconSrc(btn)}
                   ></ShimmerImage>
                 </div>

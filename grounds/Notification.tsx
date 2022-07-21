@@ -10,7 +10,10 @@ interface NotifWithI extends Notif {
   idx: number;
 }
 export default function Notification(props) {
-  const notifs: Notif[] = JamOS.notifs;
+  const notifs: NotifWithI[] = JamOS.notifs.map((notif, i) => ({
+    ...notif,
+    idx: i,
+  }));
   const notifDuration = JamOS.notifDuration;
   const notifsToShow: NotifWithI[] = JamOS.getReadable("notifsToShow");
   const showLastNotifs: boolean = JamOS.getReadable("showLastNotifs");
@@ -36,13 +39,14 @@ export default function Notification(props) {
     if (!timer) {
       return;
     }
-    const shows = notifs
-      .map((notif, i): NotifWithI => ({ ...notif, idx: i }))
-      .filter((notif) => notif.timestamp > timer - notifDuration);
+    const shows = notifs.filter(
+      (notif) => notif.timestamp > timer - notifDuration
+    );
     const arr = JamOS.getValue("notifsToShow");
     if (arr && arr.length === 0 && shows.length === 0) {
       return;
     }
+    // shows.reverse();
     JamOS.set({ notifsToShow: shows });
   }, [timer]);
 
@@ -152,7 +156,7 @@ export default function Notification(props) {
               <ul className={`${styles.list} ${styles.fixed}`}>
                 {fixedNotifs?.map((notif, i) => (
                   <li
-                    key={i}
+                    key={notif.idx}
                     className={styles.item}
                     style={buildNotifStyle(notif?.type)}
                     onClick={(e) => {
