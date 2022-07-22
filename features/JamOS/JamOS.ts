@@ -17,6 +17,13 @@ export interface SerializedData {
   [key:string]:string|number|boolean,
 }
 
+export interface WorldInfo {
+  uid: string;
+  wid: string;
+  rights: string;
+  created_time: string;
+  last_update_time: string;
+}
 
 export default class JamOS {
   public static get version() {return '0.2'};
@@ -238,8 +245,181 @@ return server;
   public static get authHeader () {
     // const token = getCookie('accessToken');
     const token = this.userValue().token;
-    return token ? { headers: {"Authorization" : `Bearer ${token}`} } : {};
+    return token ? { headers: {"Authorization" : `Bearer ${token}`}, withCredentials:true } : {withCredentials:true};
   }
+
+  public static trySignin(userId:string, password:string, args?:{procId?:string, onSignin?:(msg:string)=>void, onError?:(msg:string)=>void}):void{
+
+    console.log("5");
+
+    if(!JamOS.isUserInfoValid(userId, password, args?.onError)){
+      return;
+    }
+
+    JamOS.setLoading();
+    // JamOS.setNotif(`Signing in as ${userId}...`);
+    axios
+      .post(JamOS.apis.signin, {user:userId, password:password}, this.authHeader)
+      .then(async (res) => {
+        const stat = res.status;
+        const cont = res.data?.content;
+        // console.log("Signin Status : " + stat + "Content : ", cont);
+        const acc = cont["accessToken"];
+        const ref = cont["refreshToken"];
+
+        const signedIn = stat === 200 && acc && ref;
+    console.log("6");
+    if (signedIn) {
+    console.log("7");
+    JamOS.signin(userId, acc, ref);
+          JamOS.setNotif(`Welcome ${userId}`, "success");
+          args?.onSignin?.(`Welcome ${userId}`);
+        } else {
+          JamOS.setNotif("Failed to sign in as " + userId, "error");
+          args?.onError?.("Failed to sign in as " + userId);
+          // CallbackStore.getById(args?.errorCallbackId)?.();
+          // JamOS.setNotif("Failed to sign in as " + userInput.user, "error");
+    console.log("8");
+  }
+        JamOS.setLoading(false);
+      })
+      .catch((err) => {
+        const cont = err.response?.data?.content;
+        if (cont) {
+          JamOS.setNotif(cont);
+          args?.onError?.(cont);
+          // CallbackStore.getById(args?.errorCallbackId)?.();
+        } else {
+          JamOS.setNotif("Failed to sign in as " + userId, "error");
+          args?.onError?.("Failed to sign in with unknown error code");
+          // CallbackStore.getById(args?.errorCallbackId)?.();
+        }
+        JamOS.setLoading(false);
+      });
+  }
+
+  public static get minIdLength() { return 3; }
+  public static get maxIdLength() { return 12; }
+  public static get minPasswordLength() { return 3; }
+  public static get maxPasswordLength() { return 12; }
+
+  public static isUserInfoValid(userId:string, password:string, onError?:(msg:string)=>void):boolean {
+    if(!userId || userId.length<JamOS.minIdLength || userId.length>JamOS.maxIdLength){
+      onError?.(`User id is not correct. Id must have at least ${JamOS.minIdLength} characters and cannot be more than ${JamOS.maxIdLength}.`);
+      return false;
+    }
+    if(!password || password.length<JamOS.minIdLength || password.length>JamOS.maxIdLength){
+      onError?.(`Password is not correct. Password must have at least ${JamOS.minPasswordLength} characters and cannot be more than ${JamOS.maxPasswordLength}.`);
+      return false;
+    }
+    return true;
+  }
+
+  public static createWorld(wid:string, args?:{calledByProc?:string, onSuccess?:(msg:string)=>void, onError?:(msg:string)=>void}){
+    JamOS.setLoading();
+      axios
+        .post(JamOS.apis.worldCreate, { wid: wid }, JamOS.authHeader)
+        .then((res) => {
+          // console.log("res:", res);
+          const cont = res.data;
+          if (cont) {
+            args?.onSuccess(`Successfully created world ${cont.wid} for ${cont.uid}`);
+          } else {
+            args?.onSuccess("Successfully created world");
+          }
+          JamOS.setLoading(false);
+          if(args?.calledByProc){
+            JamOS.worldList(args?.calledByProc);
+          }
+          return true;
+        })
+        .catch((err) => {
+          console.error(err);
+          const cont = err.response?.data?.content;
+          if (cont) {
+            args?.onError(cont);
+          } else {
+            args?.onError("Unknown error occured. Please try again.");
+          }
+          JamOS.setLoading(false);
+          return false;
+        });
+  }
+
+  // procmgr.set(procId, { worldList:WorldInfo[] })
+  public static worldList(procId:string='system') {
+    //user info is contained in JamOS.authHeader
+    axios
+    .get(JamOS.apis.worldList, JamOS.authHeader)
+    .then((res) => {
+      // console.log("res:", res);
+      const worldList: WorldInfo[] = res.data?.content?.map((datum) => ({
+        uid: datum.uid,
+        wid: datum.wid,
+        rights: datum.wid,
+        created_time: datum.created_time,
+        last_update_time: datum.last_update_time,
+      }));
+      // console.log("worldList:", worldList);
+      // console.log("Initted : ", res.data?.initted);
+      JamOS.procmgr.set(procId, { worldList: [...worldList] });
+      JamOS.setLoading(false);
+    })
+    .catch((err) => {
+      console.error(err);
+      JamOS.setLoading(false);
+    });
+  }
+
+  public static trySignup(userId:string, password:string, args?:{signinAfterSignup?:boolean, procId?:string, onSignup?:(msg:string)=>void, onError?:(msg:string)=>void}):void {
+
+    if(!JamOS.isUserInfoValid(userId, password, args?.onError)){
+      return;
+    }
+
+    JamOS.setLoading();
+    JamOS.setNotif(`Signing up as userId...`);
+    console.log("2");
+
+    axios
+      .post(JamOS.apis.signup, {user:userId, password:password}, this.authHeader)
+      .then(async (res) => {
+        const stat = res.status;
+        const cont = res.data?.content;
+        if (stat === 200) {
+          // JamOS.setNotif("Signed up as " + userInput.user);
+    console.log("3");
+    args?.onSignup("Signed up as " + userId);
+          if (args?.procId)
+            JamOS.procmgr.set(args.procId, { onSignupSuccess: true });
+          if(args?.signinAfterSignup){
+            console.log("4");
+            setTimeout(()=>{
+              JamOS.trySignin(userId, password, {...args})
+            },100);
+          }
+        } else {
+          if (cont) {
+            args?.onError(cont);
+            // JamOS.setNotif(cont, "error");
+          } else {
+            args?.onError("Failed to sign in as " + userId);
+            // JamOS.setNotif("Failed to sign up as " + userInput.user, "error");
+          }
+        }
+        JamOS.setLoading(false);
+      })
+      .catch((err) => {
+        console.error(err);
+        const cont = err.response?.data?.content;
+        if (cont) {
+          args?.onError(cont);
+        } else {
+          args?.onError("Failed to sign up with unknown error code");
+        }
+        JamOS.setLoading(false);
+      });
+  };
 
   public static signin(userId:string, accessToken:string, refreshToken:string){
     const user:JamUser = {

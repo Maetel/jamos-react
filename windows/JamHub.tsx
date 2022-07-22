@@ -1,4 +1,3 @@
-import axios from "axios";
 import { useEffect, useRef, useState } from "react";
 import ShimmerImage from "../components/ShimmerImage";
 import Window from "../components/Window";
@@ -50,83 +49,16 @@ export const onSigninCoreSubmit = (
     withCredentials: true,
   };
 
-  const trySignIn = () => {
-    JamOS.setLoading();
-    JamOS.setNotif(`Signing in as ${userInput.user}...`);
-    axios
-      .post(JamOS.apis.signin, userInput, config)
-      .then(async (res) => {
-        const stat = res.status;
-        const cont = res.data?.content;
-        // console.log("Signin Status : " + stat + "Content : ", cont);
-        const acc = cont["accessToken"];
-        const ref = cont["refreshToken"];
-
-        const signedIn = stat === 200 && acc && ref;
-        if (signedIn) {
-          JamOS.signin(userInput.user, acc, ref);
-          JamOS.setNotif(`Welcome ${userInput.user}`, "success");
-        } else {
-          setError("Failed to sign in as " + userInput.user);
-          CallbackStore.getById(args?.errorCallbackId)?.();
-          // JamOS.setNotif("Failed to sign in as " + userInput.user, "error");
-        }
-        JamOS.setLoading(false);
-      })
-      .catch((err) => {
-        const cont = err.response?.data?.content;
-        if (cont) {
-          setError(cont);
-          CallbackStore.getById(args?.errorCallbackId)?.();
-        } else {
-          setError("Failed to sign in with unknown error code");
-          CallbackStore.getById(args?.errorCallbackId)?.();
-        }
-        JamOS.setLoading(false);
-      });
-  };
-
-  const trySignup = () => {
-    JamOS.setLoading();
-    JamOS.setNotif(`Signing up as ${userInput.user}...`);
-    axios
-      .post(JamOS.apis.signup, userInput, config)
-      .then(async (res) => {
-        const stat = res.status;
-        const cont = res.data?.content;
-        if (stat === 200) {
-          // JamOS.setNotif("Signed up as " + userInput.user);
-          setSuccess?.("Signed up as " + userInput.user);
-          if (args?.procId)
-            JamOS.procmgr.set(args.procId, { onSignupSuccess: true });
-        } else {
-          if (cont) {
-            setError(cont);
-            // JamOS.setNotif(cont, "error");
-          } else {
-            setError("Failed to sign in as " + userInput.user);
-            // JamOS.setNotif("Failed to sign up as " + userInput.user, "error");
-          }
-        }
-        JamOS.setLoading(false);
-      })
-      .catch((err) => {
-        console.error(err);
-        const cont = err.response?.data?.content;
-        if (cont) {
-          setError(cont);
-        } else {
-          setError("Failed to sign up with unknown error code");
-        }
-        JamOS.setLoading(false);
-      });
-  };
-
   if (mode === "signin") {
-    trySignIn();
+    JamOS.trySignin(userInput.user, userInput.password);
   } else {
     //signup then sign in
-    trySignup();
+    console.log("1");
+    JamOS.trySignup(userInput.user, userInput.password, {
+      signinAfterSignup: true,
+      onSignup: args?.successMsg,
+      onError: args?.errorMsg,
+    });
   }
 };
 
@@ -316,6 +248,7 @@ export default function JamHub(props) {
       CallbackStore.unregister(`${proc.id}/onDestroy`);
     }
   }, [isInitial]);
+
   const isFront = JamOS.procmgr.isFront(proc.id);
 
   const jamUser = JamOS.userReadable();
@@ -433,6 +366,10 @@ export default function JamHub(props) {
     JamOS.procmgr.updateToolbarItem(proc.id, "JamHub", "Sign out", {
       disabled: !jamUser.signedin,
     });
+
+    if (isInitial) {
+      JamOS.procmgr.add("worldeditor");
+    }
   }, [jamUser]);
   const statusColor =
     status.type === "standby"

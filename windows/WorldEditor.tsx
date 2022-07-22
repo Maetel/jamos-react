@@ -2,41 +2,10 @@ import axios from "axios";
 import { useEffect, useRef, useState } from "react";
 import ShimmerImage from "../components/ShimmerImage";
 import Window from "../components/Window";
-import JamOS from "../features/JamOS/JamOS";
+import JamOS, { WorldInfo } from "../features/JamOS/JamOS";
 import Process from "../features/procmgr/ProcTypes";
 import styles from "../styles/WorldEditor.module.css";
 import { InnerSignin } from "./JamHub";
-
-interface WorldInfo {
-  uid: string;
-  wid: string;
-  rights: string;
-  created_time: string;
-  last_update_time: string;
-}
-const tryFetchWorlds = (procId: string) => {
-  JamOS.setLoading();
-  axios
-    .get(JamOS.apis.worldList, JamOS.authHeader)
-    .then((res) => {
-      // console.log("res:", res);
-      const worldList: WorldInfo[] = res.data?.content?.map((datum) => ({
-        uid: datum.uid,
-        wid: datum.wid,
-        rights: datum.wid,
-        created_time: datum.created_time,
-        last_update_time: datum.last_update_time,
-      }));
-      // console.log("worldList:", worldList);
-      // console.log("Initted : ", res.data?.initted);
-      JamOS.procmgr.set(procId, { worldList: [...worldList] });
-      JamOS.setLoading(false);
-    })
-    .catch((err) => {
-      console.error(err);
-      JamOS.setLoading(false);
-    });
-};
 
 export interface WorldEditorCoreProps {
   proc: Process;
@@ -45,12 +14,12 @@ export function WorldEditorCore(props: WorldEditorCoreProps) {
   const proc: Process = props.proc;
   const mode = JamOS.procmgr.getReadable(proc.id, "editorMode") ?? "select";
   useEffect(() => {
-    tryFetchWorlds(proc.id);
+    JamOS.worldList(proc.id);
   }, []);
   const updateList = JamOS.procmgr.getReadable(proc.id, "updateList");
   useEffect(() => {
     console.log("updateList");
-    tryFetchWorlds(proc.id);
+    JamOS.worldList(proc.id);
   }, [updateList]);
   const worldList: WorldInfo[] = JamOS.procmgr.getReadable(
     proc.id,
@@ -147,37 +116,7 @@ export function WorldEditorCore(props: WorldEditorCoreProps) {
       if (wname.length === 0) {
         return false;
       }
-      JamOS.setLoading();
-      axios
-        .post(JamOS.apis.worldCreate, { wid: wname }, JamOS.authHeader)
-        .then((res) => {
-          // console.log("res:", res);
-          const cont = res.data;
-          if (cont) {
-            setMsg(`Successfully created world ${cont.wid} for ${cont.uid}`);
-          } else {
-            setMsg("Successfully created world");
-          }
-          // JamOS.format();
-          // JamOS.setWorld(wname);
-          // JamOS.procmgr.killAll("system");
-          // JamOS.procmgr.add("appstore");
-          // JamOS.saveWorld();
-          JamOS.setLoading(false);
-          tryFetchWorlds(proc.id);
-          return true;
-        })
-        .catch((err) => {
-          console.error(err);
-          const cont = err.response?.data?.content;
-          if (cont) {
-            setMsg(cont);
-          } else {
-            setMsg("Unknown error occured. Please try again.");
-          }
-          JamOS.setLoading(false);
-          return false;
-        });
+      JamOS.createWorld(wname, { calledByProc: proc.id });
       return false;
     };
     return (
