@@ -260,11 +260,14 @@ export const procSlice = createSlice({
 
     toggleMaximize:(state, action:PayloadAction<string>)=>{
       const proc = state.procs.find(proc=>proc.id===action.payload);
-      if(!proc){
-        return;
+      if(!proc || proc.type ==='system' || proc.type === 'daemon'){
+        return; 
       }
       if(!proc.rect){
         throw new Error("Win rect must exist");
+      }
+      if(proc.disableMaxBtn){
+        return;
       }
       // console.log(window.innerWidth, ',',window.innerHeight);
       const isMaximized = ()=>(proc.rect.width === '100%' && proc.rect.height === '100%') || (proc.rect.width === `${window.innerWidth}px` && proc.rect.height === `${window.innerHeight}px`);

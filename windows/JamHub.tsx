@@ -165,6 +165,12 @@ export function SigninCore(props: { signinCoreProps?: SigninCoreProps }) {
       });
     }
   }, [onSignupSuccess]);
+  const accElem = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    if (accElem.current) {
+      accElem.current.focus();
+    }
+  }, []);
   return (
     <div className={styles.signinContainer}>
       <form
@@ -182,6 +188,7 @@ export function SigninCore(props: { signinCoreProps?: SigninCoreProps }) {
       >
         <input
           className={`${styles.label} ${styles.userLabel}`}
+          ref={accElem}
           type="text"
           name="user"
           value={user}

@@ -47,6 +47,24 @@ export const themeByName = (name:string, caseSensitive = false)=>{
     return th.name.toLowerCase() === name.toLocaleLowerCase();
   }) ?? defaultTheme;
 }
+export interface BgImg {
+  type:string,
+  src?:string, // default : '/bg/{type}.jpg'
+  title:string,
+  alt?:string, // default : 'Background image of {title}'
+}
+export const buildBg = (bg:BgImg):BgImg=>{
+  return Object.assign({...bg}, {
+    alt:bg.alt??`Background image of ${bg.title}`,
+    src:bg.src??`/bg/${bg.type}.jpg`,
+  });
+}
+export const officialBackgrounds:BgImg[] = [
+  {type:'desert', title:"Desert"},
+  {type:'space', title:"Space"},
+  {type:'lake', title:"Lake"},
+  {type:'mountain', title:"Mountain"},
+]
 const officialThemes:Theme[] = [
     { ...defaultTheme },
 

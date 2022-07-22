@@ -232,14 +232,14 @@ export default function System(props) {
     onSampleInit();
   }, [sampleInit]);
 
-  const disableCmdE = JamOS.getReadable("disableCmdE");
+  const disableMetaKey = JamOS.getReadable("disableMetaKey");
   useEffect(() => {
-    if (disableCmdE) {
+    if (disableMetaKey) {
       setTimeout(() => {
-        JamOS.set({ disableCmdE: false });
+        JamOS.set({ disableMetaKey: false });
       }, 250);
     }
-  }, [disableCmdE]);
+  }, [disableMetaKey]);
 
   return <Daemon {...props} proc={proc}></Daemon>;
 }

@@ -205,6 +205,7 @@ export default function Window(props) {
   }, []);
 
   useEffectOnce(() => {
+    procmgr.set(proc.id, { disableMaxBtn: proc.disableMaxBtn });
     CallbackStore.getById(procmgr.getValue(proc.id, "onMount"))?.();
     return () => {
       CallbackStore.getById(procmgr.getValue(proc.id, "onDestroy"))?.();
@@ -563,10 +564,15 @@ export default function Window(props) {
     //combination
     const combination = (key: string) =>
       (e.metaKey || e.cmdKey) && e.key === key;
-    if (combination("e") && !JamOS.getValue("disableCmdE")) {
+    if (combination("e") && !JamOS.getValue("disableMetaKey")) {
       e.preventDefault();
       JamOS.procmgr.kill(proc.id);
-      JamOS.set({ disableCmdE: true }); //watched by System, will be toggled back to false in 250ms
+      JamOS.set({ disableMetaKey: true }); //watched by System, will be toggled back to false in 250ms
+    }
+    if (combination("f") && !JamOS.getValue("disableMetaKey")) {
+      e.preventDefault();
+      JamOS.procmgr.toggleMaximize(proc.id);
+      JamOS.set({ disableMetaKey: true }); //watched by System, will be toggled back to false in 250ms
     }
   };
 

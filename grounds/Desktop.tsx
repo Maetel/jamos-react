@@ -9,9 +9,11 @@ import {
 import Path from "../scripts/Path";
 import { Dir } from "../features/file/FileTypes";
 import ShimmerImage from "../components/ShimmerImage";
-
-const backgroundImg = "/imgs/wall2.jpg";
-const broomImg = "/imgs/broom.svg";
+import {
+  BgImg,
+  buildBg,
+  officialBackgrounds,
+} from "../features/settings/Themes";
 
 export default function Desktop(props) {
   const filemgr = JamOS.filemgr;
@@ -95,6 +97,9 @@ export default function Desktop(props) {
   const isLoading = JamOS.getReadable("isLoading");
   const colors = JamOS.theme.colors;
 
+  const bg: BgImg = JamOS.setmgr.getReadable("bg") ?? officialBackgrounds.at(0);
+  const bgRestored: BgImg = buildBg(bg);
+
   return (
     <div
       id="desktop"
@@ -108,8 +113,8 @@ export default function Desktop(props) {
       <div className={styles.bgImageWrapper}>
         <img
           className={styles.bgImage}
-          src={backgroundImg}
-          alt="Desktop background"
+          src={bgRestored.src}
+          alt={bgRestored.alt}
         />
         <div
           className={styles.behindImage}

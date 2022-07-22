@@ -8,6 +8,8 @@
 }
 
 .title {
+  width:100%;
+  position: relative;
   height:16%;
   margin:0;
   display:flex;
@@ -130,8 +132,8 @@
 
 .signout {
   position:absolute;
-  bottom:32px;
-  right:32px;
+  /* bottom:32px; */
+  right:30px;
   overflow:hidden;
   display:flex;
   justify-content: center;

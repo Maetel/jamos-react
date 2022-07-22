@@ -17,6 +17,7 @@ interface FeatDatum {
   items?: FeatItem[];
   title: string;
   desc: string;
+  skipOverall?: boolean;
 }
 interface FeatData {
   [key: string]: FeatDatum;
@@ -40,6 +41,23 @@ const data: FeatData = {
         type: "notification",
         name: "Notification",
         desc: "Notifies system messages. Hover on right bottom of the page to see notification history. Click on a notification to open the collection.",
+      },
+    ],
+  },
+  shortcut: {
+    title: "Shortcuts",
+    desc: "Keyboard shortcuts for convenience",
+    skipOverall: true,
+    items: [
+      {
+        type: "cmde",
+        name: "Close window",
+        desc: "Usage : Cmd + e",
+      },
+      {
+        type: "cmdf",
+        name: "Fullscreen",
+        desc: "Usage : Cmd + f",
       },
     ],
   },
@@ -341,15 +359,17 @@ export default function Features(props) {
               >
                 <h1 className={styles.categoryTitle}>{category.title}</h1>
                 <div className={styles.categoryDesc}>{category.desc}</div>
-                <div className={styles.imageWrapper}>
-                  <video
-                    controls
-                    muted
-                    autoPlay
-                    loop
-                    src={`/clips/${key}-overall.webm`}
-                  ></video>
-                </div>
+                {!category.skipOverall && (
+                  <div className={styles.imageWrapper}>
+                    <video
+                      controls
+                      muted
+                      autoPlay
+                      loop
+                      src={`/clips/${key}-overall.webm`}
+                    ></video>
+                  </div>
+                )}
                 {category?.items?.map((item: FeatItem) => (
                   <article
                     key={buildId(key, item.type)}
