@@ -320,8 +320,8 @@ export default function Terminal(props) {
     ],
     ["kill", "kill <$processId>", "closes process", "closes process"],
     ["killall", "killall", "closes all processes", "closes all processes"],
-    ["savebread", "savebread", "save current status", "save current status"],
-    ["loadbread", "loadbread", "load saved", "load saved"],
+    ["saveworld", "saveworld", "save current status", "save current status"],
+    ["loadworld", "loadworld", "load saved", "load saved"],
     [
       "resetbread",
       "resetbread",
@@ -655,13 +655,15 @@ export default function Terminal(props) {
           addWarn("Failed to remove file");
         }
         return;
-      case "savebread":
-        JamOS.saveData("breadData", JamOS.stringify());
+      case "saveworld":
+        JamOS.saveWorld();
         return;
-      case "loadbread":
-        const loaded = JamOS.loadData("breadData");
-        // addText(loaded);
-        JamOS.loadFromString(loaded);
+      case "loadworld":
+        if (!merged || merged.length === 0) {
+          JamOS.loadWorld();
+        } else {
+          JamOS.loadWorld(merged);
+        }
         return;
       case "resetbread":
         JamOS.reset();

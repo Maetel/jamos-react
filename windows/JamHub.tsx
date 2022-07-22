@@ -292,6 +292,7 @@ export default function JamHub(props) {
   };
   proc.disableMaxBtn = proc.disableMaxBtn ?? true;
   proc.hideNav = proc.hideNav ?? true;
+  proc.closeOnEscape = proc.closeOnEscape ?? true;
   const isInitial = JamOS.procmgr.getReadable(proc.id, "isInitial");
   useEffect(() => {
     if (isInitial) {
@@ -305,6 +306,14 @@ export default function JamHub(props) {
         },
         disableDrag: true,
       });
+      CallbackStore.register(`${proc.id}/onDestroy`, (killThisProc) => {
+        if (JamOS.worldValue().name === "__pending__") {
+          JamOS.setWorld("sample_world");
+        }
+        killThisProc();
+      });
+    } else {
+      CallbackStore.unregister(`${proc.id}/onDestroy`);
     }
   }, [isInitial]);
   const isFront = JamOS.procmgr.isFront(proc.id);
@@ -326,26 +335,25 @@ export default function JamHub(props) {
     }
     JamOS.procmgr.kill(proc.id);
   };
-  const handleKey = (e) => {
-    const isFront = JamOS.procmgr.getValue(proc.id, "zIndex") === "0";
-    if (!isFront) {
-      return;
-    }
-    const keyMap = {
-      Escape: handleCancel,
-    };
-    keyMap[e.key]?.(e);
-  };
 
-  useEffect(() => {
-    setTimeout(() => {
-      window.addEventListener("keydown", handleKey);
-    }, 300);
-
-    return () => {
-      window.removeEventListener("keydown", handleKey);
-    };
-  }, []);
+  // const handleKey = (e) => {
+  //   const isFront = JamOS.procmgr.getValue(proc.id, "zIndex") === "0";
+  //   if (!isFront) {
+  //     return;
+  //   }
+  //   const keyMap = {
+  //     Escape: handleCancel,
+  //   };
+  //   keyMap[e.key]?.(e);
+  // };
+  // useEffect(() => {
+  //   setTimeout(() => {
+  //     window.addEventListener("keydown", handleKey);
+  //   }, 300);
+  //   return () => {
+  //     window.removeEventListener("keydown", handleKey);
+  //   };
+  // }, []);
 
   const setSuccess = (msg: string) => {
     JamOS.setNotif(msg, "success");
@@ -475,7 +483,7 @@ export default function JamHub(props) {
               className={`${styles.btn}`}
               style={btnStyle}
               onClick={(e) => {
-                JamOS.setWorld("sample_world");
+                // JamOS.setWorld("sample_world");
                 JamOS.procmgr.kill(proc.id);
               }}
             >

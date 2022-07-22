@@ -204,6 +204,29 @@ export default function Window(props) {
     }
   }, []);
 
+  const handleKey = (e) => {
+    if (!JamOS.procmgr.isFrontValue(proc.id)) {
+      return;
+    }
+    const keyMap = {
+      Escape: (e) => {
+        procmgr.kill(proc.id);
+      },
+    };
+    keyMap[e.key]?.(e);
+  };
+  useEffect(() => {
+    if (!proc.closeOnEscape) {
+      return;
+    }
+    setTimeout(() => {
+      window.addEventListener("keydown", handleKey);
+    }, 300);
+    return () => {
+      window.removeEventListener("keydown", handleKey);
+    };
+  }, []);
+
   useEffectOnce(() => {
     procmgr.set(proc.id, { disableMaxBtn: proc.disableMaxBtn });
     CallbackStore.getById(procmgr.getValue(proc.id, "onMount"))?.();

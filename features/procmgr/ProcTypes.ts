@@ -52,6 +52,7 @@ export default interface Process {
   disableBackground?:boolean,
   opaqueBackground?:boolean,
   closeOnBackgroundClick?:boolean,
+  closeOnEscape?:boolean,
   disableDrag?:boolean,
   disableCloseBtn?:boolean,
   disableMinBtn?:boolean,

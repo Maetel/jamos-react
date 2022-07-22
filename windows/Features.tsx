@@ -67,31 +67,31 @@ const data: FeatData = {
   },
   terminal: {
     title: "Terminal",
-    desc: "Command Line Interface(CLI) for JamOS",
+    desc: "Command Line Interface(CLI) for JamOS. The terminal app provides full access and control to the entire OS, supporting auto completion by 'Tab' key.",
     items: [
       {
         type: "ls",
-        name: "list files",
+        name: "List files",
         desc: "Interactive list of files and directories.",
       },
       {
         type: "browse",
-        name: "browse",
+        name: "Browse",
         desc: "Browse throughout the file system using 'cd' command.",
       },
 
       {
         type: "rm",
-        name: "remove",
+        name: "Remove",
         desc: "Remove files and directories",
       },
       {
         type: "toolbar",
-        name: "toggle toolbar",
+        name: "Toggle toolbar",
       },
       {
         type: "dock",
-        name: "toggle dock",
+        name: "Toggle dock",
       },
     ],
   },
@@ -126,7 +126,19 @@ const data: FeatData = {
   },
   styler: {
     title: "Styler",
-    desc: "Set OS theme and style. Type 'styler -h' to use on Terminal app.",
+    desc: "Set OS theme and style. You can change styles in terminal.",
+    items: [
+      {
+        type: "background",
+        name: "Background",
+        desc: "Change background image, or upload your own image(to be update).",
+      },
+      {
+        type: "terminal",
+        name: "Terminal",
+        desc: "Type 'styler -l' to view style list and either click on the item or type 'styler {style}'.",
+      },
+    ],
   },
   notepad: {
     title: "Notepad",

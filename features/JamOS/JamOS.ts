@@ -298,6 +298,7 @@ return server;
     // const saveable = this.userValue().signedin && this.worldValue().name !==_initialWorld.name;
     const saveable = this.userValue().signedin;
     if(!saveable){
+      JamOS.setNotif(`Sign in first to save`, 'warn')
       return;
     }
     const wid = this.worldValue().name;
@@ -349,6 +350,9 @@ return server;
   }
   public static loadWorld(wid?:string){
     wid = wid ?? this.worldValue().name;
+    if(wid.length===0){
+      wid = 'sample_world';
+    }
     JamOS.setNotif(`Loading ${wid}...`)
     JamOS.setLoading();
     return axios.get(this.apis.worldLoad+wid,this.authHeader).then(res=>{
