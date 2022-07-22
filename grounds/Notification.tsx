@@ -16,7 +16,9 @@ export default function Notification(props) {
   }));
   const notifDuration = JamOS.notifDuration;
   const notifsToShow: NotifWithI[] = JamOS.getReadable("notifsToShow");
-  const showLastNotifs: boolean = JamOS.getReadable("showLastNotifs");
+  // const showLastNotifs: boolean = JamOS.getReadable("showLastNotifs");
+  const [showLastNotifs, setShowLastNotifs] = useState(false);
+
   const colors = JamOS.theme.colors;
 
   // const timer = JamOS.getReadable("timer");
@@ -99,7 +101,7 @@ export default function Notification(props) {
             NotifTriggerHeight &&
           Math.abs(e.clientX - window.innerWidth) / (window.innerWidth + 0.1) <
             NotifTriggerWidth;
-        JamOS.set({ showLastNotifs: isEdge });
+        setShowLastNotifs(isEdge);
       };
       window.addEventListener("mousemove", detectEdge);
       return () => {
