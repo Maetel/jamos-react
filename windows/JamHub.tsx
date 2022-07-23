@@ -366,10 +366,6 @@ export default function JamHub(props) {
     JamOS.procmgr.updateToolbarItem(proc.id, "JamHub", "Sign out", {
       disabled: !jamUser.signedin,
     });
-
-    if (isInitial) {
-      JamOS.procmgr.add("worldeditor");
-    }
   }, [jamUser]);
   const statusColor =
     status.type === "standby"

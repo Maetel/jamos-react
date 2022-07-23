@@ -119,12 +119,8 @@ export default function System(props) {
       }
       return;
     }
-    const d = JamOS.loadData("breadData");
     const initAnywaysForDebug = !true;
-    if (d && initAnywaysForDebug) {
-      JamOS.loadFromString(d);
-      JamOS.setNotif("Loading finished!");
-    } else {
+    {
       if (!initted) {
         init();
         initted = true;
@@ -140,7 +136,7 @@ export default function System(props) {
     }
 
     const onSaveOnExit = (e) => {
-      JamOS.saveData("breadData", JamOS.stringify());
+      JamOS.saveWorld();
       console.log("Save on exit");
     };
     const onAskOnExit = (e) => {
@@ -182,7 +178,7 @@ export default function System(props) {
 
     if (0) {
       console.log("Save on option change");
-      JamOS.saveData("breadData", JamOS.stringify());
+      JamOS.saveWorld();
     }
   }, [saveOnExit, askOnExit, muteOptions]);
 

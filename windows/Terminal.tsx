@@ -16,7 +16,7 @@ import Log from "../features/log/Log";
 import Commands from "../scripts/CommandParser";
 import officialThemes, { themeExists } from "../features/settings/Themes";
 import JamOS from "../features/JamOS/JamOS";
-import Process from "../features/procmgr/ProcTypes";
+import Process, { AddOnTerminals } from "../features/procmgr/ProcTypes";
 import { dirExists } from "../features/file/fileSlice";
 import CallbackStore from "../features/JamOS/CallbackStore";
 
@@ -475,23 +475,6 @@ export default function Terminal(props) {
       case "signout":
         JamOS.signout();
         break;
-      case "test":
-        // procmgr.openTextModal(proc.id, { title: "Terminal test" });
-        break;
-      case "postman":
-      case "about":
-      case "settings":
-      case "terminal":
-      case "appstore":
-      case "logger":
-      case "settings":
-      case "systeminfo":
-      case "comments":
-      case "jamhub":
-      case "worldeditor":
-        procmgr.add(cmd);
-        break;
-
       case "dock":
         JamOS.toggleDock();
         break;
@@ -847,7 +830,11 @@ export default function Terminal(props) {
         procmgr.toggleMaximize(proc.id);
         break;
       default:
-        addError("No command : " + cmds.join(" "));
+        if (AddOnTerminals.includes(cmd)) {
+          procmgr.add(cmd);
+        } else {
+          addError("No command : " + cmds.join(" "));
+        }
         break;
     }
   };

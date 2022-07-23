@@ -8,7 +8,7 @@ import {killAllofType} from "../procmgr/procSlice";
 import SetMgr from "../settings/SetMgr";
 import { Theme } from "../settings/Themes";
 import CallbackStore from "./CallbackStore";
-import { closeDock, closeToolbar, forceHideDock, forceHideToolbar, forceOpenDock, forceOpenToolbar, getUser, getWorld, JamUser, JamWorld, Notif, openDock, openToolbar, selectForceHideDock, selectForceHideToolbar, selectForceOpenDock, selectForceOpenToolbar, selectIsDockOpen, selectIsToolbarOpen, selectNotifDuration, selectNotifs, selectUser, selectWorld, setNotification, setUser, toggleDock, toggleToolbar, signout, setWorld, _initialWorld, setWorldLoaded, loadOsFromString, setArgs, selectArgs } from "./osSlice";
+import { closeDock, closeToolbar, forceHideDock, forceHideToolbar, forceOpenDock, forceOpenToolbar, getUser, getWorld, JamUser, JamWorld, Notif, openDock, openToolbar, selectForceHideDock, selectForceHideToolbar, selectForceOpenDock, selectForceOpenToolbar, selectIsDockOpen, selectIsToolbarOpen, selectNotifDuration, selectNotifs, selectUser, selectWorld, setNotification, setUser, toggleDock, toggleToolbar, signout, setWorld, _initialWorld, setWorldLoaded, loadOsFromString, setArgs, selectArgs, updateUserToken } from "./osSlice";
 
 export interface SerializedData {
   proc?:string,
@@ -44,7 +44,6 @@ export default class JamOS {
     const retval = {};
     const val = JamOS.procmgr.getValue(procId, prop);
     if(!(typeof val === 'boolean' || val === undefined)){
-      console.log("val",val);
       return false;
     }
     retval[prop] = !val;
@@ -105,19 +104,19 @@ export default class JamOS {
       console.error(err);
     }
   }
-  public static saveData(key:string,val:string){
+  public static saveLocal(key:string,val:string){
     localStorage.setItem(key,val)
   }
-  public static loadData(key:string):string{
+  public static loadLocal(key:string):string{
     return localStorage.getItem(key);
   }
-  public static saveStringified(){
+  private static _saveStringified(){
     console.log("saveStringified");
-    JamOS.saveData("stringifiedJamOS",  JamOS.stringify());
+    JamOS.saveLocal("stringifiedJamOS",  JamOS.stringify());
   }
-  public static loadStringified(){
+  private static _loadStringified(){
     console.log("loadStringified");
-    const data = JamOS.loadData("stringifiedJamOS");
+    const data = JamOS.loadLocal("stringifiedJamOS");
     if(data){
       JamOS.loadFromString(data);
     }
@@ -204,12 +203,16 @@ export default class JamOS {
   }
 
   public static get server() {
+    const local = "http://localhost:3000/";
+    const remote = "https://jamos-v2.herokuapp.com/"
     const server =
-  process.env.NODE_ENV === "development"
-    ? "http://localhost:3000/"
-    : "https://jamos-v2.herokuapp.com/";
-// const server = 'http://jamos-v2/';
-return server;
+      process.env.NODE_ENV === "development"
+        ? local
+        : remote;
+    
+    // return remote;
+    return server;
+    
   }
   public static get apis() {
     const retval = {
@@ -217,6 +220,7 @@ return server;
       signup : "user/signup",  //post
       signin : "user/signin",  //post
       signincheck : "user/check",  //get
+      refreshToken : 'user/refresh', //get
       worldList : 'world/list', //get
       worldCreate : 'world/create', // post 
       worldSave : 'world/data', //post
@@ -242,7 +246,7 @@ return server;
     return useAppSelector(selectWorld);
   }
 
-  public static get authHeader () {
+  public static get authHeader ():{} {
     // const token = getCookie('accessToken');
     const token = this.userValue().token;
     return token ? { headers: {"Authorization" : `Bearer ${token}`}, withCredentials:true } : {withCredentials:true};
@@ -250,7 +254,6 @@ return server;
 
   public static trySignin(userId:string, password:string, args?:{procId?:string, onSignin?:(msg:string)=>void, onError?:(msg:string)=>void}):void{
 
-    console.log("5");
 
     if(!JamOS.isUserInfoValid(userId, password, args?.onError)){
       return;
@@ -261,17 +264,17 @@ return server;
     axios
       .post(JamOS.apis.signin, {user:userId, password:password}, this.authHeader)
       .then(async (res) => {
+        // console.log("res:",res);
         const stat = res.status;
         const cont = res.data?.content;
         // console.log("Signin Status : " + stat + "Content : ", cont);
         const acc = cont["accessToken"];
         const ref = cont["refreshToken"];
 
+
         const signedIn = stat === 200 && acc && ref;
-    console.log("6");
-    if (signedIn) {
-    console.log("7");
-    JamOS.signin(userId, acc, ref);
+        if (signedIn) {
+          JamOS.signin(userId, acc, ref);
           JamOS.setNotif(`Welcome ${userId}`, "success");
           args?.onSignin?.(`Welcome ${userId}`);
         } else {
@@ -279,23 +282,23 @@ return server;
           args?.onError?.("Failed to sign in as " + userId);
           // CallbackStore.getById(args?.errorCallbackId)?.();
           // JamOS.setNotif("Failed to sign in as " + userInput.user, "error");
-    console.log("8");
-  }
-        JamOS.setLoading(false);
-      })
-      .catch((err) => {
-        const cont = err.response?.data?.content;
-        if (cont) {
-          JamOS.setNotif(cont);
-          args?.onError?.(cont);
-          // CallbackStore.getById(args?.errorCallbackId)?.();
-        } else {
-          JamOS.setNotif("Failed to sign in as " + userId, "error");
-          args?.onError?.("Failed to sign in with unknown error code");
-          // CallbackStore.getById(args?.errorCallbackId)?.();
         }
-        JamOS.setLoading(false);
-      });
+          JamOS.setLoading(false);
+        })
+        .catch((err) => {
+          // console.log("Err:",err);
+          const cont = err.response?.data?.message;
+          if (cont) {
+            JamOS.setNotif(cont);
+            args?.onError?.(cont);
+            // CallbackStore.getById(args?.errorCallbackId)?.();
+          } else {
+            JamOS.setNotif("Failed to sign in as " + userId, "error");
+            args?.onError?.("Failed to sign in with unknown error code");
+            // CallbackStore.getById(args?.errorCallbackId)?.();
+          }
+          JamOS.setLoading(false);
+        });
   }
 
   public static get minIdLength() { return 3; }
@@ -321,11 +324,11 @@ return server;
         .post(JamOS.apis.worldCreate, { wid: wid }, JamOS.authHeader)
         .then((res) => {
           // console.log("res:", res);
-          const cont = res.data;
+          const cont = res.data?.content;
           if (cont) {
-            args?.onSuccess(`Successfully created world ${cont.wid} for ${cont.uid}`);
+            args?.onSuccess?.(`Successfully created world ${cont.wid} for ${cont.uid}`);
           } else {
-            args?.onSuccess("Successfully created world");
+            args?.onSuccess?.("Successfully created world");
           }
           JamOS.setLoading(false);
           if(args?.calledByProc){
@@ -335,11 +338,19 @@ return server;
         })
         .catch((err) => {
           console.error(err);
-          const cont = err.response?.data?.content;
-          if (cont) {
-            args?.onError(cont);
+          const msg = err.response?.data?.message;
+          if(err.response?.status === 401 && msg === 'jwt expired'){
+            JamOS.setLoading(false)
+            JamOS.refreshToken().then(_=>{
+              JamOS.createWorld(wid, args);
+            });
+            return;
+          }
+
+          if (msg) {
+            args?.onError?.(msg);
           } else {
-            args?.onError("Unknown error occured. Please try again.");
+            args?.onError?.("Unknown error occured. Please try again.");
           }
           JamOS.setLoading(false);
           return false;
@@ -347,13 +358,17 @@ return server;
   }
 
   // procmgr.set(procId, { worldList:WorldInfo[] })
-  public static worldList(procId:string='system') {
+  public static worldList(procId?:string) {
     //user info is contained in JamOS.authHeader
+    procId = procId ?? JamOS.procmgr.processesValue()?.find(proc=>proc.type==='worldeditor')?.id;
+    if(!procId){
+      return;
+    }
+    JamOS.setLoading(true);
     axios
     .get(JamOS.apis.worldList, JamOS.authHeader)
     .then((res) => {
-      // console.log("res:", res);
-      const worldList: WorldInfo[] = res.data?.content?.map((datum) => ({
+      const worldList: WorldInfo[] = res.data?.content?.rows?.map((datum) => ({
         uid: datum.uid,
         wid: datum.wid,
         rights: datum.wid,
@@ -362,24 +377,30 @@ return server;
       }));
       // console.log("worldList:", worldList);
       // console.log("Initted : ", res.data?.initted);
-      JamOS.procmgr.set(procId, { worldList: [...worldList] });
       JamOS.setLoading(false);
+      JamOS.procmgr.set(procId, { worldList: [...worldList] });
     })
     .catch((err) => {
-      console.error(err);
+      const msg = err.response?.data?.message;
+      if(err.response?.status === 401 && msg === 'jwt expired'){
+        JamOS.setLoading(false)
+        JamOS.refreshToken().then(_=>{
+          console.log("on refresh");
+          JamOS.worldList(procId);
+        });
+        return;
+      }
       JamOS.setLoading(false);
+      console.error(err);
     });
   }
 
   public static trySignup(userId:string, password:string, args?:{signinAfterSignup?:boolean, procId?:string, onSignup?:(msg:string)=>void, onError?:(msg:string)=>void}):void {
-
     if(!JamOS.isUserInfoValid(userId, password, args?.onError)){
       return;
     }
-
     JamOS.setLoading();
     JamOS.setNotif(`Signing up as userId...`);
-    console.log("2");
 
     axios
       .post(JamOS.apis.signup, {user:userId, password:password}, this.authHeader)
@@ -388,22 +409,20 @@ return server;
         const cont = res.data?.content;
         if (stat === 200) {
           // JamOS.setNotif("Signed up as " + userInput.user);
-    console.log("3");
-    args?.onSignup("Signed up as " + userId);
+    args?.onSignup?.("Signed up as " + userId);
           if (args?.procId)
             JamOS.procmgr.set(args.procId, { onSignupSuccess: true });
           if(args?.signinAfterSignup){
-            console.log("4");
             setTimeout(()=>{
               JamOS.trySignin(userId, password, {...args})
             },100);
           }
         } else {
           if (cont) {
-            args?.onError(cont);
+            args?.onError?.(cont);
             // JamOS.setNotif(cont, "error");
           } else {
-            args?.onError("Failed to sign in as " + userId);
+            args?.onError?.("Failed to sign in as " + userId);
             // JamOS.setNotif("Failed to sign up as " + userInput.user, "error");
           }
         }
@@ -413,9 +432,9 @@ return server;
         console.error(err);
         const cont = err.response?.data?.content;
         if (cont) {
-          args?.onError(cont);
+          args?.onError?.(cont);
         } else {
-          args?.onError("Failed to sign up with unknown error code");
+          args?.onError?.("Failed to sign up with unknown error code");
         }
         JamOS.setLoading(false);
       });
@@ -429,7 +448,10 @@ return server;
     }
     store.dispatch(setUser(user));
     JamOS.setWorld("__pending__")
+    JamOS.saveLocal('refreshToken', refreshToken);
   }
+
+
 
   public static signout(){
     store.dispatch(signout());
@@ -453,11 +475,12 @@ return server;
     JamOS.setLoading();
     wid = wid ?? JamOS.worldValue().name;
     JamOS.setNotif(`Deleting ${wid}...`);
+    const proc = JamOS.procmgr.processOfTypeValue('worldeditor');
     axios.delete(JamOS.apis.worldDelete, { data:{wid:wid}, ...this.authHeader}).then(res=>{
       // console.log(res);
       // console.log("wid:",wid,", res.data?.wid:",res.data?.wid);
-      if(wid && wid === res.data?.wid){
-        const proc = JamOS.procmgr.processOfTypeValue('worldeditor');
+      const content = res.data?.content
+      if(content && wid && wid === content.wid){
         // console.log("deleteworld : proc",proc);
         if(proc){
           JamOS.toggle(proc.id, 'updateList');
@@ -467,10 +490,18 @@ return server;
         JamOS.setNotif(`Failed to delete ${wid}${res.data?.content ?? ""}`, 'error');
       }
       JamOS.setLoading(false);
+      JamOS.worldList();
     }).catch(err=>{
       console.error(err);
+      const msg = err.response?.data?.message;
+      if(err.response?.status === 401 && msg === 'jwt expired'){
+        JamOS.setLoading(false)
+        JamOS.refreshToken();
+        return;
+      }
       JamOS.setLoading(false);
       JamOS.setNotif(`Failed to delete ${wid} : ${err}`, 'error');
+      JamOS.worldList();
     });
   }
 
@@ -512,15 +543,21 @@ return server;
       data:data,
       wid:wid
     }
-    const res = axios.post(this.apis.worldSave, payload, this.authHeader).then(res=>{
-      // console.log(res);
-    JamOS.setLoading(false);
-    JamOS.setNotif(`${wid} saved`, 'success');
-  }).catch(err=>{
-    console.error(err);
-    JamOS.setLoading(false);
-    JamOS.setNotif(`Faild to save ${wid} : ${err}`, 'error');
-  })
+    axios.post(this.apis.worldSave, payload, this.authHeader).then(res=>{
+        // console.log(res);
+      JamOS.setLoading(false);
+      JamOS.setNotif(`${wid} saved`, 'success');
+    }).catch(err=>{
+      console.error(err);
+      const msg = err.response?.data?.message;
+          if(err.response?.status === 401 && msg === 'jwt expired'){
+            JamOS.setLoading(false)
+            JamOS.refreshToken();
+            return;
+          }
+      JamOS.setLoading(false);
+      JamOS.setNotif(`Faild to save ${wid} : ${err}`, 'error');
+    })
   }
   public static setLoading(isLoading:boolean=true){
     JamOS.set({isLoading:isLoading});
@@ -536,13 +573,15 @@ return server;
     JamOS.setNotif(`Loading ${wid}...`)
     JamOS.setLoading();
     return axios.get(this.apis.worldLoad+wid,this.authHeader).then(res=>{
-      const content = res.data;
+      const content = res.data?.content;
+      console.log({res});
       const funcMap = {
         file:JamOS.filemgr.loadFromString,
         proc:JamOS.procmgr.loadFromString,
         setting:JamOS.setmgr.loadFromString,
         os:(data)=>{store.dispatch(loadOsFromString(data));}
       }
+      console.log("content[key]:",content['os']);
       for(let key in funcMap){
         if(content[key]){
           funcMap[key](content[key]);
@@ -551,7 +590,13 @@ return server;
     JamOS.setLoading(false);
     JamOS.setNotif(`${wid} loaded`, 'success');
   }).catch(err=>{
-      console.error(err);
+    console.error(err);
+    const msg = err.response?.data?.message;
+    if(err.response?.status === 401 && msg === 'jwt expired'){
+      JamOS.setLoading(false)
+      JamOS.refreshToken();
+      return;
+    }
     JamOS.setLoading(false);
     JamOS.setNotif(`Faild to load ${wid}`, 'error');
   });
@@ -570,6 +615,34 @@ return server;
     } else {
       store.dispatch(setWorldLoaded(loaded))
     }
+  }
+  public static async refreshToken(){
+    const token = JamOS.loadLocal('refreshToken');
+    if(!token){
+      JamOS.setNotif("Session expired. Sign in again please.", 'error');
+      return;
+    }
+    JamOS.setLoading();
+    const config = {...JamOS.authHeader};
+    if(config['headers']){
+      config['headers'] = {...config['headers'], refresh:token}
+    } else {
+      config['headers'] = { refresh:token}
+    }
+    return axios.get(JamOS.apis.refreshToken, config).then(res=>{
+      const acc = res.data?.content?.accessToken;
+      if(acc){
+        store.dispatch(updateUserToken(acc));
+      } else {
+        JamOS.setNotif("Session expired. Sign in again please.", 'error');
+      }
+      JamOS.setLoading(false);
+
+    }).catch(err=>{
+      console.error(err);
+      // JamOS.setNotif()
+      JamOS.setLoading(false);
+    })
   }
 }
 export type SaveWorldType = 'whole' | 'os' | 'file' | 'proc' | 'setting';

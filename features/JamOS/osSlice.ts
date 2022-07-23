@@ -61,6 +61,10 @@ const osSlice = createSlice({
   initialState,
   reducers:{
    
+    
+    updateUserToken:(state,action:PayloadAction<string>)=>{
+      state.jamUser.token = action.payload;
+    },
     setUser:(state,action:PayloadAction<JamUser>)=>{
       const user:JamUser = action.payload;
       state.jamUser = {...user};
@@ -153,4 +157,4 @@ export const selectNotifDuration = (state:AppState):number=>state.os.notifDurati
 export const selectNotifs = (state:AppState):Notif[]=>state.os.notifs;
 export const selectArgs = (prop:string)=>(state:AppState)=>state.os.args[prop];
 export default osSlice.reducer;
-export const { setNotification, openToolbar, closeToolbar, toggleToolbar, openDock, closeDock,toggleDock,forceHideToolbar, forceHideDock,forceOpenToolbar, forceOpenDock, setUser, setWorld, setWorldLoaded, signout, loadOsFromString, setArgs } = osSlice.actions;
+export const { setNotification, openToolbar, closeToolbar, toggleToolbar, openDock, closeDock,toggleDock,forceHideToolbar, forceHideDock,forceOpenToolbar, forceOpenDock, setUser, updateUserToken, setWorld, setWorldLoaded, signout, loadOsFromString, setArgs } = osSlice.actions;

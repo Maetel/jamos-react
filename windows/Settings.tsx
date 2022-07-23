@@ -26,16 +26,6 @@ export default function Settings(props) {
   };
   const settingsView = buildView(settings);
 
-  const saveBread = (forceSave: boolean = false) => {
-    JamOS.saveData("breadData", JamOS.stringify());
-  };
-  const loadBread = (forceSave: boolean = false) => {
-    const d = JamOS.loadData("breadData");
-    if (d) {
-      JamOS.loadFromString(d);
-    }
-  };
-
   const toggleBoolean = (key: string) => {
     setmgr.toggleBoolean(key);
   };
@@ -49,8 +39,7 @@ export default function Settings(props) {
             <button
               className={`${styles.btn} ${styles.save}`}
               onClick={() => {
-                saveBread();
-                JamOS.setNotif("Saved", "system");
+                JamOS.saveWorld();
               }}
             >
               Save
@@ -58,8 +47,7 @@ export default function Settings(props) {
             <button
               className={`${styles.btn} ${styles.load}`}
               onClick={() => {
-                loadBread();
-                JamOS.setNotif("Loaded", "system");
+                JamOS.loadWorld();
               }}
             >
               Load

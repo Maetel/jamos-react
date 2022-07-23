@@ -100,6 +100,7 @@ export interface ProcessCommand {
   defaultFileName?:string,
   hideOnDock?:boolean,
   hideOnToolbar?:boolean,
+  onTerminal?:boolean,
 }
 
 export const ProcessTypeName = (type:string):string=>{
@@ -115,36 +116,36 @@ export const _ProcessCommands:ProcessCommand[] = [
   {comp:"textmodal", name:"TextModal",icon:"/imgs/circlequestion.svg", hideOnDock:true, hideOnToolbar:true},
   {comp:"filedialogue", name:"FileDialogue",icon:"/imgs/circlequestion.svg", hideOnDock:true, hideOnToolbar:true},
   {comp:"contextmenu", name:"Context Menu",icon:"/imgs/circlequestion.svg", hideOnDock:true, hideOnToolbar:true},
-  
-  {comp:"appstore", name:"AppStore",icon:"/imgs/appstore.svg", defaultFileName:"AppStore",addOnAppstore:true},
-  {comp:"testwindow", name:'Test Window', defaultFileName:"Test Window"},
-  {comp:"viewer",name:"Viewer", icon:"/imgs/viewer.svg", addOnAppstore:true, defaultFileName:"Viewer"},
-  {comp:"editor",name:"Editor", },
-  {comp:"browser",name:"Browser",},
-  {comp:"notepad", name:"Notepad",icon:"/imgs/notepad.svg", addOnAppstore:true, defaultFileName:"Notepad"},
-  {comp:"terminal", name:"Terminal",icon:"/imgs/terminal.svg", addOnAppstore:true, defaultFileName:"Terminal"},
-  {comp:"logger",name:"Logger", icon:"/imgs/logger.svg", runOnce:true, addOnAppstore:true, defaultFileName:"Logger"},
-  {comp:"finder",name:"Finder", icon:"/imgs/dir.svg", addOnAppstore:true, defaultFileName:"Finder"},
-  {comp:"atelier",name:"Atelier", icon:"/imgs/atelier.svg", addOnAppstore:true, defaultFileName:"Atelier"},
-  {comp:"postman", name:"Postman",icon:"/imgs/postman.svg", runOnce:true, addOnAppstore:true, defaultFileName:"Postman"},
-  {comp:"about",name:"About", icon:"/imgs/jamos.png", addOnAppstore:true, defaultFileName:"About"},
-  {comp:"notif",name:"Notifications", icon:"/imgs/notif.png", addOnAppstore:true, defaultFileName:"Notifications", runOnce:true},
-  {comp:"settings", name:"Settings",icon:"/imgs/settings.svg", runOnce:true, addOnAppstore:true, defaultFileName:"Settings"},
-  {comp:"styler", name:"Styler",icon:"/imgs/styler.svg", runOnce:true, addOnAppstore:true, defaultFileName:"Styler"},
-  {comp:"systeminfo",name:"SystemInfo", icon:"/imgs/systeminfo.svg", runOnce:true, addOnAppstore:true, defaultFileName:"System Monitor"},
-  {comp:'simpleabout',name:"About", icon:"/imgs/circlequestion.svg"},
   {comp:'toolbar',name:"Toolbar", icon:"/imgs/circlequestion.svg", type:'system'},
+  
+  {comp:"appstore", name:"AppStore",icon:"/imgs/appstore.svg", defaultFileName:"AppStore",addOnAppstore:true, onTerminal:true},
+  {comp:"testwindow", name:'Test Window', defaultFileName:"Test Window", onTerminal:true},
+  {comp:"viewer",name:"Viewer", icon:"/imgs/viewer.svg", addOnAppstore:true, defaultFileName:"Viewer", onTerminal:true},
+  {comp:"browser",name:"Browser",},
+  {comp:"notepad", name:"Notepad",icon:"/imgs/notepad.svg", addOnAppstore:true, defaultFileName:"Notepad", onTerminal:true},
+  {comp:"terminal", name:"Terminal",icon:"/imgs/terminal.svg", addOnAppstore:true, defaultFileName:"Terminal", onTerminal:true},
+  {comp:"logger",name:"Logger", icon:"/imgs/logger.svg", runOnce:true, addOnAppstore:true, defaultFileName:"Logger", onTerminal:true},
+  {comp:"finder",name:"Finder", icon:"/imgs/dir.svg", addOnAppstore:true, defaultFileName:"Finder", onTerminal:true},
+  {comp:"atelier",name:"Atelier", icon:"/imgs/atelier.svg", addOnAppstore:true, defaultFileName:"Atelier", onTerminal:true},
+  {comp:"postman", name:"Postman",icon:"/imgs/postman.svg", runOnce:true, addOnAppstore:true, defaultFileName:"Postman", onTerminal:true},
+  {comp:"about",name:"About", icon:"/imgs/jamos.png", addOnAppstore:true, defaultFileName:"About", onTerminal:true},
+  {comp:"notif",name:"Notifications", icon:"/imgs/notif.png", addOnAppstore:true, defaultFileName:"Notifications", runOnce:true, onTerminal:true},
+  {comp:"settings", name:"Settings",icon:"/imgs/settings.svg", runOnce:true, addOnAppstore:true, defaultFileName:"Settings", onTerminal:true},
+  {comp:"styler", name:"Styler",icon:"/imgs/styler.svg", runOnce:true, addOnAppstore:true, defaultFileName:"Styler", onTerminal:true},
+  {comp:"systeminfo",name:"SystemInfo", icon:"/imgs/systeminfo.svg", runOnce:true, addOnAppstore:true, defaultFileName:"System Monitor", onTerminal:true},
+  {comp:'simpleabout',name:"About", icon:"/imgs/circlequestion.svg"},
 
   //network usage
-  {comp:'comments',name:"Leave comments!", icon:"/imgs/comments.svg", runOnce:true, addOnAppstore:true, defaultFileName:"Comments"},
-  {comp:'jamhub',name:"JamHub", icon:"/imgs/jamos.png", runOnce:true, addOnAppstore:true, defaultFileName:"JamHub"},
-  {comp:'worldeditor',name:"WorldEditor", icon:"/imgs/worldeditor.svg", runOnce:true, addOnAppstore:true, defaultFileName:"World Editor"},
-  {comp:'features',name:"Features", icon:"/imgs/features.svg", runOnce:true, addOnAppstore:true, defaultFileName:"Features"},
+  {comp:'comments',name:"Leave comments!", icon:"/imgs/comments.svg", runOnce:true, addOnAppstore:true, defaultFileName:"Comments", onTerminal:true},
+  {comp:'jamhub',name:"JamHub", icon:"/imgs/jamos.png", runOnce:true, addOnAppstore:true, defaultFileName:"JamHub", onTerminal:true},
+  {comp:'worldeditor',name:"WorldEditor", icon:"/imgs/worldeditor.svg", runOnce:true, addOnAppstore:true, defaultFileName:"World Editor", onTerminal:true},
+  {comp:'features',name:"Features", icon:"/imgs/features.svg", runOnce:true, addOnAppstore:true, defaultFileName:"Features", onTerminal:true},
 
 
 ]
 export const AddOnAppstores = _ProcessCommands.filter(cmd=>cmd.addOnAppstore);
 export const ProcessCommands = _ProcessCommands.filter(cmd=>((cmd.type === 'window') || (cmd.type === undefined))).map(cmd=>cmd.comp);
+export const AddOnTerminals = _ProcessCommands.filter(cmd=>cmd.onTerminal).map(cmd=>cmd.comp);
 
 export const SystemCommands = _ProcessCommands.filter(cmd=>cmd.type === 'system').map(cmd=>cmd.comp);
 
