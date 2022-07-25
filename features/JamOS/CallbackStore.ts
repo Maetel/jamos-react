@@ -80,18 +80,9 @@ export default class CallbackStore {
             return ()=>{JamOS.closeDock()}
           }
         case 'save':
-          if(param==='local'){
-            return ()=>{JamOS.saveStringified();}
-          } else {
-            return ()=>{JamOS.saveWorld()};
-          }
-          break;
+          return ()=>{JamOS.saveWorld()};
         case 'load':
-          if(param==='local'){
-            return ()=>{JamOS.loadStringified()};
-          } else {
-            return ()=>{JamOS.loadWorld()};
-          }
+          return ()=>{JamOS.loadWorld()};
         case 'format':
           return ()=>{
             JamOS.procmgr.openConfirm('system', ()=>{
