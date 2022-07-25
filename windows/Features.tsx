@@ -264,7 +264,7 @@ export default function Features(props) {
       const el = trackables[i] as HTMLElement;
       pairs.push({
         id: el.id,
-        top: el.getBoundingClientRect().top - 107,
+        top: el.getBoundingClientRect().top,
         el: el,
       });
     }

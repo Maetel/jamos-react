@@ -1,4 +1,3 @@
-import { FileDialProps } from "../../components/FileDialogue";
 import { ToolbarItem } from "../../scripts/ToolbarTypes";
 import { Node } from "../file/FileTypes";
 
@@ -129,7 +128,7 @@ export const _ProcessCommands:ProcessCommand[] = [
   {comp:"atelier",name:"Atelier", icon:"/imgs/atelier.svg", addOnAppstore:true, defaultFileName:"Atelier", onTerminal:true},
   {comp:"postman", name:"Postman",icon:"/imgs/postman.svg", runOnce:true, addOnAppstore:true, defaultFileName:"Postman", onTerminal:true},
   {comp:"about",name:"About", icon:"/imgs/jamos.png", addOnAppstore:true, defaultFileName:"About", onTerminal:true},
-  {comp:"notif",name:"Notifications", icon:"/imgs/notif.png", addOnAppstore:true, defaultFileName:"Notifications", runOnce:true, onTerminal:true},
+  {comp:"notif",name:"Notifications", icon:"/imgs/notif.svg", addOnAppstore:true, defaultFileName:"Notifications", runOnce:true, onTerminal:true},
   {comp:"settings", name:"Settings",icon:"/imgs/settings.svg", runOnce:true, addOnAppstore:true, defaultFileName:"Settings", onTerminal:true},
   {comp:"styler", name:"Styler",icon:"/imgs/styler.svg", runOnce:true, addOnAppstore:true, defaultFileName:"Styler", onTerminal:true},
   {comp:"systeminfo",name:"SystemInfo", icon:"/imgs/systeminfo.svg", runOnce:true, addOnAppstore:true, defaultFileName:"System Monitor", onTerminal:true},
