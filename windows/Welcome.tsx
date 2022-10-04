@@ -19,7 +19,7 @@ export default function Welcome(props) {
   proc.hideNavButtons = proc.hideNavButtons ?? true;
   proc.hideNav = proc.hideNav ?? true;
   // proc.closeOnEscape = proc.closeOnEscape ?? true;
-  proc.disableBackground = proc.disableBackground ?? true;
+  // proc.disableBackground = proc.disableBackground ?? true;
   const isInitial = JamOS.procmgr.getReadable(proc.id, "isInitial");
 
   const colors = JamOS.theme.colors;
@@ -45,6 +45,7 @@ export default function Welcome(props) {
           transform: "translate( -50%, -50%)",
         },
         disableDrag: true,
+        disableBackground: true,
       });
     }
   }, [isInitial]);

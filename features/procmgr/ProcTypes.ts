@@ -136,7 +136,7 @@ export const _ProcessCommands:ProcessCommand[] = [
 
   //network usage
   {comp:'comments',name:"Leave comments!", icon:"/imgs/comments.svg", runOnce:true, addOnAppstore:true, defaultFileName:"Comments", onTerminal:true},
-  {comp:'welcome',name:"Welcome",runOnce:true, addOnAppstore:true, defaultFileName:"Welcome", onTerminal:true},
+  {comp:'welcome',name:"Welcome",runOnce:true, addOnAppstore:true, defaultFileName:"Welcome"},
   {comp:'jamhub',name:"JamHub", icon:"/imgs/jamos.png", runOnce:true, addOnAppstore:true, defaultFileName:"JamHub", onTerminal:true},
   {comp:'worldeditor',name:"WorldEditor", icon:"/imgs/worldeditor.svg", runOnce:true, addOnAppstore:true, defaultFileName:"World Editor", onTerminal:true},
   {comp:'features',name:"Features", icon:"/imgs/features.svg", runOnce:true, addOnAppstore:true, defaultFileName:"Features", onTerminal:true},
