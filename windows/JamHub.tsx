@@ -244,6 +244,7 @@ export default function JamHub(props) {
         }
         killThisProc();
       });
+      JamOS.setNotif("Press ESC to continue as a guest", "system");
     } else {
       CallbackStore.unregister(`${proc.id}/onDestroy`);
     }

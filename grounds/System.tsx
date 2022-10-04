@@ -106,7 +106,7 @@ export default function System(props) {
     // JamOS.procmgr.add("jamhub", { isInitial: true });
     JamOS.procmgr.add("welcome", { isInitial: true });
     JamOS.openToolbar();
-    JamOS.setNotif("Press ESC to continue as a guest", "system");
+    // JamOS.setNotif("Press ESC to continue as a guest", "system");
     return;
   };
 
