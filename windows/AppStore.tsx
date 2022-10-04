@@ -107,7 +107,7 @@ export default function AppStore(props) {
               handleInput(e);
             }
           }}
-          placeholder="Search Apps"
+          placeholder="Search Apps..."
         />
         <p className={`${styles.paragraph} ${styles.desc}`}>
           Add/Remove apps on your desktop💻

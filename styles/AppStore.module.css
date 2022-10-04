@@ -48,6 +48,7 @@
   padding: 10px;
   box-sizing: border-box;
   outline: none;
+  font-style : italic;
 }
 .not-found {
   width: 100%;
