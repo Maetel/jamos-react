@@ -16,17 +16,20 @@ export interface Theme {
 
 ///Theme list
 export const defaultTheme: Theme = {
-  //https://www.schemecolor.com/funky-music.php
-  name: "Navy",
+  //https://digitalsynopsis.com/design/minimal-web-color-palettes-combination-hex-code/
+  name: "Cloudy",
   colors: {
-    "1": "#f8f8ff",
-    "3": "#031b28",
-    "4": "#0b2838",
-    "2": "#083248",
-    okay: "#4DBD60",
-    warn: "#FFD154",
-    error: "#EE475E",
-    boxShadow: "2px 2px 20px #dbdbdb",
+    "1": "#7896fc",
+    // "2": "#fcf4ec",
+    "2": "#f9f1e0",
+    "3": "#ffcfcb",
+    "4": "#ff9f97",
+    okay: "#82ac26",
+    warn: "#ffa22a",
+    error: "#ff662a",
+    // navback: "#dbdbdb",
+    // navcolor: "#595FB5",
+    boxShadow: "2px 2px 30px #ffcfcb",
   },
   nav: "default",
 };
@@ -67,7 +70,21 @@ export const officialBackgrounds:BgImg[] = [
 ]
 const officialThemes:Theme[] = [
     { ...defaultTheme },
-
+    {
+      //https://www.schemecolor.com/funky-music.php
+      name: "Navy",
+      colors: {
+        "1": "#f8f8ff",
+        "3": "#031b28",
+        "4": "#0b2838",
+        "2": "#083248",
+        okay: "#4DBD60",
+        warn: "#FFD154",
+        error: "#EE475E",
+        boxShadow: "2px 2px 20px #dbdbdb",
+      },
+      nav: "default",
+    },
     {
       //https://www.schemecolor.com/funky-music.php
       name: "NERDY",
@@ -237,24 +254,7 @@ const officialThemes:Theme[] = [
       },
       nav: "default",
     },
-    {
-      //https://digitalsynopsis.com/design/minimal-web-color-palettes-combination-hex-code/
-      name: "Cloudy",
-      colors: {
-        "1": "#7896fc",
-        // "2": "#fcf4ec",
-        "2": "#f9f1e0",
-        "3": "#ffcfcb",
-        "4": "#ff9f97",
-        okay: "#82ac26",
-        warn: "#ffa22a",
-        error: "#ff662a",
-        // navback: "#dbdbdb",
-        // navcolor: "#595FB5",
-        boxShadow: "2px 2px 30px #ffcfcb",
-      },
-      nav: "default",
-    },
+    
     {
       //https://digitalsynopsis.com/design/minimal-web-color-palettes-combination-hex-code/
       name: "Binary",

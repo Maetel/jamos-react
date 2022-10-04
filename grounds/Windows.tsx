@@ -29,6 +29,7 @@ import JamHub from "../windows/JamHub";
 import WorldEditor from "../windows/WorldEditor";
 import Features from "../windows/Features";
 import NotifWindow from "../windows/NotifWindow";
+import Welcome from "../windows/Welcome";
 
 const winCmdMap: { [key: string]: (props) => JSX.Element } = {
   testwindow: TestWindow,
@@ -56,6 +57,7 @@ const winCmdMap: { [key: string]: (props) => JSX.Element } = {
   worldeditor: WorldEditor,
   features: Features,
   notif: NotifWindow,
+  welcome: Welcome,
 };
 
 export default function Windows(props) {

@@ -13,7 +13,7 @@ export interface SettingsState {
 }
 
 const initialState :SettingsState = {
-  theme:"Navy",
+  theme:"Cloudy",
   muteAllOptions:!true,
   saveOnExit:true,
   askOnExit:false,

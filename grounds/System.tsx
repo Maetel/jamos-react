@@ -22,7 +22,8 @@ export default function System(props) {
   const front = procmgr.front();
 
   const onSampleInit = () => {
-    procmgr.add("jamhub", { isInitial: true });
+    // procmgr.add("jamhub", { isInitial: true });
+    procmgr.add("welcome", { isInitial: true });
     if (!1) {
       JamOS.forceOpenToolbar();
       JamOS.forceOpenDock();
@@ -102,7 +103,8 @@ export default function System(props) {
     // procmgr.add("terminal");
     JamOS.procmgr.killAll("system");
     JamOS.format();
-    JamOS.procmgr.add("jamhub", { isInitial: true });
+    // JamOS.procmgr.add("jamhub", { isInitial: true });
+    JamOS.procmgr.add("welcome", { isInitial: true });
     JamOS.openToolbar();
     JamOS.setNotif("Press ESC to continue as a guest", "system");
     return;
