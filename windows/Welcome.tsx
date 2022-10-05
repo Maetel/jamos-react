@@ -18,6 +18,7 @@ export default function Welcome(props) {
   proc.disableMaxBtn = proc.disableMaxBtn ?? true;
   proc.hideNavButtons = proc.hideNavButtons ?? true;
   proc.hideNav = proc.hideNav ?? true;
+  proc.hideOnToolbar = proc.hideOnToolbar ?? true;
   // proc.closeOnEscape = proc.closeOnEscape ?? true;
   // proc.disableBackground = proc.disableBackground ?? true;
   const isInitial = JamOS.procmgr.getReadable(proc.id, "isInitial");

@@ -30,6 +30,7 @@ import WorldEditor from "../windows/WorldEditor";
 import Features from "../windows/Features";
 import NotifWindow from "../windows/NotifWindow";
 import Welcome from "../windows/Welcome";
+import Tutorial from "../windows/Tutorial";
 
 const winCmdMap: { [key: string]: (props) => JSX.Element } = {
   testwindow: TestWindow,
@@ -58,6 +59,7 @@ const winCmdMap: { [key: string]: (props) => JSX.Element } = {
   features: Features,
   notif: NotifWindow,
   welcome: Welcome,
+  tutorial: Tutorial,
 };
 
 export default function Windows(props) {

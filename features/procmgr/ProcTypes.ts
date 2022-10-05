@@ -131,7 +131,9 @@ export const _ProcessCommands:ProcessCommand[] = [
   {comp:"notif",name:"Notifications", icon:"/imgs/notif.svg", addOnAppstore:true, defaultFileName:"Notifications", runOnce:true, onTerminal:true},
   {comp:"settings", name:"Settings",icon:"/imgs/settings.svg", runOnce:true, addOnAppstore:true, defaultFileName:"Settings", onTerminal:true},
   {comp:"styler", name:"Styler",icon:"/imgs/styler.svg", runOnce:true, addOnAppstore:true, defaultFileName:"Styler", onTerminal:true},
-  {comp:"systeminfo",name:"SystemInfo", icon:"/imgs/systeminfo.svg", runOnce:true, addOnAppstore:true, defaultFileName:"System Monitor", onTerminal:true},
+  {comp:"tutorial", name:"Tutorial",icon:"/imgs/tutorial.svg", runOnce:true, addOnAppstore:true, defaultFileName:"Tutorial", onTerminal:true},
+  {comp:"systeminfo",name:"SystemInfo", icon:"/imgs/systeminfo.svg", runOnce:true, addOnAppstore:true, 
+  defaultFileName:"System Monitor", onTerminal:true},
   {comp:'simpleabout',name:"About", icon:"/imgs/circlequestion.svg"},
 
   //network usage
