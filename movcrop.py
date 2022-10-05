@@ -6,8 +6,8 @@ from functools import reduce
 
 #ffmpeg -i copied.mov -vcodec libwebp -filter:v fps=fps=20 -lossless 0  -compression_level 3 -q:v 70 -loop 1 -preset picture -an -vsync 0 -s 800:600 output_lossy.webp
 
-destDir = os.path.join(os.path.expanduser("~"), "Desktop")+'/features/cropped'
-toSave = destDir+'/converted'
+destDir = os.path.join(os.path.expanduser("~"), "Desktop")+'/features'
+toSave = destDir+'/cropped'
 def ver1():
   onlyfiles = [f for f in listdir(destDir) if isfile(join(destDir, f))]
 
@@ -17,8 +17,7 @@ def ver1():
   ffmpeg.run(stream)
 
 def ver2():
-  resolution = '735:420'
-  outputExtension = '.webm'
+  outputExtension = '.mov'
   candidates = list(filter(lambda fname: fname.endswith('.mov') , os.listdir(destDir))) 
   _toSave = list(filter(lambda fname: fname.endswith(outputExtension) , os.listdir(toSave))) 
   replacer = lambda ext: (lambda x:x.replace(ext, ''))
@@ -39,10 +38,10 @@ def ver2():
   convertCount = 0;
   for i, filename in enumerate(todos):
     fromFile = destDir+'/'+filename;
-    destFile = '"{0}/{1}{2}"'.format(toSave,filename,outputExtension).replace('.mov', '');
+    destFile = '{0}/{1}{2}'.format(toSave,filename,outputExtension).replace('.mov', '');
     if (filename.endswith(".mov")): #or .avi, .mpeg, whatever.
       convertCount += 1
-      query = 'ffmpeg -i "{0}" -filter:v fps=fps=20 -lossless 0  -compression_level 3 -q:v 70 -loop 0 -preset picture -an -s {1} {2}'.format(fromFile, resolution, destFile);
+      query = 'ffmpeg -i {0} -filter:v "crop=2940:1680:0:232" {1}.mov'.format(fromFile,destFile)
       print('query:',query);
       os.system(query)
     else:
