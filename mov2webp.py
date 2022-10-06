@@ -17,7 +17,10 @@ def ver1():
   ffmpeg.run(stream)
 
 def ver2():
-  resolution = '735:420'
+  width, height, divider = 2940, 1680, 1
+  resolution = '{0}:{1}'.format(int(width/divider), int(height/divider));
+  # resolution = '735:420'
+  # resolution = '735:420'
   outputExtension = '.webm'
   candidates = list(filter(lambda fname: fname.endswith('.mov') , os.listdir(destDir))) 
   _toSave = list(filter(lambda fname: fname.endswith(outputExtension) , os.listdir(toSave))) 
