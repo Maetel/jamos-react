@@ -37,6 +37,12 @@ const systemMenu: ToolbarItem[] = [
   {
     caller: "system",
     menu: "osicon",
+    item: "Save world",
+    callback: "system/Toolbar/save",
+  },
+  {
+    caller: "system",
+    menu: "osicon",
     item: "Format",
     callback: "system/Toolbar/format",
     separator: true,
