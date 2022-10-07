@@ -25,6 +25,24 @@ export default function Tutorial(props) {
   const colors = JamOS.theme.colors;
   const videoIndex = JamOS.procmgr.getReadable(proc.id, "videoIndex") ?? 0;
 
+  const handleKeydown = (e) => {
+    //https://codewithhugo.com/detect-ctrl-click-js-react-vue/
+    const isFront = JamOS.procmgr.isFrontValue(proc.id);
+    if (!isFront) {
+      return;
+    }
+    //combination
+    switch (e.key) {
+      case "ArrowRight":
+        toNext();
+        break;
+      case "ArrowLeft":
+        toPrev();
+      default:
+        break;
+    }
+  };
+
   useEffect(() => {
     JamOS.procmgr.set(proc.id, { videoIndex: 0 });
     JamOS.procmgr.set(proc.id, {
@@ -35,6 +53,11 @@ export default function Tutorial(props) {
         left: "5%",
       },
     });
+
+    document.addEventListener("keydown", handleKeydown);
+    return () => {
+      document.removeEventListener("keydown", handleKeydown);
+    };
   }, []);
 
   const toNext = () => {
