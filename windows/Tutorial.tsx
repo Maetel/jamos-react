@@ -96,7 +96,10 @@ export default function Tutorial(props) {
           <button
             className={styles.arrow}
             onClick={toPrev}
-            style={{ color: colors["1"] }}
+            style={{
+              color: colors["1"],
+              boxShadow: colors.boxShadow,
+            }}
           >
             &#10918;
           </button>
@@ -105,7 +108,10 @@ export default function Tutorial(props) {
           </span>
           <button
             className={styles.arrow}
-            style={{ color: colors["1"] }}
+            style={{
+              color: colors["1"],
+              boxShadow: colors.boxShadow,
+            }}
             onClick={toNext}
           >
             &#10919;
