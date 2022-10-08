@@ -531,11 +531,16 @@ export default class JamOS {
       const osData = store.getState().os;
       const retval = {};
       const skips = ['jamUser', 'jamWorld'];
+      
+      console.log("osData type : ", typeof(osData));
+      console.log("osData : ", osData);
+
       for ( let key in osData){
         if(!skips.includes(key)){
           retval[key] = osData[key];
         }
       }
+      // console.log("os data:",retval);
       data['os'] = JSON.stringify(retval);
     }
     const payload = {
@@ -565,6 +570,17 @@ export default class JamOS {
   public static isLoading(){
     return JamOS.getReadable('isLoading');
   }
+
+  public static async loadOSFromString(data:string) {
+    try {
+      const parsed = await JSON.parse(data);
+      store.dispatch(loadOsFromString(parsed));
+      
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
   public static loadWorld(wid?:string){
     wid = wid ?? this.worldValue().name;
     if(wid.length===0){
@@ -579,7 +595,7 @@ export default class JamOS {
         file:JamOS.filemgr.loadFromString,
         proc:JamOS.procmgr.loadFromString,
         setting:JamOS.setmgr.loadFromString,
-        os:(data)=>{store.dispatch(loadOsFromString(data));}
+        os:JamOS.loadOSFromString,
       }
       console.log("content[key]:",content['os']);
       for(let key in funcMap){
@@ -598,7 +614,7 @@ export default class JamOS {
       return;
     }
     JamOS.setLoading(false);
-    JamOS.setNotif(`Faild to load ${wid}`, 'error');
+    JamOS.setNotif(`Failed to load ${wid}`, 'error');
   });
   }
 
