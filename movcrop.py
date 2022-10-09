@@ -41,7 +41,7 @@ def ver2():
     destFile = '{0}/{1}{2}'.format(toSave,filename,outputExtension).replace('.mov', '');
     if (filename.endswith(".mov")): #or .avi, .mpeg, whatever.
       convertCount += 1
-      query = 'ffmpeg -i {0} -filter:v "crop=2940:1680:0:232" {1}.mov'.format(fromFile,destFile)
+      query = 'ffmpeg -i {0} -filter:v "crop=2940:1680:0:232"  {1}.mov'.format(fromFile,destFile)
       print('query:',query);
       os.system(query)
     else:
