@@ -6,7 +6,7 @@ from functools import reduce
 
 #ffmpeg -i copied.mov -vcodec libwebp -filter:v fps=fps=20 -lossless 0  -compression_level 3 -q:v 70 -loop 1 -preset picture -an -vsync 0 -s 800:600 output_lossy.webp
 
-destDir = os.path.join(os.path.expanduser("~"), "Desktop")+'/features/cropped'
+destDir = os.path.join(os.path.expanduser("~"), "Desktop")+'/features/cropped/trimmed'
 toSave = destDir+'/converted'
 def ver1():
   onlyfiles = [f for f in listdir(destDir) if isfile(join(destDir, f))]
