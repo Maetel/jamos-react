@@ -204,7 +204,7 @@ export default class JamOS {
 
   public static get server() {
     const local = "http://localhost:3000/";
-    const remote = "3.36.186.87"
+    const remote = "http://3.36.186.87/"
     const server =
       process.env.NODE_ENV === "development"
         ? local
