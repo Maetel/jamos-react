@@ -31,6 +31,7 @@ import Features from "../windows/Features";
 import NotifWindow from "../windows/NotifWindow";
 import Welcome from "../windows/Welcome";
 import Tutorial from "../windows/Tutorial";
+import MarkdownViewer from "../windows/MarkdownViewer";
 
 const winCmdMap: { [key: string]: (props) => JSX.Element } = {
   testwindow: TestWindow,
@@ -60,6 +61,7 @@ const winCmdMap: { [key: string]: (props) => JSX.Element } = {
   notif: NotifWindow,
   welcome: Welcome,
   tutorial: Tutorial,
+  markdownviewer: MarkdownViewer,
 };
 
 export default function Windows(props) {

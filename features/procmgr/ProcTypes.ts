@@ -122,6 +122,7 @@ export const _ProcessCommands:ProcessCommand[] = [
   {comp:"viewer",name:"Viewer", icon:"/imgs/viewer.svg", addOnAppstore:true, defaultFileName:"Viewer", onTerminal:true},
   {comp:"browser",name:"Browser",},
   {comp:"notepad", name:"Notepad",icon:"/imgs/notepad.svg", addOnAppstore:true, defaultFileName:"Notepad", onTerminal:true},
+  {comp:"markdownviewer", name:"Markdown Viewer",icon:"/imgs/markdownviewer.svg", addOnAppstore:true, defaultFileName:"Markdown Viewer", onTerminal:true},
   {comp:"terminal", name:"Terminal",icon:"/imgs/terminal.svg", addOnAppstore:true, defaultFileName:"Terminal", onTerminal:true},
   {comp:"logger",name:"Logger", icon:"/imgs/logger.svg", runOnce:true, addOnAppstore:true, defaultFileName:"Logger", onTerminal:true},
   {comp:"finder",name:"Finder", icon:"/imgs/dir.svg", addOnAppstore:true, defaultFileName:"Finder", onTerminal:true},
