@@ -93,7 +93,7 @@ export default class Path {
     }
     return subPaths;
   }
-  get extension() {
+  get extension():string {
     const lastIndex = this.last.lastIndexOf(".");
     if (lastIndex === -1) {
       return "";

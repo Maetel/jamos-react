@@ -203,6 +203,17 @@ export default class ProcMgr{
     byDefault.type = byDefault.type ?? 'window';
     Object.assign(proc, byDefault)
     
+    {
+      // handle file extensions
+      // ex) filetype==='text' && extension==='md', exe with MdViewer
+      if(proc.node?.type==='text' && proc.node?.path){
+        const path = new Path(proc.node?.path);
+        if(path.extension==='md'){
+          proc.comp='markdownviewer';
+        }
+      }
+    }
+
     store.dispatch(addProc(proc));
 
     return this;
