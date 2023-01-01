@@ -26,6 +26,7 @@ another content.
 export default function MarkdownViewer(props) {
   const proc: Process = { ...props.proc };
   proc.name = proc.name ?? "Markdown viewer";
+  proc.resize = "both";
   const initialNodePath =
     proc.node && proc.node.type === "text" ? proc.node.path : undefined;
 
