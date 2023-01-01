@@ -147,6 +147,9 @@ const fileSlice = createSlice({
       }
       const f:WritableDraft<File> = findFile(state, _path);
       const {dataKey, dataValue} = action.payload;
+      if(!f.data){
+        f["data"]={};
+      }
       f.data[dataKey] = dataValue;
     },
     rm : (state,action:PayloadAction<string>)=>{

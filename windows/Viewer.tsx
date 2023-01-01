@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from "react";
+import Process from "../features/procmgr/ProcTypes";
+import styles from "../styles/Viewer.module.css";
 import ShimmerImage from "../components/ShimmerImage";
 import Window from "../components/Window";
 import JamOS from "../features/JamOS/JamOS";
-import Process from "../features/procmgr/ProcTypes";
 import Path from "../scripts/Path";
-import styles from "../styles/Viewer.module.css";
 import type { File, Dir } from "../features/file/FileTypes";
 import CallbackStore from "../features/JamOS/CallbackStore";
 
