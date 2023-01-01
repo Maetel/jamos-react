@@ -233,19 +233,15 @@ export default function MarkdownViewer(props) {
     let windowName = "Markdown Viewer";
     let desc = null;
     if (nodePathReadable?.length) {
-      // console.log("nodePathReadable.length: true");
-      navNext.current.style.setProperty("display", "flex");
-      navPrev.current.style.setProperty("display", "flex");
-
+      // navNext.current.style.setProperty("display", "flex");
+      // navPrev.current.style.setProperty("display", "flex");
       const { fileIdx, fileCount } = getMeta();
       windowName =
-        new Path(nodePathReadable).last + ` [${fileIdx + 1}/${fileCount}]`;
+        new Path(nodePathReadable) + ` [${fileIdx + 1}/${fileCount}]`;
       desc = new Path(nodePathReadable).last;
     } else {
-      // console.log("nodePathReadable.length: false");
-      navNext.current.style.setProperty("display", "none");
-      navPrev.current.style.setProperty("display", "none");
-      // JamOS.setNotif("No image found", "error");
+      // navNext.current.style.setProperty("display", "none");
+      // navPrev.current.style.setProperty("display", "none");
     }
     JamOS.procmgr.set(proc.id, {
       name: windowName,
@@ -281,32 +277,33 @@ export default function MarkdownViewer(props) {
             <ReactMarkdown>{mdContent}</ReactMarkdown>
           )}
         </div>
-        <div
-          className={`${styles.nav} ${styles.next}`}
-          style={navButtonColors}
-          ref={navNext}
-          onClick={() => {
-            toNext();
-          }}
-        >
-          {/* &gtcc; */}
-          &#10919;
-        </div>
-        <div
-          className={`${styles.nav} ${styles.prev}`}
-          style={navButtonColors}
-          ref={navPrev}
-          onClick={() => {
-            toPrev();
-          }}
-        >
-          {/* &ltcc; */}
-          &#10918;
-        </div>
-        <span className={`${styles.pathView}`} ref={pathViewElem}>
-          {nodePathReadable}&nbsp;{pageNumber}
-        </span>
       </div>
     </Window>
   );
+
+  // <div
+  //         className={`${styles.nav} ${styles.next}`}
+  //         style={navButtonColors}
+  //         ref={navNext}
+  //         onClick={() => {
+  //           toNext();
+  //         }}
+  //       >
+  //         {/* &gtcc; */}
+  //         &#10919;
+  //       </div>
+  //       <div
+  //         className={`${styles.nav} ${styles.prev}`}
+  //         style={navButtonColors}
+  //         ref={navPrev}
+  //         onClick={() => {
+  //           toPrev();
+  //         }}
+  //       >
+  //         {/* &ltcc; */}
+  //         &#10918;
+  //       </div>
+  //       <span className={`${styles.pathView}`} ref={pathViewElem}>
+  //         {nodePathReadable}&nbsp;{pageNumber}
+  //       </span>
 }
