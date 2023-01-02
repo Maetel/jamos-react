@@ -127,7 +127,7 @@ export default function Desktop(props) {
       <div
         className={styles.loadingWrapper}
         style={{
-          display: isLoading ? "block" : "none",
+          display: isLoading && 0 ? "block" : "none",
           boxShadow: colors.boxShadow,
         }}
       >
