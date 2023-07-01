@@ -277,7 +277,7 @@ export default class JamOS {
 
   public static get server() {
     const local = "http://localhost:3000/";
-    const remote = "https://jamos-v3.link/";
+    const remote = "__unknown__";
     const server = process.env.NODE_ENV === "development" ? local : remote;
 
     // return remote;
